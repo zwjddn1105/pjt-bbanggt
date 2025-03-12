@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import com.breadbolletguys.breadbread.common.domain.BaseTimeEntity;
 
@@ -18,6 +19,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseTimeEntity {
 
@@ -50,4 +52,8 @@ public class Order extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "product_state", nullable = false)
     private ProductState productState;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "bread_type", nullable = false)
+    private BreadType breadType;
 }
