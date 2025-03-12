@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import com.breadbolletguys.breadbread.common.domain.BaseTimeEntity;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -44,4 +45,21 @@ public class User extends BaseTimeEntity {
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
+
+    @Builder
+    public User(
+            String socialId,
+            UserRole userRole,
+            String name,
+            String email,
+            boolean noticeCheck,
+            boolean deleted
+    ) {
+        this.socialId = socialId;
+        this.userRole = userRole;
+        this.name = name;
+        this.email = email;
+        this.noticeCheck = noticeCheck;
+        this.deleted = deleted;
+    }
 }
