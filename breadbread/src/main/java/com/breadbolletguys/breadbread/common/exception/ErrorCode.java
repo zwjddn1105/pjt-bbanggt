@@ -28,7 +28,9 @@ public enum ErrorCode {
     VALIDATION_FAIL(4000, "유효하지 않은 형식입니다."),
     INTERNAL_SERVER_ERROR(4001, "Internal Server Error"),
 
-    MINUS_BALANCE_ERROR(5000, "잔고에 음수가 들어올 수 없습니다.");
+    MINUS_BALANCE_ERROR(5000, "잔고에 음수가 들어올 수 없습니다."),
+
+    SCORE_RANGE_ERROR(6000, "리뷰 점수의 범위는 1-5점입니다.");
 
     private final int code;
     private final String message;
