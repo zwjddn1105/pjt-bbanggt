@@ -26,9 +26,9 @@ public class Space {
     @Column(name = "occupied", nullable = false)
     private boolean occupied;
 
-    @Column(name = "row", nullable = false)
-    private int row;
+    @Column(name = "width", nullable = false)
+    private int width;
 
-    @Column(name = "col", nullable = false)
-    private int col;
+    @Column(name = "height", nullable = false)
+    private int height;
 }
