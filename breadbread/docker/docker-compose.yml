@@ -1,0 +1,79 @@
+services:
+  backend1:
+    image: mjinsu/backend:${BUILD_NUMBER}
+    ports:
+      - "${BACKEND1_PORT}:${BACKEND1_PORT}"
+    environment:
+      - SERVER_PORT=${BACKEND1_PORT}
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - breadbread-network
+
+  backend2:
+    image: mjinsu/backend:${BUILD_NUMBER}
+    ports:
+      - "${BACKEND2_PORT}:${BACKEND2_PORT}"
+    environment:
+      - SERVER_PORT=${BACKEND2_PORT}
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - breadbread-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:${BACKEND2_PORT}/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  backend3:
+    image: mjinsu/backend:${BUILD_NUMBER}
+    ports:
+      - "${BACKEND3_PORT}:${BACKEND3_PORT}"
+    environment:
+      - SERVER_PORT=${BACKEND3_PORT}
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - breadbread-network
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - breadbread-network
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - breadbread-network
+
+networks:
+  breadbread-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  redis-data:
