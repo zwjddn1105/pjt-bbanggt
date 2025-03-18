@@ -8,7 +8,6 @@ pipeline {
         OAUTH_FILE = credentials('oauth-file-credentials')
         ENVIRO_FILE = credentials('enviro-file-dc')
         JAVA_HOME = '/opt/java/openjdk'
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
     }
 
     stages {
@@ -23,17 +22,11 @@ pipeline {
                 dir('breadbread') {
                     withCredentials([
                     file(credentialsId: 'env-file-credentials-ENT', variable: 'ENV_FILE_ENT'),
-                    file(credentialsId: 'env-file-credentials', variable: 'ENV_FILE'),
-                    file(credentialsId: 'oauth-file-credentials', variable: 'OAUTH_FILE'),
-                    file(credentialsId: 'enviro-file-dc', variable: 'ENVIRO_FILE')
                     ]) {
                         sh '''
                           mkdir -p src/main/resources
                           chmod -R 700 src/main/resources
                           cp $ENV_FILE_ENT src/main/resources/application.yml
-                          cp $ENV_FILE src/main/resources/application-prod.yml
-                          cp $OAUTH_FILE src/main/resources/application-oauth.yml
-                          cp $ENVIRO_FILE src/main/resources/.env
                         '''
                     }
                 }
