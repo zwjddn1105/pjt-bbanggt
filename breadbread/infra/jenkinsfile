@@ -24,7 +24,8 @@ pipeline {
                     withCredentials([
                     file(credentialsId: 'env-file-credentials-ENT', variable: 'ENV_FILE_ENT'),
                     file(credentialsId: 'env-file-credentials', variable: 'ENV_FILE'),
-                    file(credentialsId: 'oauth-file-credentials', variable: 'OAUTH_FILE')
+                    file(credentialsId: 'oauth-file-credentials', variable: 'OAUTH_FILE'),
+                    file(credentialsId: 'enviro-file-dc', variable: 'ENVIRO_FILE')
                     ]) {
                         sh '''
                           mkdir -p src/main/resources
@@ -32,6 +33,7 @@ pipeline {
                           cp $ENV_FILE_ENT src/main/resources/application.yml
                           cp $ENV_FILE src/main/resources/application-prod.yml
                           cp $OAUTH_FILE src/main/resources/application-oauth.yml
+                          cp $ENVIRO_FILE src/main/resources/.env
                         '''
                     }
                 }
