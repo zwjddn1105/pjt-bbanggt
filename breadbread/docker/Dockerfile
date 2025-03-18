@@ -2,7 +2,7 @@ FROM openjdk:17-jdk
 
 WORKDIR /app
 
-COPY build/libs/breadBE-0.0.1-SNAPSHOT.jar backend.jar
+COPY build/libs/breadbread-0.0.1-SNAPSHOT.jar backend.jar
 
 ENV TZ=Asia/Seoul
 ENV SERVER_PORT=8080
