@@ -2,6 +2,7 @@ import type React from "react"
 import "./globals.css"
 import type { Metadata } from "next"
 import BottomNavTab from "@/components/bottom-navtab"
+import RegisterSW from "@/components/register-sw"
 
 export const metadata: Metadata = {
   title: "빵긋 - 빵 주문 앱",
@@ -14,10 +15,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko">
-      <body className="pb-16">
+    <html lang="ko" className="hide-scrollbar">
+      <body className="pb-16 hide-scrollbar overflow-auto">
         {children}
         <BottomNavTab/>
+        <RegisterSW/>
       </body>
     </html>
   )

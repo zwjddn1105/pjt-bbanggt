@@ -94,3 +94,15 @@
   }
 }
 
+ /* 스크롤바 숨기기 클래스 */
+ .hide-scrollbar {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE and Edge */
+  -ms-overflow-style: none;
+}
+
+/* Chrome, Safari, Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

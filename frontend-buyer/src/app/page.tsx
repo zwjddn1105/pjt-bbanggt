@@ -3,7 +3,7 @@ import Image from "next/image"
 
 export default function Page() {
   return (
-    <main className="pb-20">
+    <main className="pb-20 hide-scrollbar overflow-auto">
       {/* 상단 헤더 */}
       <header className="p-4 border-b">
         <div className="flex justify-between items-center">
@@ -11,11 +11,12 @@ export default function Page() {
             <Image src="/mascot.png" alt="빵긋 마스코트" width={40} height={40} className="mr-2" />
             <h1 className="text-2xl font-bold">빵긋 홈</h1>
           </div>
+          {/* 장바구니 api와 연동 해야 됨 */}
           <div className="relative">
             <ShoppingCart className="h-6 w-6" />
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              3
-            </span>
+              3     
+            </span>   
           </div>
         </div>
       </header>
