@@ -8,18 +8,23 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.Type;
 import org.locationtech.jts.geom.Point;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE vending_machine SET deleted = true WHERE vending_machine_id = ?")
+@SQLRestriction("deleted = false")
 public class VendingMachine {
 
     @Id
@@ -45,4 +50,30 @@ public class VendingMachine {
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
+
+    @Column(name = "height", nullable = false)
+    private int height;
+
+    @Column(name = "width", nullable = false)
+    private int width;
+
+    @Builder
+    public VendingMachine(
+            Long id,
+            Point point,
+            List<String> imageUrls,
+            String memo,
+            int height,
+            int width
+    ) {
+        this.id = id;
+        this.point = point;
+        this.imageUrls = imageUrls;
+        this.memo = memo;
+        this.height = height;
+        this.width = width;
+        this.totalCount = height * width;
+        this.availableCount = height * width;
+        this.deleted = false;
+    }
 }
