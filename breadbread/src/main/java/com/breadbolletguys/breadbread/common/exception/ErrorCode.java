@@ -12,6 +12,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(1002, "요청 ID에 해당하는 유저가 존재하지 않습니다."),
     FOLLOW_REQUEST_NOT_FOUND(1003, "요청 ID에 해당하는 팔로우 요청이 존재하지 않습니다."),
     FOLLOW_HISTORY_NOT_FOUND(1004, "요청의 기록을 찾을 수 없습니다."),
+    BAKERY_NOT_FOUND(1005, "요청 ID에 해당하는 빵집이 존재하지 않습니다."),
+    REVIEW_NOT_FOUND(1006, "요청 ID에 해당하는 리뷰가 존재하지 않습니다."),
     ALREADY_FOLLOWED(1008, "이미 팔로우 되어 요청 오류가 발생했습니다."),
     ALREADY_REQUESTED(1009, "이미 팔로우 요청 되어 오류가 발생했습니다."),
 
@@ -30,6 +32,7 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(4001, "Internal Server Error"),
 
     MINUS_BALANCE_ERROR(5000, "잔고에 음수가 들어올 수 없습니다."),
+    MINUS_REVIEW_ERROR(5001, "리뷰에 음수가 들어올 수 없습니다."),
 
     SCORE_RANGE_ERROR(6000, "리뷰 점수의 범위는 1-5점입니다."),
 
