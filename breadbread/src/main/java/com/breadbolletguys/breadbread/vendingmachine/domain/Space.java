@@ -1,4 +1,4 @@
-package com.breadbolletguys.breadbread.space.domain;
+package com.breadbolletguys.breadbread.vendingmachine.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -6,13 +6,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import org.hibernate.annotations.SQLRestriction;
+
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLRestriction("deleted = false")
 public class Space {
 
     @Id
@@ -31,4 +35,21 @@ public class Space {
 
     @Column(name = "height", nullable = false)
     private int height;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted;
+
+    @Builder
+    public Space(
+            Long vendingMachineId,
+            int width,
+            int height,
+            boolean deleted
+    ) {
+        this.vendingMachineId = vendingMachineId;
+        this.width = width;
+        this.height = height;
+        this.occupied = false;
+        this.deleted = deleted;
+    }
 }

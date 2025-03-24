@@ -19,6 +19,7 @@ public enum ErrorCode {
     UNABLE_TO_GET_ACCESS_TOKEN(2002, "소셜 로그인 공급자로부터 인증 토큰을 받아올 수 없습니다."),
     NOT_SOCIAL_USER(2003, "소셜 로그인 유저가 아닙니다."),
     NOT_NONE_SOCIAL_USER(2004, "일반 로그인 유저가 아닙니다."),
+    NOT_ADMIN_USER(2005, "관리자 권한이 없습니다."),
 
     UNAUTHORIZED_ACCESS(3000, "접근할 수 없는 리소스입니다."),
     INVALID_REFRESH_TOKEN(3001, "유효하지 않은 Refresh Token입니다."),
@@ -30,7 +31,12 @@ public enum ErrorCode {
 
     MINUS_BALANCE_ERROR(5000, "잔고에 음수가 들어올 수 없습니다."),
 
-    SCORE_RANGE_ERROR(6000, "리뷰 점수의 범위는 1-5점입니다.");
+    SCORE_RANGE_ERROR(6000, "리뷰 점수의 범위는 1-5점입니다."),
+
+    INVALID_GEO_COORDINATES(7000, "유효하지 않은 위경도 범위입니다."),
+
+    CANT_REMOVE_OCCUPIED_VENDING_MACHINE(8000, "사용중인 자판기는 삭제할 수 없습니다."),
+    NOT_FOUND_VENDING_MACHINE(8001, "해당 자판기를 찾을 수 없습니다.");
 
     private final int code;
     private final String message;
