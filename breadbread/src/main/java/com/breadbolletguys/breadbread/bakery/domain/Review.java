@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 @Table(
-    name = "review_id",
+    name = "review",
     indexes = {
         @Index(name = "idx_bakery_id_desc", columnList = "bakery_id, review_id desc")
     }
