@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import com.breadbolletguys.breadbread.common.domain.BaseTimeEntity;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -46,6 +47,9 @@ public class Order extends BaseTimeEntity {
     @Column(name = "price", nullable = false)
     private int price;
 
+    @Column(name = "count", nullable = false)
+    private int count;
+
     @Column(name = "expiration_date", nullable = false)
     private LocalDateTime expirationDate;
 
@@ -56,4 +60,29 @@ public class Order extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "bread_type", nullable = false)
     private BreadType breadType;
+
+    @Builder
+    private Order(
+            Long bakeryId,
+            Long sellerId,
+            Long spaceId,
+            Long buyerId,
+            String name,
+            int price,
+            int count,
+            LocalDateTime expirationDate,
+            ProductState productState,
+            BreadType breadType
+    ) {
+        this.bakeryId = bakeryId;
+        this.sellerId = sellerId;
+        this.spaceId = spaceId;
+        this.buyerId = buyerId;
+        this.name = name;
+        this.price = price;
+        this.count = count;
+        this.expirationDate = expirationDate;
+        this.productState = productState;
+        this.breadType = breadType;
+    }
 }
