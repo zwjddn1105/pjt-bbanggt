@@ -1,4 +1,5 @@
 # Default ignored files
+.env
 /shelf/
 /.idea
 # Editor-based HTTP Client requests
