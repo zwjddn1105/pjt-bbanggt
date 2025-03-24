@@ -1,4 +1,4 @@
-package com.breadbolletguys.breadbread.auth;
+package com.breadbolletguys.breadbread.auth.resolver;
 
 import java.util.Arrays;
 
@@ -13,6 +13,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import com.breadbolletguys.breadbread.auth.JwtUtil;
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
