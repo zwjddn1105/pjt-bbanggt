@@ -62,4 +62,8 @@ public class User extends BaseTimeEntity {
         this.noticeCheck = noticeCheck;
         this.deleted = deleted;
     }
+
+    public boolean isAdmin() {
+        return userRole == UserRole.ADMIN;
+    }
 }
