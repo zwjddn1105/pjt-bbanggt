@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.breadbolletguys.breadbread.auth.annotation.AdminUser;
+import com.breadbolletguys.breadbread.image.application.S3Service;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.vendingmachine.application.VendingMachineService;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.request.VendingMachineCreateJsonRequest;
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class VendingMachineController {
 
     private final VendingMachineService vendingMachineService;
+    private final S3Service s3Service;
 
     /**
      * 자판기 정보를 입력받고 저장한다.
@@ -39,8 +41,7 @@ public class VendingMachineController {
             @RequestPart VendingMachineCreateJsonRequest jsonRequest,
             @RequestPart List<MultipartFile> files
     ) {
-        // TODO: 파일을 S3에 업로드하고 url을 받아온다.
-        List<String> imageUrls = List.of("tmpImage1.jpg", "tmpImage2.png");
+        List<String> imageUrls = s3Service.uploadFiles(files);
         Long vendingMachineId = vendingMachineService.save(jsonRequest, imageUrls);
         return ResponseEntity.created(URI.create("/api/v1/vending-machines/" + vendingMachineId)).build();
     }
