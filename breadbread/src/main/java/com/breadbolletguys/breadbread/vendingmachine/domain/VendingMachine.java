@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.Type;
-import org.locationtech.jts.geom.Point;
 
 import com.vladmihalcea.hibernate.type.json.JsonType;
 
@@ -32,8 +31,11 @@ public class VendingMachine {
     @Column(name = "vending_machine_id")
     private Long id;
 
-    @Column(name = "point", columnDefinition = "POINT SRID 4326", nullable = false)
-    private Point point;
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
+
+    @Column(name = "longitude", nullable = false)
+    private Double longitude;
 
     @Type(JsonType.class)
     @Column(name = "image_urls", columnDefinition = "JSON")
@@ -60,14 +62,16 @@ public class VendingMachine {
     @Builder
     public VendingMachine(
             Long id,
-            Point point,
+            Double longitude,
+            Double latitude,
             List<String> imageUrls,
             String memo,
             int height,
             int width
     ) {
         this.id = id;
-        this.point = point;
+        this.longitude = longitude;
+        this.latitude = latitude;
         this.imageUrls = imageUrls;
         this.memo = memo;
         this.height = height;
