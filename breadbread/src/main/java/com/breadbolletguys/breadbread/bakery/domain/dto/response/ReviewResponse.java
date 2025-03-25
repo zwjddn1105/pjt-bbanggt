@@ -15,6 +15,6 @@ public class ReviewResponse {
     private Long id;
     private String name;
     private String content;
-    private Score score;
+    private Integer score;
     private List<String> imageUrls;
 }

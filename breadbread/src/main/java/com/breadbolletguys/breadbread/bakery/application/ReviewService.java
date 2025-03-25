@@ -2,6 +2,8 @@ package com.breadbolletguys.breadbread.bakery.application;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,10 +29,6 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final BakeryRepository bakeryRepository;
 
-    public List<ReviewResponse> findByBakeryId(Long bakeryId) {
-        return reviewRepository.findByBakeryId(bakeryId);
-    }
-
     public void save(User user, Long bakeryId, ReviewRequest reviewRequest) {
         Bakery bakery = bakeryRepository.findById(bakeryId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BAKERY_NOT_FOUND));
@@ -43,6 +41,10 @@ public class ReviewService {
                 .build();
         reviewRepository.save(review);
         bakeryRepository.increaseReview(bakeryId);
+    }
+
+    public Page<ReviewResponse> findReviewByBakeryIdWithPagenation(Long bakeryId, Pageable pageable) {
+        return reviewRepository.findReviewByBakeryIdWithPagenation(bakeryId, pageable);
     }
 
     public void delete(User user, Long bakeryId, Long reviewId) {
