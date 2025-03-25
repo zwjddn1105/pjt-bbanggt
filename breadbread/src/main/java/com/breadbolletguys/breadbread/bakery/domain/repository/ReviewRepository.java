@@ -3,6 +3,8 @@ package com.breadbolletguys.breadbread.bakery.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.bakery.domain.Review;
@@ -16,8 +18,8 @@ public class ReviewRepository {
     private final ReviewJpaRepository reviewJpaRepository;
     private final ReviewQueryRepository reviewQueryRepository;
 
-    public List<ReviewResponse> findByBakeryId(Long bakeryId) {
-        return reviewQueryRepository.findByBakeryId(bakeryId);
+    public Page<ReviewResponse> findReviewByBakeryIdWithPagenation(Long bakeryId, Pageable pageable) {
+        return reviewQueryRepository.findReviewByBakeryIdWithPagenation(bakeryId, pageable);
     }
 
     public Optional<Review> findById(Long reviewId) {

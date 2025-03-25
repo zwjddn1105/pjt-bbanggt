@@ -1,9 +1,10 @@
 package com.breadbolletguys.breadbread.bakery.domain.repository;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.breadbolletguys.breadbread.bakery.domain.dto.response.ReviewResponse;
 
 public interface ReviewQueryRepository {
-    List<ReviewResponse> findByBakeryId(Long bakeryId);
+    Page<ReviewResponse> findReviewByBakeryIdWithPagenation(Long bakeryId, Pageable pageable);
 }
