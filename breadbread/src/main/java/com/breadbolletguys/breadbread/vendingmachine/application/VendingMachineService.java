@@ -4,11 +4,7 @@ import static com.breadbolletguys.breadbread.common.exception.ErrorCode.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +23,6 @@ public class VendingMachineService {
 
     private final VendingMachineRepository vendingMachineRepository;
     private final SpaceRepository spaceRepository;
-    private final GeometryFactory geometryFactory = new GeometryFactory();
 
     @Transactional
     public Long save(
@@ -36,19 +31,13 @@ public class VendingMachineService {
     ) {
         validatePosition(request.latitude(), request.longitude());
 
-        //TODO: 모듈화
-        Point point = geometryFactory.createPoint(new Coordinate(
-                request.longitude(),
-                request.latitude())
-        );
-        point.setSRID(4326);
-
         VendingMachine vendingMachine = VendingMachine.builder()
                 .height(request.row())
                 .width(request.column())
                 .imageUrls(vendingMachineImageUrls)
                 .memo(request.memo())
-                .point(point)
+                .longitude(request.longitude())
+                .latitude(request.latitude())
                 .build();
 
         vendingMachineRepository.save(vendingMachine);
