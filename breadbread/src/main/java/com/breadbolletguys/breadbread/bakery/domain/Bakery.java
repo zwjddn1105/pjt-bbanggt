@@ -40,6 +40,12 @@ public class Bakery extends BaseTimeEntity {
     @Column(name = "homepage_url", length = 128, nullable = false)
     private String homepageUrl;
 
+    @Column(name = "address", length = 128, nullable = false)
+    private String address;
+
+    @Column(name = "phone", length = 16, nullable = false)
+    private String phone;
+
     @Column(name = "authentication_date", nullable = false)
     private LocalDateTime authenticationDate;
 
@@ -58,6 +64,8 @@ public class Bakery extends BaseTimeEntity {
         String name,
         String businessNumber,
         String homepageUrl,
+        String address,
+        String phone,
         LocalDateTime authenticationDate,
         Boolean authenticated,
         Integer reviewCount,
@@ -67,6 +75,8 @@ public class Bakery extends BaseTimeEntity {
         this.name = name;
         this.businessNumber = businessNumber;
         this.homepageUrl = homepageUrl;
+        this.address = address;
+        this.phone = phone;
         this.authenticationDate = authenticationDate;
         this.authenticated = authenticated;
         this.reviewCount = reviewCount;
