@@ -9,37 +9,42 @@ export default function OrderTabs() {
 
   return (
     <>
-      {/* 탭 네비게이션 */}
-      <div className="flex border-b">
-        <button
-          className={`flex-1 py-3 text-center ${
-            activeTab === "My 빵긋" ? "border-b-2 border-primary-custom text-primary-custom" : "text-gray-500"
-          }`}
-          onClick={() => setActiveTab("My 빵긋")}
-        >
-          My 빵긋
-        </button>
-        <button
-          className={`flex-1 py-3 text-center ${
-            activeTab === "MY 빵집" ? "border-b-2 border-primary-custom text-primary-custom" : "text-gray-500"
-          }`}
-          onClick={() => setActiveTab("MY 빵집")}
-        >
-          MY 빵집
-        </button>
+      {/* 탭 네비게이션 - 개별 탭에 그림자 적용 */}
+      <div className="flex items-center p-4 gap-1">
+        <div className="flex flex-1">
+          <button
+            className={`flex-1 py-3 text-center text-white rounded-l-lg ${
+              activeTab === "My 빵긋"
+                ? "bg-primary-custom shadow-[0_4px_8px_rgba(0,0,0,0.2)] relative z-10"
+                : "bg-gray-300"
+            }`}
+            onClick={() => setActiveTab("My 빵긋")}
+          >
+            My 빵긋
+          </button>
+          <button
+            className={`flex-1 py-3 text-center text-white rounded-r-lg ${
+              activeTab === "MY 빵집"
+                ? "bg-primary-custom shadow-[0_4px_8px_rgba(0,0,0,0.2)] relative z-10"
+                : "bg-gray-300"
+            }`}
+            onClick={() => setActiveTab("MY 빵집")}
+          >
+            MY 빵집
+          </button>
+        </div>
         {/* 검색 버튼 */}
-        <button className="p-3">
+        <button className="p-2 text-primary-custom">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
+            width="28"
+            height="28"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-primary-custom"
           >
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
@@ -52,7 +57,7 @@ export default function OrderTabs() {
         {activeTab === "My 빵긋" ? (
           <>
             {/* 주문 가능 시간 안내 */}
-            <div className="p-4 text-sm">
+            <div className="px-4 pb-4 text-sm">
               <p>20:00~9:00 까지 주문 가능합니다</p>
               <p>9:30까지 빵긋에서 찾아가세요</p>
             </div>
