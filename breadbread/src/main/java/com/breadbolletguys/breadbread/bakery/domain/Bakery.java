@@ -82,4 +82,12 @@ public class Bakery extends BaseTimeEntity {
         this.reviewCount = reviewCount;
         this.averageScore = averageScore;
     }
+
+    public void update(String name, String businessNumber, String homepageUrl, String address, String phone) {
+        this.name = name;
+        this.businessNumber = businessNumber;
+        this.homepageUrl = homepageUrl;
+        this.address = address;
+        this.phone = phone;
+    }
 }
