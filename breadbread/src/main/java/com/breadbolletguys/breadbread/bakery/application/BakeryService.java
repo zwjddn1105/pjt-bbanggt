@@ -9,6 +9,9 @@ import com.breadbolletguys.breadbread.bakery.domain.Bakery;
 import com.breadbolletguys.breadbread.bakery.domain.dto.request.BakeryRequest;
 import com.breadbolletguys.breadbread.bakery.domain.dto.response.BakeryResponse;
 import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
+import com.breadbolletguys.breadbread.common.exception.BadRequestException;
+import com.breadbolletguys.breadbread.common.exception.ErrorCode;
+import com.breadbolletguys.breadbread.common.exception.NotFoundException;
 import com.breadbolletguys.breadbread.user.domain.User;
 
 import lombok.RequiredArgsConstructor;
@@ -39,5 +42,28 @@ public class BakeryService {
 
     public BakeryResponse findByBakeryId(Long bakeryId) {
         return bakeryRepository.findByBakeryId(bakeryId);
+    }
+
+    public BakeryResponse updateBakery(User user, Long bakeryId, BakeryRequest bakeryRequest) {
+        Bakery bakery = bakeryRepository.findById(bakeryId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BAKERY_NOT_FOUND));
+
+        if (!user.getId().equals(bakery.getUserId())) {
+            throw new BadRequestException(ErrorCode.UNAUTHORIZED_ACCESS);
+        }
+        bakery.update(
+                bakeryRequest.getName(),
+                bakeryRequest.getBusinessNumber(),
+                bakeryRequest.getHomepageUrl(),
+                bakeryRequest.getAddress(),
+                bakeryRequest.getPhone()
+        );
+        return new BakeryResponse(
+                bakery.getId(),
+                bakery.getName(),
+                bakery.getHomepageUrl(),
+                bakery.getAddress(),
+                bakery.getPhone()
+        );
     }
 }
