@@ -26,6 +26,8 @@ public class BakeryService {
                 .name(bakeryRequest.getName())
                 .businessNumber(bakeryRequest.getBusinessNumber())
                 .homepageUrl(bakeryRequest.getHomepageUrl())
+                .address(bakeryRequest.getAddress())
+                .phone(bakeryRequest.getPhone())
                 .authenticationDate(LocalDateTime.now())
                 .authenticated(true)
                 .reviewCount(0)
