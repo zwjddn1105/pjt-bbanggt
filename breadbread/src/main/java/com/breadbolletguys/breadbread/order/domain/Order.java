@@ -17,6 +17,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -39,6 +40,7 @@ public class Order extends BaseTimeEntity {
     private Long spaceId;
 
     @Column(name = "buyer_id")
+    @Setter
     private Long buyerId;
 
     @Column(name = "name", length = 128, nullable = false)
@@ -55,6 +57,7 @@ public class Order extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "product_state", nullable = false)
+    @Setter
     private ProductState productState;
 
     @Enumerated(EnumType.STRING)

@@ -14,8 +14,11 @@ public enum ErrorCode {
     FOLLOW_HISTORY_NOT_FOUND(1004, "요청의 기록을 찾을 수 없습니다."),
     BAKERY_NOT_FOUND(1005, "요청 ID에 해당하는 빵집이 존재하지 않습니다."),
     REVIEW_NOT_FOUND(1006, "요청 ID에 해당하는 리뷰가 존재하지 않습니다."),
+    ORDER_NOT_FOUND(1007, "요청 ID에 해당하는 빵이 존재하지 않습니다."),
     ALREADY_FOLLOWED(1008, "이미 팔로우 되어 요청 오류가 발생했습니다."),
     ALREADY_REQUESTED(1009, "이미 팔로우 요청 되어 오류가 발생했습니다."),
+    UNABLE_TO_RESERVE_PRODUCT(10010, "해당 상태의 빵은 선점할 수 없습니다."),
+    UNABLE_TO_PURCHASE_PRODUCT(10011, "해당 상태의 빵은 결제할 수 없습니다."),
 
     UNABLE_TO_GET_USER_INFO(2001, "소셜 로그인 공급자로부터 유저 정보를 받아올 수 없습니다."),
     UNABLE_TO_GET_ACCESS_TOKEN(2002, "소셜 로그인 공급자로부터 인증 토큰을 받아올 수 없습니다."),
@@ -27,6 +30,7 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN(3001, "유효하지 않은 Refresh Token입니다."),
     FAILED_TO_VALIDATE_TOKEN(3002, "토큰 검증에 실패했습니다."),
     INVALID_ACCESS_TOKEN(3003, "유효하지 않은 Access Token입니다."),
+    FORBIDDEN_ORDER_ACCESS(3004, "해당 주문에 대한 접근 권한이 없습니다."),
 
     VALIDATION_FAIL(4000, "유효하지 않은 형식입니다."),
     INTERNAL_SERVER_ERROR(4001, "Internal Server Error"),

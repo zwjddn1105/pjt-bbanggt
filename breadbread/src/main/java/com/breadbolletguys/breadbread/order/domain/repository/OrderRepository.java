@@ -1,6 +1,8 @@
 package com.breadbolletguys.breadbread.order.domain.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -27,4 +29,11 @@ public class OrderRepository {
         orderJpaRepository.save(order);
     }
 
+    public Optional<Order> findById(Long orderId) {
+        return orderJpaRepository.findById(orderId);
+    }
+
+    public List<Order> findAllByExpirationDateAfter() {
+        return orderQueryRepository.findAllByExpirationDateAfter();
+    }
 }
