@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.bakery.domain.Bakery;
+import com.breadbolletguys.breadbread.bakery.domain.dto.response.BakeryResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,10 @@ public class BakeryRepository {
 
     public void save(Bakery bakery) {
         bakeryJpaRepository.save(bakery);
+    }
+
+    public BakeryResponse findByBakeryId(Long bakeryId) {
+        return bakeryQueryRepository.findByBakeryId(bakeryId);
     }
 
     public void increaseReview(Long bakeryid) {

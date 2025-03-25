@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.breadbolletguys.breadbread.bakery.domain.Bakery;
 import com.breadbolletguys.breadbread.bakery.domain.dto.request.BakeryRequest;
+import com.breadbolletguys.breadbread.bakery.domain.dto.response.BakeryResponse;
 import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
 import com.breadbolletguys.breadbread.user.domain.User;
 
@@ -34,5 +35,9 @@ public class BakeryService {
                 .averageScore(0.0)
                 .build();
         bakeryRepository.save(bakery);
+    }
+
+    public BakeryResponse findByBakeryId(Long bakeryId) {
+        return bakeryRepository.findByBakeryId(bakeryId);
     }
 }
