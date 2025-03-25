@@ -49,4 +49,22 @@ public class OrderController {
     ) {
         return ResponseEntity.ok(orderService.getOrdersByIdAndVendingMachineId(id, vendingMachineId));
     }
+
+    @PostMapping("/reserve/{orderId}")
+    public ResponseEntity<Void> reserveOrder(
+            @AuthUser User user,
+            @PathVariable("orderId") Long orderId
+    ) {
+        orderService.selectOrder(user, orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/pay/{orderId}")
+    public ResponseEntity<Void> payForOrder(
+            @AuthUser User user,
+            @PathVariable("orderId") Long orderId
+    ) {
+        orderService.payForOrder(user, orderId);
+        return ResponseEntity.ok().build();
+    }
 }
