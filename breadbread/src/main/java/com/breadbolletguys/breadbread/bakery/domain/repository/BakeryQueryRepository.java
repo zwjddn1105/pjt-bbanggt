@@ -8,4 +8,6 @@ public interface BakeryQueryRepository {
     void increaseReview(Long bakeryId);
 
     BakeryResponse findByBakeryId(Long bakeryId);
+
+    void updateAverageScore(Long bakeryId, Integer score);
 }

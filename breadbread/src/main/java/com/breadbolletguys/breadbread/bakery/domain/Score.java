@@ -7,8 +7,10 @@ import jakarta.persistence.Embeddable;
 
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Embeddable
 @NoArgsConstructor(access = PROTECTED)
 public class Score {
