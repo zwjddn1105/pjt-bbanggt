@@ -40,6 +40,7 @@ public class ReviewService {
                 .imageUrls(reviewRequest.getImageUrls())
                 .build();
         reviewRepository.save(review);
+        bakeryRepository.updateAverageScore(bakeryId, reviewRequest.getScore().getScore());
         bakeryRepository.increaseReview(bakeryId);
     }
 

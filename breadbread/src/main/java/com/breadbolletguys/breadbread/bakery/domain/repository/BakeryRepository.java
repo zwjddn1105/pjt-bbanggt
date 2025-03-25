@@ -35,4 +35,8 @@ public class BakeryRepository {
     public void decreaseReview(Long bakeryId) {
         bakeryQueryRepository.decreaseReview(bakeryId);
     }
+
+    public void updateAverageScore(Long bakeryId, Integer score) {
+        bakeryQueryRepository.updateAverageScore(bakeryId, score);
+    }
 }

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.bakery.domain.QBakery;
 import com.breadbolletguys.breadbread.bakery.domain.dto.response.BakeryResponse;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -47,5 +48,32 @@ public class BakeryQueryRepositoryImpl implements BakeryQueryRepository {
                 .from(qBakery)
                 .where(qBakery.id.eq(bakeryId))
                 .fetchOne();
+    }
+
+    @Override
+    public void updateAverageScore(Long bakeryId, Integer score) {
+        QBakery qBakery = QBakery.bakery;
+
+        Tuple result = jpaQueryFactory
+                .select(qBakery.reviewCount, qBakery.averageScore)
+                .from(qBakery)
+                .where(qBakery.id.eq(bakeryId))
+                .fetchOne();
+
+        if (result == null) {
+            return;
+        }
+
+        Integer reviewCount = result.get(qBakery.reviewCount);
+        Double averageScore = result.get(qBakery.averageScore);
+
+        int newReviewCount = reviewCount + 1;
+        double newAverage = ((averageScore * reviewCount) + score) / newReviewCount;
+
+        jpaQueryFactory
+                .update(qBakery)
+                .set(qBakery.averageScore, newAverage)
+                .where(qBakery.id.eq(bakeryId))
+                .execute();
     }
 }

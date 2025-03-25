@@ -33,4 +33,5 @@ public class ReviewRepository {
     public void deleteById(Long reviewId) {
         reviewJpaRepository.deleteById(reviewId);
     }
+
 }
