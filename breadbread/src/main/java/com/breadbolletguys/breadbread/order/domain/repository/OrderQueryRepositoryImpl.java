@@ -1,6 +1,5 @@
 package com.breadbolletguys.breadbread.order.domain.repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import com.breadbolletguys.breadbread.order.domain.ProductState;
 import com.breadbolletguys.breadbread.order.domain.QOrder;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.vendingmachine.domain.QSpace;
+import com.breadbolletguys.breadbread.vendingmachine.domain.QVendingMachine;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -28,15 +28,16 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         QSpace qSpace = QSpace.space;
         QOrder qOrder = QOrder.order;
         QBakery qBakery = QBakery.bakery;
+        QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
         return queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
                         qOrder.id,
+                        qVendingMachine.memo,
                         qBakery.name,
                         qOrder.name,
                         qOrder.price,
-                        qOrder.count,
-                        qOrder.expirationDate
+                        qOrder.count
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
@@ -47,29 +48,54 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     }
 
     @Override
-    public OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId) {
+    public List<OrderResponse> findByBuyerId(Long userId) {
         QSpace qSpace = QSpace.space;
         QOrder qOrder = QOrder.order;
         QBakery qBakery = QBakery.bakery;
-
+        QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
         return queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
                         qOrder.id,
+                        qVendingMachine.memo,
                         qBakery.name,
                         qOrder.name,
                         qOrder.price,
-                        qOrder.count,
-                        qOrder.expirationDate
+                        qOrder.count
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
                 .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
+                .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
+                .where(qOrder.bakeryId.eq(userId)
+                        .and(qOrder.productState.eq(ProductState.RESERVED)))
+                .fetch();
+    }
+
+    @Override
+    public OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId) {
+        QSpace qSpace = QSpace.space;
+        QOrder qOrder = QOrder.order;
+        QBakery qBakery = QBakery.bakery;
+        QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
+        return queryFactory
+                .select(Projections.constructor(
+                        OrderResponse.class,
+                        qOrder.id,
+                        qVendingMachine.memo,
+                        qBakery.name,
+                        qOrder.name,
+                        qOrder.price,
+                        qOrder.count
+                ))
+                .from(qOrder)
+                .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
+                .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
+                .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
                 .where(qSpace.vendingMachineId.eq(vendingMachineId)
                         .and(qOrder.id.eq(id))
                         .and(qOrder.productState.eq(ProductState.AVAILABLE)))
                 .fetchOne();
-
     }
 
     @Override

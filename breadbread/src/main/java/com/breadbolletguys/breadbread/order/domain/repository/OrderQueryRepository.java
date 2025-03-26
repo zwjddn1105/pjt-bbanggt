@@ -9,6 +9,8 @@ import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 public interface OrderQueryRepository {
     List<OrderResponse> findByVendingMachineId(Long vendingMachineId);
 
+    List<OrderResponse> findByBuyerId(Long userId);
+
     OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId);
 
     List<Order> findAllByExpirationDateBefore();
