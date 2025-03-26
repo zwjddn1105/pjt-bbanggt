@@ -1,101 +1,69 @@
-import Image from "next/image";
+import { ShoppingCart, Star } from "lucide-react"
+import Image from "next/image"
 
-export default function Home() {
+export default function Page() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="pb-20 hide-scrollbar overflow-auto">
+      {/* 상단 헤더 */}
+      <header className="p-4 border-b">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <Image src="/mascot.png" alt="빵긋 마스코트" width={40} height={40} className="mr-2" />
+            <h1 className="text-2xl font-bold">빵긋 홈</h1>
+          </div>
+          {/* 장바구니 api와 연동 해야 됨 */}
+          <div className="relative">
+            <ShoppingCart className="h-6 w-6" />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              3     
+            </span>   
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+      </header>
+
+      {/* 메인 콘텐츠 */}
+      <div className="p-4">
+        <h2 className="text-xl font-semibold mb-4">오늘의 추천 빵집</h2>
+
+        {/* 추천 빵집 카드 */}
+        <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+          <div className="flex items-center mb-3">
+            <div className="w-12 h-12 bg-bread-brown rounded-full flex items-center justify-center text-white mr-3">
+              <Image src="/mascot.png" alt="빵긋 마스코트" width={36} height={36} />
+            </div>
+            <div>
+              <h3 className="font-bold">빵긋빵긋 역삼점</h3>
+              <div className="flex text-primary-custom">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star key={star} fill="#FF9671" className="w-4 h-4" />
+                ))}
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-3">
+            역삼역 3번 출구에서 도보 5분 거리에 위치한 프리미엄 베이커리입니다. 매일 아침 신선한 빵을 구워 판매합니다.
+          </p>
+          <button className="w-full bg-primary-custom text-white py-2 rounded-md">주문하기</button>
+        </div>
+
+        {/* 인기 메뉴 섹션 */}
+        <h2 className="text-xl font-semibold mb-4">인기 메뉴</h2>
+        <div className="grid grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map((item) => (
+            <div key={item} className="bg-white rounded-lg shadow p-3">
+              <div className="w-full h-32 bg-gray-200 rounded-md mb-2"></div>
+              <h3 className="font-medium">소보로 빵</h3>
+              <p className="text-sm text-gray-500">3,200원</p>
+              <div className="flex text-primary-custom mt-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star key={star} fill="#FF9671" className="w-3 h-3" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
+  )
 }
+
