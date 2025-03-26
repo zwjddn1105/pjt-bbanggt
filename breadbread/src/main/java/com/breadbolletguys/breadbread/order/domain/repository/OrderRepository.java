@@ -25,6 +25,10 @@ public class OrderRepository {
         return orderQueryRepository.findByIdAndVendingMachineId(id, vendingMachineId);
     }
 
+    public void saveAll(List<Order> orders) {
+        orderJpaRepository.saveAll(orders);
+    }
+
     public void save(Order order) {
         orderJpaRepository.save(order);
     }
@@ -33,7 +37,11 @@ public class OrderRepository {
         return orderJpaRepository.findById(orderId);
     }
 
-    public List<Order> findAllByExpirationDateAfter() {
-        return orderQueryRepository.findAllByExpirationDateAfter();
+    public List<Order> findAllByExpirationDateBefore() {
+        return orderQueryRepository.findAllByExpirationDateBefore();
+    }
+
+    public List<Order> findAvailableOrdersBySpaceIds(List<Long> spaceIds) {
+        return orderQueryRepository.findAvailableOrdersBySpaceIds(spaceIds);
     }
 }

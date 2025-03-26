@@ -44,8 +44,8 @@ public class VendingMachineController {
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Void> create(
             @AdminUser User user,
-            @RequestPart VendingMachineCreateJsonRequest jsonRequest,
-            @RequestPart List<MultipartFile> files
+            @RequestPart("jsonRequest") VendingMachineCreateJsonRequest jsonRequest,
+            @RequestPart("files") List<MultipartFile> files
     ) {
         List<String> imageUrls = s3Service.uploadFiles(files);
         Long vendingMachineId = vendingMachineService.save(jsonRequest, imageUrls);

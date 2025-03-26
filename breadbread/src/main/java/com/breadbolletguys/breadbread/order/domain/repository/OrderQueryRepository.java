@@ -11,5 +11,7 @@ public interface OrderQueryRepository {
 
     OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId);
 
-    List<Order> findAllByExpirationDateAfter();
+    List<Order> findAllByExpirationDateBefore();
+
+    List<Order> findAvailableOrdersBySpaceIds(List<Long> spaceIds);
 }
