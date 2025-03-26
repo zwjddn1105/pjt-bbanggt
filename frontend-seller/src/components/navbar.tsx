@@ -1,6 +1,4 @@
 "use client";
-
-import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -10,56 +8,87 @@ import { Menu, X } from "lucide-react";
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // 로그인이 필요한 페이지로 이동하려고 할 때 처리
+  const handleProtectedNavigation = (path: string) => {
+    // 카카오 로그인 구현 후 활성화 예정
+    /*
+    if (!isLoggedIn) {
+      alert("이 기능을 사용하려면 로그인이 필요합니다.");
+      return;
+    }
+    */
+
+    // 로그인 체크 없이 해당 페이지로 이동
+    window.location.href = path;
+  };
+
   return (
-    <header className="bg-background border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Left navigation items */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/map"
-              className="text-muted-foreground hover:text-primary transition-colors"
+    <header className="bg-white border-b shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative">
+        <div className="flex justify-between items-center h-20 relative">
+          {/* 균등한 간격의 네비게이션 아이템 */}
+          <div className="flex-1 flex justify-start items-center">
+            <button
+              onClick={() => handleProtectedNavigation("/map")}
+              className="text-gray-600 hover:text-orange-500 transition-all duration-200 font-medium text-base relative group py-2"
             >
-              빵긋 지도
-            </Link>
-            <Link
-              href="/products"
-              className="text-muted-foreground hover:text-primary transition-colors"
-            >
-              상품관리
-            </Link>
+              <span className="relative">
+                빵긋지도
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-400 group-hover:w-full transition-all duration-300"></span>
+              </span>
+            </button>
           </div>
 
-          {/* Logo (center on desktop) */}
-          <div className="flex items-center justify-center flex-shrink-0">
-            <Link href="/" className="flex items-center">
-              {/* Replace with your actual logo */}
-              <div className="w-10 h-10 relative">
+          <div className="flex-1 flex justify-center items-center">
+            <button
+              onClick={() => handleProtectedNavigation("/products")}
+              className="text-gray-600 hover:text-orange-500 transition-all duration-200 font-medium text-base relative group py-2"
+            >
+              <span className="relative">
+                상품관리
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-400 group-hover:w-full transition-all duration-300"></span>
+              </span>
+            </button>
+          </div>
+
+          {/* 로고 (중앙) - 버튼에서 이미지로 변경 */}
+          <div className="flex-1 flex flex-col items-center justify-center mx-4 relative">
+            <div className="flex flex-col items-center">
+              <div className="w-20 h-20 relative">
                 <Image
-                  src="/logo.png"
+                  src="/logo.png?v=1"
                   alt="빵긋 로고"
-                  fill
-                  className="object-contain"
+                  width={80}
+                  height={80}
+                  className="object-contain drop-shadow-md hover:scale-105 transition-transform duration-300"
                 />
               </div>
-            </Link>
+            </div>
           </div>
 
-          {/* Right navigation items */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/inquiries"
-              className="text-muted-foreground hover:text-primary transition-colors"
+          <div className="flex-1 flex justify-center items-center">
+            <button
+              onClick={() => handleProtectedNavigation("/inquiries")}
+              className="text-gray-600 hover:text-orange-500 transition-all duration-200 font-medium text-base relative group py-2"
             >
-              고객 문의 관리
-            </Link>
-            <Button asChild>
-              <Link href="/login">로그인</Link>
+              <span className="relative">
+                고객 문의 관리
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-orange-400 group-hover:w-full transition-all duration-300"></span>
+              </span>
+            </button>
+          </div>
+
+          <div className="flex-1 flex justify-end items-center">
+            <Button
+              onClick={() => (window.location.href = "/")}
+              className="bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white rounded-full px-6 py-2 shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              로그인
             </Button>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          {/* 모바일 메뉴 버튼 */}
+          <div className="md:hidden flex items-center ml-4">
             <Button
               variant="ghost"
               size="icon"
@@ -67,39 +96,59 @@ export default function Navbar() {
             >
               <span className="sr-only">메뉴 열기</span>
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6 text-orange-500" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-6 w-6 text-orange-500" />
               )}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      <div className={cn("md:hidden", isMobileMenuOpen ? "block" : "hidden")}>
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <Link
-            href="/map"
-            className="block px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-primary hover:bg-accent"
+      {/* 모바일 메뉴 */}
+      <div
+        className={cn(
+          "md:hidden shadow-lg",
+          isMobileMenuOpen ? "block" : "hidden"
+        )}
+      >
+        <div className="px-4 pt-3 pb-4 space-y-2 sm:px-5 bg-white">
+          <button
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              handleProtectedNavigation("/map");
+            }}
+            className="block w-full text-left px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all duration-200"
           >
             빵긋 지도
-          </Link>
-          <Link
-            href="/products"
-            className="block px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-primary hover:bg-accent"
+          </button>
+          <button
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              handleProtectedNavigation("/products");
+            }}
+            className="block w-full text-left px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all duration-200"
           >
             상품관리
-          </Link>
-          <Link
-            href="/inquiries"
-            className="block px-3 py-2 rounded-md text-base font-medium text-muted-foreground hover:text-primary hover:bg-accent"
+          </button>
+          <button
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              handleProtectedNavigation("/inquiries");
+            }}
+            className="block w-full text-left px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all duration-200"
           >
             고객 문의 관리
-          </Link>
-          <div className="px-3 py-2">
-            <Button className="w-full" asChild>
-              <Link href="/login">로그인</Link>
+          </button>
+          <div className="px-3 py-3 mt-2">
+            <Button
+              className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white rounded-full py-2 shadow-md hover:shadow-lg transition-all duration-200"
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                window.location.href = "/";
+              }}
+            >
+              로그인
             </Button>
           </div>
         </div>
