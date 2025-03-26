@@ -11,6 +11,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -36,4 +37,13 @@ public class Bookmark {
 
     @Column(name = "bakery_id", nullable = false)
     private Long bakeryId;
+
+    @Builder
+    private Bookmark(
+            Long userId,
+            Long bakeryId
+    ) {
+        this.userId = userId;
+        this.bakeryId = bakeryId;
+    }
 }

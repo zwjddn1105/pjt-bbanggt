@@ -1,6 +1,7 @@
 package com.breadbolletguys.breadbread.bakery.presentation;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,5 +44,25 @@ public class BakeryController {
                                                        @RequestBody BakeryRequest bakeryRequest
     ) {
         return ResponseEntity.ok(bakeryService.updateBakery(user, bakeryId, bakeryRequest));
+    }
+
+    @GetMapping("/bookmark/{bakeryId}")
+    public ResponseEntity<Boolean> getBookMark(@AuthUser User user,
+                                               @PathVariable("bakeryId") Long bakeryId) {
+        return ResponseEntity.ok(bakeryService.hasBookmark(user, bakeryId));
+    }
+
+    @PostMapping("/bookmark/{bakeryId}")
+    public ResponseEntity<Void> createBookmark(@AuthUser User user,
+                                               @PathVariable("bakeryId") Long bakeryId) {
+        bakeryService.addBookmark(user, bakeryId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/bookmark/{bakeryId}")
+    public ResponseEntity<Void> deleteBookmark(@AuthUser User user,
+                                               @PathVariable("bakeryId") Long bakeryId) {
+        bakeryService.removeBookmark(user, bakeryId);
+        return ResponseEntity.ok().build();
     }
 }
