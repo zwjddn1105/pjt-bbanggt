@@ -73,14 +73,23 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     }
 
     @Override
-    public List<Order> findAllByExpirationDateAfter() {
+    public List<Order> findAllByExpirationDateBefore() {
         QOrder qOrder = QOrder.order;
-        LocalDateTime endOfToday = LocalDate.now().atTime(23, 59, 59);
+        LocalDateTime endOfToday = LocalDateTime.now();
         return queryFactory
                 .selectFrom(qOrder)
                 .where(qOrder.expirationDate.loe(endOfToday)
                         .and(qOrder.productState.eq(ProductState.AVAILABLE)))
                 .fetch();
+    }
 
+    @Override
+    public List<Order> findAvailableOrdersBySpaceIds(List<Long> spaceIds) {
+        QOrder qOrder = QOrder.order;
+        return queryFactory
+                .selectFrom(qOrder)
+                .where(qOrder.spaceId.in(spaceIds)
+                        .and(qOrder.productState.eq(ProductState.AVAILABLE)))
+                .fetch();
     }
 }

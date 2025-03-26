@@ -19,6 +19,8 @@ public enum ErrorCode {
     ALREADY_REQUESTED(1009, "이미 팔로우 요청 되어 오류가 발생했습니다."),
     UNABLE_TO_RESERVE_PRODUCT(10010, "해당 상태의 빵은 선점할 수 없습니다."),
     UNABLE_TO_PURCHASE_PRODUCT(10011, "해당 상태의 빵은 결제할 수 없습니다."),
+    DUPLICATE_BOOKMARK(10012, "이미 북마크한 빵집입니다."),
+    BOOKMARK_NOT_FOUND(10013, "북마크가 존재하지 않습니다."),
 
     UNABLE_TO_GET_USER_INFO(2001, "소셜 로그인 공급자로부터 유저 정보를 받아올 수 없습니다."),
     UNABLE_TO_GET_ACCESS_TOKEN(2002, "소셜 로그인 공급자로부터 인증 토큰을 받아올 수 없습니다."),

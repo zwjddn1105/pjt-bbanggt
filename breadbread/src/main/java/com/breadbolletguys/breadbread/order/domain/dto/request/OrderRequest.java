@@ -14,11 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderRequest {
     private Long bakeryId;
-    private Long spaceId;
     private String name;
     private int price;
     private int count;
-    private LocalDateTime expirationDate;
+    private int discount;
     private ProductState productState;
     private BreadType breadType;
 }

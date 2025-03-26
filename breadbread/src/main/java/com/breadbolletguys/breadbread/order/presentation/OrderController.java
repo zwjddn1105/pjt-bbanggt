@@ -2,6 +2,7 @@ package com.breadbolletguys.breadbread.order.presentation;
 
 import java.util.List;
 
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import com.breadbolletguys.breadbread.order.application.OrderService;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.user.domain.User;
+import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SpaceResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,13 +32,13 @@ public class OrderController {
     public ResponseEntity<Void> createOrder(
             @AuthUser User user,
             @PathVariable("spaceId") Long spaceId,
-            @RequestBody OrderRequest orderRequest) {
-        orderService.save(user, spaceId, orderRequest);
+            @RequestBody List<OrderRequest> orderRequests) {
+        orderService.save(user, spaceId, orderRequests);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/vendor/{vendingMachineId}")
-    public ResponseEntity<List<OrderResponse>> getOrdersByVendingMachineId(
+    public ResponseEntity<List<SpaceResponse>> getOrdersByVendingMachineId(
             @PathVariable("vendingMachineId") Long vendingMachineId
     ) {
         return ResponseEntity.ok(orderService.getOrdersByVendingMachineId(vendingMachineId));
