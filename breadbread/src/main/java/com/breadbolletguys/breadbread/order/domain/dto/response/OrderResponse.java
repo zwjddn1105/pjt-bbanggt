@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderResponse {
     private Long id;
+    private String memo;
     private String bakeryName;
     private String name;
     private int price;
     private int count;
-    private LocalDateTime expirationDate;
 }

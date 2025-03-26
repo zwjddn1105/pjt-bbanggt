@@ -63,7 +63,12 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderResponse getOrdersByIdAndVendingMachineId( Long id, Long vendingMachineId) {
+    public List<OrderResponse> getOrdersByBuyerId(User user) {
+        return orderRepository.findByBuyerId(user.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse getOrdersByIdAndVendingMachineId(Long id, Long vendingMachineId) {
         return orderRepository.findByIdAndVendingMachineId(id, vendingMachineId);
     }
 

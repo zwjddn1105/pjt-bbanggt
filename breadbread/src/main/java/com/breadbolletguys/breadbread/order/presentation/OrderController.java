@@ -69,4 +69,11 @@ public class OrderController {
         orderService.payForOrder(user, orderId);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/myOrder")
+    public ResponseEntity<List<OrderResponse>> getOrdersByBuyerId(
+            @AuthUser User user
+    ) {
+        return ResponseEntity.ok(orderService.getOrdersByBuyerId(user));
+    }
 }

@@ -1,6 +1,5 @@
 package com.breadbolletguys.breadbread.order.domain.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +18,10 @@ public class OrderRepository {
 
     public List<OrderResponse> findByVendingMachineId(Long vendingMachineId) {
         return orderQueryRepository.findByVendingMachineId(vendingMachineId);
+    }
+
+    public List<OrderResponse> findByBuyerId(Long userId) {
+        return orderQueryRepository.findByBuyerId(userId);
     }
 
     public OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId) {
