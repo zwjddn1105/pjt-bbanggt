@@ -38,7 +38,7 @@ export default function PickupPage() {
                 <p className="text-sm">가격: 3,200원 x 1개</p>
 
                 {/* 픽업 완료 버튼 */}
-                <button className="mt-2 bg-primary-custom text-white text-sm px-4 py-1 rounded-full">픽업 완료</button>
+                <button className="mt-2 bg-primary-custom text-white text-sm px-4 py-1 rounded-full">빵긋 픽업</button>
               </div>
             </div>
           </div>

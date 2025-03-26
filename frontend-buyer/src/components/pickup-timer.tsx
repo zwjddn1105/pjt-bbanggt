@@ -82,12 +82,18 @@ export default function PickupTimer() {
   }, [])
 
   return (
-    <div className="bg-orange-100 p-3 rounded-md mb-4">
-      <div className="font-bold text-lg text-orange-600">남은 시간: {remainingTime}</div>
-      <p className="text-sm text-gray-600">
-        {isAvailable ? "빵긋빵 매장에서 픽업 가능합니다." : "픽업 시간은 오전 9시 30분부터 오후 7시 30분까지입니다."}
-      </p>
-    </div>
+    <div className="mb-4">
+      <div className="bg-orange-100 p-3 rounded-md mb-2">
+        <div className="font-bold text-lg text-orange-600">남은 시간: {remainingTime}</div>
+      </div>
+      <div className="text-sm text-gray-600 leading-relaxed">
+          {/* {isAvailable ? "빵긋빵 매장에서 픽업 가능합니다." : "픽업 시간은 오전 9시 30분부터 오후 7시 30분까지입니다."}
+          */}
+          <p>빵긋빵긋에서 찾아가세요</p>
+          <p>픽업 시간은 오전 9시 30분부터 오후 7시 30분까지입니다.</p> 
+
+      </div>
+     </div>
   )
 }
 

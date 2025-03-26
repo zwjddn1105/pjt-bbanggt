@@ -11,7 +11,7 @@ self.addEventListener("install", (event) => {
   const CACHE_NAME = "ppanggut-cache-v1"
   
   // 캐싱할 파일 목록
-  const urlsToCache = ["/", "/index.html", "/mascot.png", "/logo.jpg"]
+  const urlsToCache = ["/", "/mascot.png", "/logo.jpg"]
   
   // 설치 시 캐시 생성 및 파일 캐싱
   self.addEventListener("install", (event) => {
