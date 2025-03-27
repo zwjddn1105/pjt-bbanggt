@@ -6,12 +6,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.breadbolletguys.breadbread.auth.domain.UserTokens;
@@ -19,6 +17,7 @@ import com.breadbolletguys.breadbread.auth.domain.request.LoginRequest;
 import com.breadbolletguys.breadbread.auth.domain.response.AccessTokenResponse;
 import com.breadbolletguys.breadbread.auth.service.LoginService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +32,7 @@ public class LoginController {
     private final LoginService loginService;
 
     @PostMapping(value = "/login/kakao")
+    @Operation(description = "auth code를 받아서 로그인을 완료하고 access/refresh 토큰을 전달한다.")
     public ResponseEntity<AccessTokenResponse> kakaoLogin(
             @RequestBody LoginRequest loginRequest,
             HttpServletResponse response
@@ -44,7 +44,7 @@ public class LoginController {
 //                .secure(true)
                 .httpOnly(true)
                 .sameSite("None")
-                .domain(".grabtable.net")
+                .domain(".breadbread.net")
                 .path("/")
                 .build();
 
@@ -54,6 +54,7 @@ public class LoginController {
 
 
     @PostMapping("/reissue")
+    @Operation(description = "refresh-token을 재발급 받는다.")
     public ResponseEntity<AccessTokenResponse> reissueToken(
             @CookieValue("refresh-token") String refreshToken,
             @RequestHeader("Authorization") String authHeader
@@ -63,17 +64,12 @@ public class LoginController {
     }
 
     @PostMapping(value = "/logout")
+    @Operation(description = "refresh-token을 받아서 로그아웃을 진행한다.")
     public ResponseEntity<Void> logout(
             @CookieValue("refresh-token") String refreshToken
     ) {
 
         loginService.logout(refreshToken);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/login/test")
-    public String test(@RequestParam String code) {
-        log.info("code={}", code);
-        return "ok";
     }
 }
