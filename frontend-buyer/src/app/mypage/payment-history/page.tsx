@@ -3,7 +3,8 @@ import { PaymentHistoryItem } from "@/components/mypage/payment-history-item"
 import Link from "next/link"
 
 export default function PaymentHistoryPage() {
-  // 더미 데이터
+  // API 연동 시 실제 데이터 가져오기 
+  // 더미 데이터 ( api 연동시 제거 )
   const paymentHistory = [
     {
       id: 1,

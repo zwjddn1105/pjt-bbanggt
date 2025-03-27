@@ -37,14 +37,15 @@ export function OrderItem({ storeName, availableCount, totalCount, items, isNew 
               {item.name}: {item.count}개
             </p>
           ))}
+          <br />
           <p className="text-sm">[더보기]</p>
 
           {/* 별점 표시 */}
-          <div className="flex text-primary-custom mt-1">
+          {/* <div className="flex text-primary-custom mt-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star key={star} fill="#FF9671" className="w-4 h-4" />
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* 버튼 */}

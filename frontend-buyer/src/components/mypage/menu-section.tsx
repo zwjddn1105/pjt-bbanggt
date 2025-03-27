@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
+// API 연동 시 이 인터페이스를 API 응답 구조에 맞게 수정해야 함
 interface MenuSectionProps {
   title: string
   items: {
