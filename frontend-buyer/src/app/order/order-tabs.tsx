@@ -1,11 +1,47 @@
 "use client"
 
 import { useState } from "react"
-import { Star } from "lucide-react"
+import { Search } from "lucide-react"
+import { OrderTimeNotice } from "@/components/order/order-time-notice"
+import { OrderItem } from "@/components/order/order-item"
 
 export default function OrderTabs() {
   // 탭 상태 관리를 위한 state
   const [activeTab, setActiveTab] = useState("My 빵긋")
+  // 더미 데이터
+  const storeItems = [
+    {
+      id: 1,
+      storeName: "빵긋빵긋 역삼점 1호점",
+      totalCount: 30,
+      availableCount: 13,
+      items: [
+        { name: "소보로", count: 6 },
+        { name: "단팥빵", count: 1 },
+      ],
+      isNew: true,
+    },
+    {
+      id: 2,
+      storeName: "빵긋빵긋 강남점",
+      totalCount: 25,
+      availableCount: 8,
+      items: [
+        { name: "크로와상", count: 3 },
+        { name: "바게트", count: 2 },
+      ],
+    },
+    {
+      id: 3,
+      storeName: "빵긋빵긋 선릉점",
+      totalCount: 20,
+      availableCount: 5,
+      items: [
+        { name: "식빵", count: 2 },
+        { name: "치즈빵", count: 3 },
+      ],
+    },
+  ]
 
   return (
     <>
@@ -35,20 +71,7 @@ export default function OrderTabs() {
         </div>
         {/* 검색 버튼 */}
         <button className="p-2 text-primary-custom">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.3-4.3" />
-          </svg>
+            <Search width={28} height={28} />
         </button>
       </div>
 
@@ -57,53 +80,18 @@ export default function OrderTabs() {
         {activeTab === "My 빵긋" ? (
           <>
             {/* 주문 가능 시간 안내 */}
-            <div className="px-4 pb-4 text-sm">
-              <p>20:00~9:00 까지 주문 가능합니다</p>
-              <p>9:30까지 빵긋에서 찾아가세요</p>
-            </div>
+            <OrderTimeNotice />
 
             {/* 상품(빵굿 매장) 목록 카드 반복 */}
-            {[1, 2, 3].map((item) => (
-              <div key={item} className="mx-4 mb-4 p-4 border rounded-3xl">
-                <div className="flex">
-                  {/* 빵 이미지 그리드 (9칸) */}
-                  <div className="flex-shrink-0 mr-4">
-                    <div className="grid grid-cols-3 gap-1">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((img) => (
-                        <div key={img} className="w-10 h-10 bg-gray-200 relative">
-                          {/* 첫 번째 이미지에 NEW 뱃지 */}
-                          {img === 1 && (
-                            <div className="absolute -top-1 -left-1 bg-red-500 text-white text-xs px-1 rounded">
-                              NEW
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 매장 정보 및 빵 재고 표시 */}
-                  <div>
-                    <h3 className="font-bold">빵긋빵긋 역삼점 1호점</h3>
-                    <p className="text-sm">잔여 갯수: 13/30</p>
-                    <p className="text-sm">소보로: 6개</p>
-                    <p className="text-sm">단팥빵: 1개</p>
-                    <p className="text-sm">[더보기]</p>
-
-                    {/* 별점 표시 (별 5개 고정) */}
-                    <div className="flex text-primary-custom mt-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} fill="#FF9671" className="w-4 h-4" />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 우측 '자세히 보기' 버튼 */}
-                  <div className="ml-auto">
-                    <button className="text-sm text-gray-500">자세히 보기</button>
-                  </div>
-                </div>
-              </div>
+            {storeItems.map((item) => (
+              <OrderItem
+                key={item.id}
+                storeName={item.storeName}
+                totalCount={item.totalCount}
+                availableCount={item.availableCount}
+                items={item.items}
+                isNew={item.isNew}
+              />
             ))}
           </>
         ) : (
