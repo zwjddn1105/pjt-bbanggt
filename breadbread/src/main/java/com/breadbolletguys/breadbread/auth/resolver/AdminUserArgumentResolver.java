@@ -48,7 +48,7 @@ public class AdminUserArgumentResolver implements HandlerMethodArgumentResolver 
             throw new BadRequestException(ErrorCode.FAILED_TO_VALIDATE_TOKEN);
         }
 
-        String refreshToken = extractRefreshToken(request);
+//        String refreshToken = extractRefreshToken(request);
         String accessToken = extractAccessToken(request);
 
         if (jwtUtil.isAccessTokenValid(accessToken)) {
