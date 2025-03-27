@@ -41,9 +41,10 @@ export default function Home() {
 
   // 카카오 로그인 처리 함수
   const handleKakaoLogin = () => {
-    // 실제 구현에서는 카카오 로그인 URL로 리다이렉트
-    alert("카카오 로그인 기능은 아직 구현되지 않았습니다.");
-    // window.location.href = "https://kauth.kakao.com/oauth/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_REDIRECT_URI&response_type=code";
+    const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
+    const redirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI;
+
+    window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
   };
 
   return (
