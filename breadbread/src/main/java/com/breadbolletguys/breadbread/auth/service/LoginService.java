@@ -13,6 +13,7 @@ import com.breadbolletguys.breadbread.auth.repository.RefreshTokenRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 import com.breadbolletguys.breadbread.user.domain.User;
+import com.breadbolletguys.breadbread.user.domain.UserRole;
 import com.breadbolletguys.breadbread.user.domain.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -55,6 +56,9 @@ public class LoginService {
                 User.builder()
                         .socialId(socialLoginId)
                         .name(nickname)
+                        .userRole(UserRole.BUYER)
+                        .noticeCheck(true)
+                        .deleted(false)
                         .build()
         );
     }
