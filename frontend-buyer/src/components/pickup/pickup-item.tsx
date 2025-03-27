@@ -16,7 +16,7 @@ export function PickupItem({ storeName, productName, quantity, price }: PickupIt
 
         {/* 상품 정보 */}
         <div className="flex-1">
-          <p className="text-sm text-gray-600">{storeName}</p>
+          <p className="font-bold">{storeName}</p>
           <h3 className="font-medium">{productName}</h3>
           <p className="text-sm">수량: {quantity}개</p>
           <p className="text-sm">

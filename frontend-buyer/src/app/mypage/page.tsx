@@ -24,7 +24,7 @@ export default function MyPage() {
   return (
     <main className="pb-20">
       {/* 프로필 섹션 */}
-      <ProfileSection username="빵타스닉터" />
+      <ProfileSection username="빵탄소년단" />
 
       {/* 구분선 */}
       <div className="h-2 bg-orange-50 border-y border-orange-100"></div>

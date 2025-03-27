@@ -1,0 +1,51 @@
+.container {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #ec9a5e; /* 배경색 변경 */
+}
+
+.movingBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("/bread-pattern.png");
+
+  /* 정확히 2열로 표시되도록 설정 */
+  background-size: 50% auto; /* 가로: 화면 너비의 절반(2열) */
+  background-repeat: repeat; /* 모든 방향으로 반복 */
+
+  /* 애니메이션 속도 조절: 20s 부분을 변경하여 속도 조절 가능 (값이 작을수록 빠름) */
+  animation: moveBackground 20s linear infinite;
+  z-index: 0;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+}
+
+/* 애니메이션 정의 - 배경 이동 속도와 방향 조절 */
+@keyframes moveBackground {
+  0% {
+    /* 시작 위치 */
+    background-position: 0 0;
+  }
+  100% {
+    /* 종료 위치 - 값을 변경하여 이동 거리 조절 가능 */
+    background-position: 0 1000px; /* 세로로만 이동 */
+  }
+}
+
