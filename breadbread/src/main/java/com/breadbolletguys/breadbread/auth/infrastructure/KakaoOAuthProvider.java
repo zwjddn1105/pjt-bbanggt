@@ -85,6 +85,8 @@ public class KakaoOAuthProvider {
         params.add("grant_type", "authorization_code");
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
 
+        log.info("redirect_uri: {}", redirectUri);
+
         ResponseEntity<KakaoTokenResponse> response = restTemplate.exchange(
                 tokenUri,
                 HttpMethod.POST,
