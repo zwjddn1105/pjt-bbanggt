@@ -37,9 +37,6 @@ public class User extends BaseTimeEntity {
     @Column(name = "name", length = 32, nullable = false)
     private String name;
 
-    @Column(name = "email", length = 32, nullable = false)
-    private String email;
-
     @Column(name = "notice_check", nullable = false)
     private boolean noticeCheck;
 
@@ -51,14 +48,12 @@ public class User extends BaseTimeEntity {
             String socialId,
             UserRole userRole,
             String name,
-            String email,
             boolean noticeCheck,
             boolean deleted
     ) {
         this.socialId = socialId;
         this.userRole = userRole;
         this.name = name;
-        this.email = email;
         this.noticeCheck = noticeCheck;
         this.deleted = deleted;
     }
