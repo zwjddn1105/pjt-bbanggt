@@ -24,6 +24,7 @@ import com.breadbolletguys.breadbread.vendingmachine.application.VendingMachineS
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.request.VendingMachineCreateJsonRequest;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.VendingMachineResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -42,6 +43,7 @@ public class VendingMachineController {
      * 자판기 정보를 입력받고 저장한다.
      */
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @Operation(description = "어드민 전용 api, 자판기 정보를 입력받고 생성한다.")
     public ResponseEntity<Void> create(
             @AdminUser User user,
             @RequestPart("jsonRequest") VendingMachineCreateJsonRequest jsonRequest,
@@ -62,6 +64,7 @@ public class VendingMachineController {
      * 자판기 Id를 받아서 삭제한다.
      */
     @DeleteMapping("/{vendingMachineId}")
+    @Operation(description = "어드민 전용 api, 자판기 id를 pathVariable 로 받아서 삭제한다.")
     public ResponseEntity<Void> delete(
             @AdminUser User user,
             @PathVariable(name = "vendingMachineId") Long vendingMachineId
@@ -76,6 +79,7 @@ public class VendingMachineController {
      * @return : 자판기 Id, 위경도, 거리
      */
     @GetMapping
+    @Operation(description = "위경도와 거리를 입력받아 현재 위치 기준으로 일정 거리 내의 자판기 리스트를 조회한다.")
     public ResponseEntity<List<VendingMachineResponse>> findAll(
             @AuthUser User user,
             @RequestParam(name = "latitude") Double latitude,
@@ -92,6 +96,7 @@ public class VendingMachineController {
     }
 
     @PostMapping("/warm-up")
+    @Operation(description = "어드민 전용 api, 최초 서버를 오픈할 때 cache warm-up 용도이다.")
     public ResponseEntity<Void> warpUp(@AdminUser User user) {
         vendingMachineCacheService.warmUp();
         return ResponseEntity.ok().build();
