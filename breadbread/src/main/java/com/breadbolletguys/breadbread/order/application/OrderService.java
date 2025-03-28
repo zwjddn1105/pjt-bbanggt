@@ -11,13 +11,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 import com.breadbolletguys.breadbread.common.exception.NotFoundException;
+import com.breadbolletguys.breadbread.order.domain.BreadType;
 import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.ProductState;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderSummaryResponse;
 import com.breadbolletguys.breadbread.order.domain.repository.OrderRepository;
 import com.breadbolletguys.breadbread.transaction.domain.Transaction;
@@ -34,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class OrderService {
+    private final BakeryRepository bakeryRepository;
     private final OrderRepository orderRepository;
     private final SpaceRepository spaceRepository;
     private final TransactionJpaRepository transactionJpaRepository;
@@ -73,34 +77,56 @@ public class OrderService {
         return orderRepository.findByIdAndVendingMachineId(id, vendingMachineId);
     }
 
+    @Transactional(readOnly = true)
+    public List<OrderStackResponse> getMyOrderStocks(User user) {
+        return orderRepository.findStocksBySellerId(user.getId());
+    }
+
+//    @Transactional
+//    public void save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
+//        List<Order> orders = new ArrayList<>();
+//        Long bakeryId = bakeryRepository.findByUserId(user.getId())
+//                .orElseThrow(() -> new BadRequestException(ErrorCode.BAKERY_NOT_FOUND))
+//                .getId();
+//        for (OrderRequest orderRequest : orderRequests) {
+//            LocalDateTime expirationDate = LocalDateTime.now()
+//                    .plusDays(1)
+//                    .withHour(10)
+//                    .withMinute(0)
+//                    .withSecond(0)
+//                    .withNano(0);
+//
+//            Order order = Order.builder()
+//                    .bakeryId(bakeryId)
+//                    .sellerId(user.getId())
+//                    .spaceId(spaceId)
+//                    .buyerId(null)
+//                    .price(orderRequest.getPrice())
+//                    .discount(orderRequest.getDiscount() * 1.0 / 100)
+//                    .count(orderRequest.getCount())
+//                    .image(null)
+//                    .expirationDate(expirationDate)
+//                    .productState(ProductState.AVAILABLE)
+//                    .breadType(orderRequest.getBreadType())
+//                    .build();
+//            orders.add(order);
+//        }
+//        orderRepository.saveAll(orders);
+//    }
+
     @Transactional
     public void save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
-        List<Order> orders = new ArrayList<>();
-        for (OrderRequest orderRequest : orderRequests) {
-            LocalDateTime expirationDate = LocalDateTime.now()
-                    .plusDays(1)
-                    .withHour(10)
-                    .withMinute(0)
-                    .withSecond(0)
-                    .withNano(0);
+        Long bakeryId = bakeryRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new BadRequestException(ErrorCode.BAKERY_NOT_FOUND))
+                .getId();
 
-            Order order = Order.builder()
-                    .bakeryId(orderRequest.getBakeryId())
-                    .sellerId(user.getId())
-                    .spaceId(spaceId)
-                    .buyerId(null)
-                    .name(orderRequest.getName())
-                    .price(orderRequest.getPrice() * orderRequest.getDiscount() / 100)
-                    .count(orderRequest.getCount())
-                    .image(null)
-                    .expirationDate(expirationDate)
-                    .productState(ProductState.AVAILABLE)
-                    .breadType(orderRequest.getBreadType())
-                    .build();
-            orders.add(order);
+        if (orderRequests.size() == 1) {
+            saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), image);
+        } else {
+            saveMixedBreadOrder(user, spaceId, bakeryId, orderRequests, image);
         }
-        orderRepository.saveAll(orders);
     }
+
 
     @Transactional
     public void selectOrder(User user, Long orderId) {
@@ -143,4 +169,81 @@ public class OrderService {
                 .max()
                 .orElse(0);
     }
+
+    private void saveSingleBreadOrder(
+            User user,
+            Long spaceId,
+            Long bakeryId,
+            OrderRequest request,
+            MultipartFile image) {
+        LocalDateTime expirationDate = getExpirationDate();
+
+        Order order = Order.builder()
+                .bakeryId(bakeryId)
+                .sellerId(user.getId())
+                .spaceId(spaceId)
+                .buyerId(null)
+                .price(request.getPrice())
+                .discount(request.getDiscount() * 1.0 / 100)
+                .count(request.getCount())
+                .image(null) // 이미지 업로드 시 로직 필요
+                .expirationDate(expirationDate)
+                .productState(ProductState.AVAILABLE)
+                .breadType(request.getBreadType())
+                .build();
+
+        orderRepository.save(order);
+    }
+
+    private void saveMixedBreadOrder(User user,
+                                     Long spaceId,
+                                     Long bakeryId,
+                                     List<OrderRequest> requests,
+                                     MultipartFile image) {
+        LocalDateTime expirationDate = getExpirationDate();
+
+        int totalOriginalPrice = 0;
+        int totalDiscountedPrice = 0;
+        int totalCount = 0;
+
+        for (OrderRequest req : requests) {
+            double rate = req.getDiscount() * 1.0 / 100;
+            int originalPrice = req.getPrice();
+            int discountPrice = (int) (req.getPrice() * (1 - rate));
+            totalOriginalPrice += originalPrice;
+            totalDiscountedPrice += discountPrice;
+            totalCount += req.getCount();
+        }
+
+        double totalDiscountRate = (totalOriginalPrice - totalDiscountedPrice) / (double) totalOriginalPrice;
+
+        Order mixedOrder = Order.builder()
+                .bakeryId(bakeryId)
+                .sellerId(user.getId())
+                .spaceId(spaceId)
+                .buyerId(null)
+                .price(totalOriginalPrice)
+                .discount(totalDiscountRate)
+                .count(totalCount)
+                .image(null) // 이미지 업로드 시 로직 필요
+                .expirationDate(expirationDate)
+                .productState(ProductState.AVAILABLE)
+                .breadType(BreadType.MIXED_BREAD)
+                .build();
+
+        orderRepository.save(mixedOrder);
+    }
+
+
+
+    private LocalDateTime getExpirationDate() {
+        return LocalDateTime.now()
+                .plusDays(1)
+                .withHour(10)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+    }
+
+
 }

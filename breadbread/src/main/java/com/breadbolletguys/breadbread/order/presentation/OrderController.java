@@ -2,7 +2,6 @@ package com.breadbolletguys.breadbread.order.presentation;
 
 import java.util.List;
 
-
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +16,7 @@ import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
 import com.breadbolletguys.breadbread.order.application.OrderService;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SpaceResponse;
 
@@ -79,5 +79,12 @@ public class OrderController {
             @AuthUser User user
     ) {
         return ResponseEntity.ok(orderService.getOrdersByBuyerId(user));
+    }
+
+    @GetMapping("/myStocks")
+    public ResponseEntity<List<OrderStackResponse>> getMyOrderStocks(
+            @AuthUser User user
+    ) {
+        return ResponseEntity.ok(orderService.getMyOrderStocks(user));
     }
 }

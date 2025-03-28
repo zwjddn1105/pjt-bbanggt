@@ -10,11 +10,12 @@ import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.ProductState;
 import com.breadbolletguys.breadbread.order.domain.QOrder;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.vendingmachine.domain.QSpace;
 import com.breadbolletguys.breadbread.vendingmachine.domain.QVendingMachine;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,9 +36,17 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.id,
                         qVendingMachine.memo,
                         qBakery.name,
-                        qOrder.name,
                         qOrder.price,
-                        qOrder.count
+                        Expressions.numberTemplate(
+                                Integer.class,
+                                "CAST({0} * (1 - {1}) AS INTEGER)",
+                                QOrder.order.price,
+                                QOrder.order.discount
+                        ),
+                        qOrder.count,
+                        qOrder.image,
+                        qOrder.productState,
+                        qOrder.breadType
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
@@ -59,16 +68,44 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.id,
                         qVendingMachine.memo,
                         qBakery.name,
-                        qOrder.name,
                         qOrder.price,
-                        qOrder.count
+                        Expressions.numberTemplate(
+                                Integer.class,
+                                "CAST({0} * (1 - {1}) AS SIGNED)",
+                                QOrder.order.price,
+                                QOrder.order.discount
+                        ),
+                        qOrder.count,
+                        qOrder.image,
+                        qOrder.productState
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
                 .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
-                .where(qOrder.bakeryId.eq(userId)
+                .where(qOrder.buyerId.eq(userId)
                         .and(qOrder.productState.eq(ProductState.RESERVED)))
+                .fetch();
+    }
+
+    @Override
+    public List<OrderStackResponse> findStocksBySellerId(Long userId) {
+        QSpace qSpace = QSpace.space;
+        QOrder qOrder = QOrder.order;
+        QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        OrderStackResponse.class,
+                        qOrder.id,
+                        qVendingMachine.memo,
+                        qOrder.count,
+                        qOrder.productState
+                ))
+                .from(qOrder)
+                .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
+                .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
+                .where(qOrder.sellerId.eq(userId))
                 .fetch();
     }
 
@@ -84,10 +121,17 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.id,
                         qVendingMachine.memo,
                         qBakery.name,
-                        qOrder.name,
                         qOrder.price,
+                        Expressions.numberTemplate(
+                                Integer.class,
+                                "CAST({0} * (1 - {1}) AS INTEGER)",
+                                QOrder.order.price,
+                                QOrder.order.discount
+                        ),
                         qOrder.count,
-                        qOrder.image
+                        qOrder.image,
+                        qOrder.productState,
+                        qOrder.breadType
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
