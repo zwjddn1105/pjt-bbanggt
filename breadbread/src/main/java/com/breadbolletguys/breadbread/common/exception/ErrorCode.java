@@ -39,6 +39,8 @@ public enum ErrorCode {
 
     MINUS_BALANCE_ERROR(5000, "잔고에 음수가 들어올 수 없습니다."),
     MINUS_REVIEW_ERROR(5001, "리뷰에 음수가 들어올 수 없습니다."),
+    CURRENCY_CODE_NOT_EXIST_ERROR(5002, "해당 유형의 통화는 사용할 수 없습니다."),
+    BANK_CODE_NOT_EXIST_ERROR(5003, "해당 유형의 은행은 존재하지 않습니다."),
 
     SCORE_RANGE_ERROR(6000, "리뷰 점수의 범위는 1-5점입니다."),
 
