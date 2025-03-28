@@ -52,6 +52,9 @@ public class Order extends BaseTimeEntity {
     @Column(name = "count", nullable = false)
     private int count;
 
+    @Column(name = "image", length = 1024)
+    private String image;
+
     @Column(name = "expiration_date", nullable = false)
     private LocalDateTime expirationDate;
 
@@ -73,6 +76,7 @@ public class Order extends BaseTimeEntity {
             String name,
             int price,
             int count,
+            String image,
             LocalDateTime expirationDate,
             ProductState productState,
             BreadType breadType
@@ -84,6 +88,7 @@ public class Order extends BaseTimeEntity {
         this.name = name;
         this.price = price;
         this.count = count;
+        this.image = image;
         this.expirationDate = expirationDate;
         this.productState = productState;
         this.breadType = breadType;

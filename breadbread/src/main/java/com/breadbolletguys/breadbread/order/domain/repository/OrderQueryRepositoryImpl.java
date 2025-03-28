@@ -86,7 +86,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qBakery.name,
                         qOrder.name,
                         qOrder.price,
-                        qOrder.count
+                        qOrder.count,
+                        qOrder.image
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
