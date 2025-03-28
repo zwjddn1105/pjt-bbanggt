@@ -17,17 +17,19 @@ import com.breadbolletguys.breadbread.bakery.domain.dto.request.ReviewRequest;
 import com.breadbolletguys.breadbread.bakery.domain.dto.response.ReviewResponse;
 import com.breadbolletguys.breadbread.user.domain.User;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/v1/review")
+@RequestMapping("/api/v1/review")
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/createReview/{bakeryId}")
+    @Operation(description = "특정 빵집에 리뷰 정보를 입력받고 생성한다.")
     public ResponseEntity<Void> createReview(
             @AuthUser User user,
             @PathVariable("bakeryId") Long bakeryId,
@@ -37,6 +39,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{bakeryId}")
+    @Operation(description = "특정 빵집의 리뷰 리스트를 조회한다.")
     public ResponseEntity<Page<ReviewResponse>> getReviews(
             @AuthUser User user,
             @PathVariable("bakeryId") Long bakeryId,
@@ -46,6 +49,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/deleteReview/{bakeryId}/{reviewId}")
+    @Operation(description = "리뷰 id를 pathVariable로 받아서 삭제한다.")
     public ResponseEntity<Void> deleteReview(@AuthUser User user,
                                              @PathVariable("bakeryId") Long bakeryId,
                                              @PathVariable("reviewId") Long reviewId) {
