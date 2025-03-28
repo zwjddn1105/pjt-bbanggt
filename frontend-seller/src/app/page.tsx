@@ -4,12 +4,22 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  // 애니메이션 상태
+  // 마운트 상태 추가
+  const [mounted, setMounted] = useState(false);
+
+  // 기존 상태들
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeFeature, setActiveFeature] = useState(-1);
 
+  // 컴포넌트가 마운트되면 마운트 상태를 true로 설정
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // 컴포넌트가 마운트되면 애니메이션 시작
   useEffect(() => {
+    if (!mounted) return; // 마운트되지 않았으면 실행하지 않음
+
     setIsLoaded(true);
 
     // 특징 아이템 순차적으로 나타나게 하기
@@ -28,7 +38,7 @@ export default function Home() {
     }, 800);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [mounted]); // mounted 상태가 변경될 때만 실행
 
   // 떠다니는 빵 아이콘 위치 - 크기와 투명도 조정
   const floatingIcons = [
@@ -44,8 +54,21 @@ export default function Home() {
     const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI;
 
+    if (!clientId || !redirectUri) {
+      console.error("카카오 로그인 환경 변수가 설정되지 않았습니다.");
+      return;
+    }
+
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
   };
+
+  // 마운트되지 않았으면 아무것도 렌더링하지 않음
+  if (!mounted) {
+    return null; // 또는 로딩 인디케이터를 표시할 수 있습니다
+    // return <div className="min-h-screen flex items-center justify-center">
+    //   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+    // </div>
+  }
 
   return (
     <div className="relative min-h-[calc(100vh-6rem)] flex items-center justify-center overflow-hidden">

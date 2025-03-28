@@ -17,15 +17,6 @@ export default function Navbar() {
 
   // 로그인이 필요한 페이지로 이동하려고 할 때 처리
   const handleProtectedNavigation = (path: string) => {
-    // 카카오 로그인 구현 후 활성화 예정
-    /*
-  if (!isLoggedIn) {
-    alert("이 기능을 사용하려면 로그인이 필요합니다.");
-    return;
-  }
-  */
-
-    // 로그인 체크 없이 해당 페이지로 이동
     window.location.href = path;
   };
 
@@ -80,7 +71,7 @@ export default function Navbar() {
             <div className="flex flex-col items-center">
               <div className="w-20 h-20 relative">
                 <Image
-                  src="/logo.png?v=1"
+                  src="/logo.png"
                   alt="빵긋 로고"
                   width={80}
                   height={80}
