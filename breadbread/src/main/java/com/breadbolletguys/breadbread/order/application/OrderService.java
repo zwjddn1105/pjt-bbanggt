@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
@@ -73,7 +74,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void save(User user, Long spaceId, List<OrderRequest> orderRequests) {
+    public void save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
         List<Order> orders = new ArrayList<>();
         for (OrderRequest orderRequest : orderRequests) {
             LocalDateTime expirationDate = LocalDateTime.now()
@@ -91,6 +92,7 @@ public class OrderService {
                     .name(orderRequest.getName())
                     .price(orderRequest.getPrice() * orderRequest.getDiscount() / 100)
                     .count(orderRequest.getCount())
+                    .image(null)
                     .expirationDate(expirationDate)
                     .productState(ProductState.AVAILABLE)
                     .breadType(orderRequest.getBreadType())

@@ -17,4 +17,5 @@ public class OrderResponse {
     private String name;
     private int price;
     private int count;
+    private String image;
 }

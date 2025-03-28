@@ -45,7 +45,9 @@ public enum ErrorCode {
     INVALID_GEO_COORDINATES(7000, "유효하지 않은 위경도 범위입니다."),
 
     CANT_REMOVE_OCCUPIED_VENDING_MACHINE(8000, "사용중인 자판기는 삭제할 수 없습니다."),
-    NOT_FOUND_VENDING_MACHINE(8001, "해당 자판기를 찾을 수 없습니다.");
+    NOT_FOUND_VENDING_MACHINE(8001, "해당 자판기를 찾을 수 없습니다."),
+
+    FILE_UPLOAD_FAILED(9000, "파일 업로드에 실패했습니다. 다시 시도해 주세요.");
 
     private final int code;
     private final String message;
