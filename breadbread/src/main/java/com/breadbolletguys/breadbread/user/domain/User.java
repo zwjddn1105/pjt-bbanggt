@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import com.breadbolletguys.breadbread.common.domain.BaseTimeEntity;
+import com.breadbolletguys.breadbread.common.exception.BadRequestException;
+import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -60,5 +62,12 @@ public class User extends BaseTimeEntity {
 
     public boolean isAdmin() {
         return userRole == UserRole.ADMIN;
+    }
+
+    public void changeSeller() {
+        if (this.userRole == UserRole.SELLER) {
+            throw new BadRequestException(ErrorCode.ALREADY_SELLER);
+        }
+        this.userRole = UserRole.SELLER;
     }
 }

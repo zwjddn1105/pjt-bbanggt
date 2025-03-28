@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,10 @@ public class OrderRepository {
 
     public OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId) {
         return orderQueryRepository.findByIdAndVendingMachineId(id, vendingMachineId);
+    }
+
+    public List<OrderStackResponse> findStocksBySellerId(Long userId) {
+        return orderQueryRepository.findStocksBySellerId(userId);
     }
 
     public void saveAll(List<Order> orders) {

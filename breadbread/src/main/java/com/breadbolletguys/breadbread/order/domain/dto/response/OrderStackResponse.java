@@ -1,24 +1,17 @@
 package com.breadbolletguys.breadbread.order.domain.dto.response;
 
-import com.breadbolletguys.breadbread.order.domain.BreadType;
 import com.breadbolletguys.breadbread.order.domain.ProductState;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderResponse {
+public class OrderStackResponse {
     private Long id;
     private String memo;
-    private String bakeryName;
-    private int price;
-    private int salePrice;
     private int count;
-    private String image;
     private ProductState productState;
-    private BreadType breadType;
 }

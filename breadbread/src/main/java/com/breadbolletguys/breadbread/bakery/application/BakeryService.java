@@ -41,6 +41,7 @@ public class BakeryService {
                 .averageScore(0.0)
                 .build();
         bakeryRepository.save(bakery);
+        user.changeSeller();
     }
 
     @Transactional(readOnly = true)

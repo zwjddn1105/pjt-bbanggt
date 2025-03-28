@@ -21,6 +21,7 @@ public enum ErrorCode {
     UNABLE_TO_PURCHASE_PRODUCT(10011, "해당 상태의 빵은 결제할 수 없습니다."),
     DUPLICATE_BOOKMARK(10012, "이미 북마크한 빵집입니다."),
     BOOKMARK_NOT_FOUND(10013, "북마크가 존재하지 않습니다."),
+    ALREADY_SELLER(10014, "이미 판매자입니다."),
 
     UNABLE_TO_GET_USER_INFO(2001, "소셜 로그인 공급자로부터 유저 정보를 받아올 수 없습니다."),
     UNABLE_TO_GET_ACCESS_TOKEN(2002, "소셜 로그인 공급자로부터 인증 토큰을 받아올 수 없습니다."),

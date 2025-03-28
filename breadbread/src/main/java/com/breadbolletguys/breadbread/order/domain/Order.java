@@ -43,11 +43,11 @@ public class Order extends BaseTimeEntity {
     @Setter
     private Long buyerId;
 
-    @Column(name = "name", length = 128, nullable = false)
-    private String name;
-
     @Column(name = "price", nullable = false)
     private int price;
+
+    @Column(name = "discount", nullable = false)
+    private double discount;
 
     @Column(name = "count", nullable = false)
     private int count;
@@ -73,8 +73,8 @@ public class Order extends BaseTimeEntity {
             Long sellerId,
             Long spaceId,
             Long buyerId,
-            String name,
             int price,
+            double discount,
             int count,
             String image,
             LocalDateTime expirationDate,
@@ -85,8 +85,8 @@ public class Order extends BaseTimeEntity {
         this.sellerId = sellerId;
         this.spaceId = spaceId;
         this.buyerId = buyerId;
-        this.name = name;
         this.price = price;
+        this.discount = discount;
         this.count = count;
         this.image = image;
         this.expirationDate = expirationDate;
