@@ -44,6 +44,9 @@ public class VendingMachine {
     @Column(name = "memo", length = 256, nullable = false)
     private String memo;
 
+    @Column(name = "name", length = 32, nullable = false)
+    private String name;
+
     @Column(name = "available_count", nullable = false)
     private int availableCount;
 
@@ -67,7 +70,8 @@ public class VendingMachine {
             List<String> imageUrls,
             String memo,
             int height,
-            int width
+            int width,
+            String name
     ) {
         this.id = id;
         this.longitude = longitude;
@@ -79,5 +83,6 @@ public class VendingMachine {
         this.totalCount = height * width;
         this.availableCount = height * width;
         this.deleted = false;
+        this.name = name;
     }
 }

@@ -5,6 +5,7 @@ public record VendingMachineCreateJsonRequest(
         Double longitude,
         String memo,
         int row,
-        int column
+        int column,
+        String name
 ) {
 }
