@@ -8,16 +8,20 @@ import { OrderItem } from "@/components/order/order-item"
 export default function OrderTabs() {
   // 탭 상태 관리를 위한 state
   const [activeTab, setActiveTab] = useState("My 빵긋")
+
   // 더미 데이터
   const storeItems = [
     {
       id: 1,
-      storeName: "빵긋빵긋 역삼점 1호점",
+      storeName: "빵긋빵긋 역삼 1번출구점",
       totalCount: 30,
       availableCount: 13,
       items: [
-        { name: "소보로", count: 6 },
+        { name: "소보로빵", count: 6 },
         { name: "단팥빵", count: 1 },
+        { name: "잡씨드너츠", count: 2 },
+        { name: "꽈배기", count: 2 },
+        { name: "모듬빵", count: 2 },
       ],
       isNew: true,
     },
@@ -29,6 +33,7 @@ export default function OrderTabs() {
       items: [
         { name: "크로와상", count: 3 },
         { name: "바게트", count: 2 },
+        { name: "치즈빵", count: 3 },
       ],
     },
     {
@@ -71,7 +76,7 @@ export default function OrderTabs() {
         </div>
         {/* 검색 버튼 */}
         <button className="p-2 text-primary-custom">
-            <Search width={28} height={28} />
+          <Search width={28} height={28} />
         </button>
       </div>
 
