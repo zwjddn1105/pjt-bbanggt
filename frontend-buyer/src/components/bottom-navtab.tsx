@@ -9,7 +9,7 @@ export default function BottomNavTab() {
   const pathname = usePathname()
 
   const tabs = [
-    { id: "홈", icon: Home, href: "/" },
+    { id: "홈", icon: Home, href: "/home" },
     { id: "문의", icon: MessageCircle, href: "/inquiry" },
     { id: "주문", icon: ShoppingCart, href: "/order" },
     { id: "픽업", icon: ShoppingCart, href: "/pickup" },
@@ -38,7 +38,7 @@ export default function BottomNavTab() {
                   <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
                     isActive ? "bg-orange-500" : "bg-bread-brown"
                   }`}>
-                    <Image src="/logo.jpg" alt="로고" width={30} height={30} className="rounded-full" />
+                    <Image src="/bread-pattern.png" alt="로고" width={30} height={30} className="rounded-full" />
                   </div>
                 </div>
               )}

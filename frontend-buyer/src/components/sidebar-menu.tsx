@@ -14,7 +14,7 @@ export default function SidebarMenu({ username = "random1234", profileImage = "/
   // 드롭다운 메뉴 상태 관리
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
     빵집리스트: false,
-    빵굿리스트: false,
+    빵긋긋리스트: false,
     빵리스트: false,
   })
 
@@ -51,7 +51,7 @@ export default function SidebarMenu({ username = "random1234", profileImage = "/
       {/* 메뉴 항목들 */}
       <div className="flex-1 overflow-auto">
         <Link href="/my-bread" className="block px-4 py-3 border-b">
-          MY 빵굿 보기
+          MY 빵긋긋 보기
         </Link>
         <Link href="/my-bakery" className="block px-4 py-3 border-b">
           MY 빵집 보기
@@ -88,25 +88,25 @@ export default function SidebarMenu({ username = "random1234", profileImage = "/
           )}
         </div>
 
-        {/* 드롭다운 메뉴 - 빵굿 리스트 */}
+        {/* 드롭다운 메뉴 - 빵긋긋 리스트 */}
         <div className="border-b">
           <button
             className="w-full flex justify-between items-center px-4 py-3"
-            onClick={() => toggleMenu("빵굿리스트")}
+            onClick={() => toggleMenu("빵긋리스트")}
           >
-            <span>MY 빵굿 리스트</span>
-            <ChevronDown className={`h-5 w-5 transition-transform ${openMenus["빵굿리스트"] ? "rotate-180" : ""}`} />
+            <span>MY 빵긋 리스트</span>
+            <ChevronDown className={`h-5 w-5 transition-transform ${openMenus["빵긋긋리스트"] ? "rotate-180" : ""}`} />
           </button>
-          {openMenus["빵굿리스트"] && (
+          {openMenus["빵긋긋리스트"] && (
             <div className="bg-gray-50 py-2 px-6">
               <Link href="/bread/list/favorite" className="block py-2">
-                즐겨찾는 빵굿
+                즐겨찾는 빵긋
               </Link>
               <Link href="/bread/list/recent" className="block py-2">
-                최근 주문 빵굿
+                최근 주문 빵긋
               </Link>
               <Link href="/bread/list/all" className="block py-2">
-                모든 빵굿
+                모든 빵긋
               </Link>
             </div>
           )}
