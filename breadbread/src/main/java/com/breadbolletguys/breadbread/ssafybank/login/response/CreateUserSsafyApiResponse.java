@@ -1,6 +1,6 @@
-package com.breadbolletguys.breadbread.ssafybank.login.service.response;
+package com.breadbolletguys.breadbread.ssafybank.login.response;
 
-public record CreateSsafyUserResponse(
+public record CreateUserSsafyApiResponse(
     String userId,
     String username,
     String institutionCode,

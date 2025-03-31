@@ -64,4 +64,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(BAD_REQUEST)
             .body(new ExceptionResponse(exception.getCode(), exception.getMessage()));
     }
+
+    @ExceptionHandler(SsafyApiException.class)
+    public ResponseEntity<SsafyApiExceptionResponse> handleSsafyApiException(SsafyApiException exception) {
+        log.warn(exception.getMessage(), exception);
+        return ResponseEntity.status(BAD_REQUEST)
+            .body(new SsafyApiExceptionResponse(
+                new SsafyApiExceptionResponse.Header(exception.getCode(), exception.getMessage())));
+    }
 }

@@ -1,4 +1,4 @@
-package com.breadbolletguys.breadbread.ssafybank.login.service.response;
+package com.breadbolletguys.breadbread.ssafybank.login.response;
 
 public record FindSsafyUserResponse(
     String userId,
