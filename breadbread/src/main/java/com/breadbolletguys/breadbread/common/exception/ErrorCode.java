@@ -48,7 +48,11 @@ public enum ErrorCode {
     CANT_REMOVE_OCCUPIED_VENDING_MACHINE(8000, "사용중인 자판기는 삭제할 수 없습니다."),
     NOT_FOUND_VENDING_MACHINE(8001, "해당 자판기를 찾을 수 없습니다."),
 
-    FILE_UPLOAD_FAILED(9000, "파일 업로드에 실패했습니다. 다시 시도해 주세요.");
+    FILE_UPLOAD_FAILED(9000, "파일 업로드에 실패했습니다. 다시 시도해 주세요."),
+
+    NOT_FOUND_CHAT_ROOM(10000, "해당 문의 채팅방이 존재하지 않습니다."),
+    USER_NOT_IN_CHAT_ROOM(10001, "문의방에 존재하지 않는 유저입니다."),
+    ALREADY_EXIST_CHAT_ROOM_BETWEEN_OWNER_AND_CUSTOMER(10002, "이미 둘 사이에 문의채팅방이 존재합니다.");
 
     private final int code;
     private final String message;

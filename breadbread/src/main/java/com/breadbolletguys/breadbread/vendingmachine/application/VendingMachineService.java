@@ -38,6 +38,7 @@ public class VendingMachineService {
                 .memo(request.memo())
                 .longitude(request.longitude())
                 .latitude(request.latitude())
+                .name(request.name())
                 .build();
 
         vendingMachineRepository.save(vendingMachine);
