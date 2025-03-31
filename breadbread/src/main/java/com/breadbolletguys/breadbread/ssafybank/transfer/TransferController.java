@@ -1,7 +1,9 @@
 package com.breadbolletguys.breadbread.ssafybank.transfer;
 
 import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountDepositRequest;
+import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountTransferRequest;
 import com.breadbolletguys.breadbread.ssafybank.transfer.response.AccountDepositSsafyApiResponse;
+import com.breadbolletguys.breadbread.ssafybank.transfer.response.AccountTransferSsafyApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,6 +35,14 @@ public class TransferController {
         @RequestBody AccountDepositRequest accountDepositRequest
     ) {
         AccountDepositSsafyApiResponse response = ssafyTransferService.accountDeposit(accountDepositRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<AccountTransferSsafyApiResponse> transferAccount(
+        @RequestBody AccountTransferRequest accountTransferRequest
+    ) {
+        AccountTransferSsafyApiResponse response = ssafyTransferService.accountTransfer(accountTransferRequest);
         return ResponseEntity.ok(response);
     }
 }

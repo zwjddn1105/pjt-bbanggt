@@ -8,9 +8,12 @@ import com.breadbolletguys.breadbread.ssafybank.common.request.SsafyBankRequestH
 import com.breadbolletguys.breadbread.ssafybank.common.response.SsafyBankErrorResponse;
 import com.breadbolletguys.breadbread.ssafybank.common.util.SsafyBankUtil;
 import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountDepositRequest;
+import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountTransferRequest;
+import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountTransferSsafyApiRequest;
 import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountWithdrawRequest;
 import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountWithdrawSsafyApiRequest;
 import com.breadbolletguys.breadbread.ssafybank.transfer.response.AccountDepositSsafyApiResponse;
+import com.breadbolletguys.breadbread.ssafybank.transfer.response.AccountTransferSsafyApiResponse;
 import com.breadbolletguys.breadbread.ssafybank.transfer.response.AccountWithdrawSsafyApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -81,5 +84,34 @@ public class SsafyTransferService {
                 throw new SsafyApiException(errorResponse.responseCode(), errorResponse.responseMessage());
             })
             .body(AccountDepositSsafyApiResponse.class);
+    }
+
+    public AccountTransferSsafyApiResponse accountTransfer(AccountTransferRequest req) {
+        String apiKey = ssafyBankUtil.userApiKey;
+
+        RestClient restClient = RestClient.create();
+        var header = SsafyBankRequestHeader.of(ApiName.TRANSFER_ACCOUNT, apiKey, req.userKey());
+        var accountTransferReq = new AccountTransferSsafyApiRequest(
+            header,
+            req.depositAccountNo(),
+            req.depositTransactionSummary(),
+            req.transactionBalance(),
+            req.withdrawalAccountNo(),
+            req.depositTransactionSummary());
+
+        return restClient.post()
+            .uri("https://finopenapi.ssafy.io/ssafy/api/v1/edu/demandDeposit/updateDemandDepositAccountTransfer")
+            .body(accountTransferReq)
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError, (reqSpec, res) -> {
+                String errorBody = new BufferedReader(new InputStreamReader(res.getBody()))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+                ObjectMapper mapper = new ObjectMapper();
+
+                SsafyBankErrorResponse errorResponse = mapper.readValue(errorBody, SsafyBankErrorResponse.class);
+                throw new SsafyApiException(errorResponse.responseCode(), errorResponse.responseMessage());
+            })
+            .body(AccountTransferSsafyApiResponse.class);
     }
 }
