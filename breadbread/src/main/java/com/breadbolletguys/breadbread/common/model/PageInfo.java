@@ -19,6 +19,6 @@ public record PageInfo<T> (
 
         var lastValue = data.get(expectedSize - 1);
         var pageToken = pageTokenFunction.apply(lastValue).toString();
-        return new PageInfo<T>(pageToken, data.subList(0, expectedSize-1), true);
+        return new PageInfo<T>(pageToken, data.subList(0, expectedSize), true);
     }
 }
