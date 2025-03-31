@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.response.CreateAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.response.FindAccountResponse;
+import com.breadbolletguys.breadbread.ssafybank.account.response.FindUserAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.service.SsafyAccountService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,17 @@ public class SsafyAccountController {
         return ResponseEntity.ok(account);
     }
 
+    @GetMapping("/accounts")
+    public ResponseEntity<FindUserAccountResponse> findUserAccount(
+        @RequestBody CreateAccountRequest request
+    ) {
+        FindUserAccountResponse userAccounts = accountService.findUserAccount(request);
+        return ResponseEntity.ok(userAccounts);
+    }
+
     @GetMapping
     public ResponseEntity<FindAccountResponse> findAccount() {
-        FindAccountResponse account = accountService.findAccount();
+        FindAccountResponse account = accountService.findProductAccount();
         return ResponseEntity.ok(account);
     }
 

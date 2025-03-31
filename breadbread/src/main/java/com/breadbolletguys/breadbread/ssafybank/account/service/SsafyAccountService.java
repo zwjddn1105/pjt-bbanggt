@@ -12,8 +12,10 @@ import com.breadbolletguys.breadbread.common.exception.SsafyApiException;
 import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountSsafyApiRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.request.FindProductSsafyApiRequest;
+import com.breadbolletguys.breadbread.ssafybank.account.request.FindUserAccountRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.response.CreateAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.response.FindAccountResponse;
+import com.breadbolletguys.breadbread.ssafybank.account.response.FindUserAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.common.domain.ApiName;
 import com.breadbolletguys.breadbread.ssafybank.common.request.SsafyBankRequestHeader;
 import com.breadbolletguys.breadbread.ssafybank.common.response.SsafyBankErrorResponse;
@@ -29,7 +31,7 @@ public class SsafyAccountService {
 
     private final SsafyBankUtil ssafyBankUtil;
 
-    public FindAccountResponse findAccount() {
+    public FindAccountResponse findProductAccount() {
         String apiKey = ssafyBankUtil.userApiKey;
 
         RestClient restClient = RestClient.create();
@@ -73,5 +75,27 @@ public class SsafyAccountService {
                 throw new SsafyApiException(errorResponse.responseCode(), errorResponse.responseMessage());
             })
             .body(CreateAccountResponse.class);
+    }
+
+    public FindUserAccountResponse findUserAccount(CreateAccountRequest req) {
+        String apiKey = ssafyBankUtil.userApiKey;
+
+        RestClient restClient = RestClient.create();
+        var header = SsafyBankRequestHeader.of(ApiName.INQUIRE_ACCOUNT_LIST, apiKey, req.userKey());
+        var findUserAccountRequest = new FindUserAccountRequest(header);
+        return restClient.post()
+            .uri("https://finopenapi.ssafy.io/ssafy/api/v1/edu/demandDeposit/inquireDemandDepositAccountList")
+            .body(findUserAccountRequest)
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError, (reqSpec, res) -> {
+                String errorBody = new BufferedReader(new InputStreamReader(res.getBody()))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+                ObjectMapper mapper = new ObjectMapper();
+
+                SsafyBankErrorResponse errorResponse = mapper.readValue(errorBody, SsafyBankErrorResponse.class);
+                throw new SsafyApiException(errorResponse.responseCode(), errorResponse.responseMessage());
+            })
+            .body(FindUserAccountResponse.class);
     }
 }
