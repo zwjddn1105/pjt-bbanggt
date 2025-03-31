@@ -7,10 +7,10 @@ public enum ApiName {
     CREATE_ACCOUNT("createDemandDepositAccount"),
     INQUIRE_DEPOSIT_LIST("inquireDemandDepositList"),
     INQUIRE_ACCOUNT_LIST("inquireDemandDepositAccountList"),
-    WITHDRAW_ACCOUNT("updateDemandDepositAccountWithdrawal");
+    WITHDRAW_ACCOUNT("updateDemandDepositAccountWithdrawal"),
+    DEPOSIT_ACCOUNT("updateDemandDepositAccountDeposit");
 
     private String apiName;
-
     ApiName(String apiName) {
         this.apiName = apiName;
     }

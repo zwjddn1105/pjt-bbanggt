@@ -7,8 +7,10 @@ import com.breadbolletguys.breadbread.ssafybank.common.domain.ApiName;
 import com.breadbolletguys.breadbread.ssafybank.common.request.SsafyBankRequestHeader;
 import com.breadbolletguys.breadbread.ssafybank.common.response.SsafyBankErrorResponse;
 import com.breadbolletguys.breadbread.ssafybank.common.util.SsafyBankUtil;
+import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountDepositRequest;
 import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountWithdrawRequest;
 import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountWithdrawSsafyApiRequest;
+import com.breadbolletguys.breadbread.ssafybank.transfer.response.AccountDepositSsafyApiResponse;
 import com.breadbolletguys.breadbread.ssafybank.transfer.response.AccountWithdrawSsafyApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class SsafyTransferService {
         String apiKey = ssafyBankUtil.userApiKey;
 
         RestClient restClient = RestClient.create();
-        var header = SsafyBankRequestHeader.of(ApiName.WITHDRAW_ACCOUNT, apiKey, null);
+        var header = SsafyBankRequestHeader.of(ApiName.WITHDRAW_ACCOUNT, apiKey, req.userKey());
         var accountWithdrawReq = new AccountWithdrawSsafyApiRequest(
             header,
             req.accountNo(),
@@ -39,7 +41,7 @@ public class SsafyTransferService {
             req.transactionSummary());
 
         return restClient.post()
-            .uri("https://finopenapi.ssafy.io/ssafy/api/v1/edu/demandDeposit/updateDemandDepositAcountWithdrawal")
+            .uri("https://finopenapi.ssafy.io/ssafy/api/v1/edu/demandDeposit/updateDemandDepositAccountWithdrawal")
             .body(accountWithdrawReq)
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, (reqSpec, res) -> {
@@ -52,5 +54,32 @@ public class SsafyTransferService {
                 throw new SsafyApiException(errorResponse.responseCode(), errorResponse.responseMessage());
             })
             .body(AccountWithdrawSsafyApiResponse.class);
+    }
+
+    public AccountDepositSsafyApiResponse accountDeposit(AccountDepositRequest req) {
+        String apiKey = ssafyBankUtil.userApiKey;
+
+        RestClient restClient = RestClient.create();
+        var header = SsafyBankRequestHeader.of(ApiName.DEPOSIT_ACCOUNT, apiKey, req.userKey());
+        var accountDepositReq = new AccountWithdrawSsafyApiRequest(
+            header,
+            req.accountNo(),
+            req.transactionBalance(),
+            req.transactionSummary());
+
+        return restClient.post()
+            .uri("https://finopenapi.ssafy.io/ssafy/api/v1/edu/demandDeposit/updateDemandDepositAccountDeposit")
+            .body(accountDepositReq)
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError, (reqSpec, res) -> {
+                String errorBody = new BufferedReader(new InputStreamReader(res.getBody()))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+                ObjectMapper mapper = new ObjectMapper();
+
+                SsafyBankErrorResponse errorResponse = mapper.readValue(errorBody, SsafyBankErrorResponse.class);
+                throw new SsafyApiException(errorResponse.responseCode(), errorResponse.responseMessage());
+            })
+            .body(AccountDepositSsafyApiResponse.class);
     }
 }
