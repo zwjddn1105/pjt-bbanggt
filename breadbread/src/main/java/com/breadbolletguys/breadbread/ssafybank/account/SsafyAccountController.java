@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.breadbolletguys.breadbread.ssafybank.account.dto.CreateAccountRequestDto;
+import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.response.CreateAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.response.FindAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.service.SsafyAccountService;
@@ -22,7 +22,7 @@ public class SsafyAccountController {
 
     @PostMapping
     public ResponseEntity<CreateAccountResponse> createAccount(
-        @RequestBody CreateAccountRequestDto request
+        @RequestBody CreateAccountRequest request
     ) {
         CreateAccountResponse account = accountService.createAccount(request);
         return ResponseEntity.ok(account);

@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import com.breadbolletguys.breadbread.common.exception.SsafyApiException;
-import com.breadbolletguys.breadbread.ssafybank.account.dto.CreateAccountRequestDto;
 import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountRequest;
-import com.breadbolletguys.breadbread.ssafybank.account.request.FindAccountProductRequest;
+import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountSsafyApiRequest;
+import com.breadbolletguys.breadbread.ssafybank.account.request.FindProductSsafyApiRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.response.CreateAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.response.FindAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.common.domain.ApiName;
@@ -34,11 +34,11 @@ public class SsafyAccountService {
 
         RestClient restClient = RestClient.create();
         var header = SsafyBankRequestHeader.of(ApiName.INQUIRE_ACCOUNT, apiKey, null);
-        FindAccountProductRequest findAccountProductRequest = new FindAccountProductRequest(header);
+        FindProductSsafyApiRequest findProductSsafyApiRequest = new FindProductSsafyApiRequest(header);
 
         return restClient.post()
             .uri("https://finopenapi.ssafy.io/ssafy/api/v1/edu/demandDeposit/inquireDemandDepositList")
-            .body(findAccountProductRequest)
+            .body(findProductSsafyApiRequest)
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, (reqSpec, res) -> {
                 String errorBody = new BufferedReader(new InputStreamReader(res.getBody()))
@@ -52,16 +52,16 @@ public class SsafyAccountService {
             .body(FindAccountResponse.class);
     }
 
-    public CreateAccountResponse createAccount(CreateAccountRequestDto req) {
+    public CreateAccountResponse createAccount(CreateAccountRequest req) {
         String apiKey = ssafyBankUtil.userApiKey;
 
         RestClient restClient = RestClient.create();
 
         var header = SsafyBankRequestHeader.of(ApiName.CREATE_ACCOUNT, apiKey, req.userKey());
-        var createAccountRequest = new CreateAccountRequest(header, accountTypeUniqueNo);
+        var createAccountSsafyApiRequest = new CreateAccountSsafyApiRequest(header, accountTypeUniqueNo);
         return restClient.post()
             .uri("https://finopenapi.ssafy.io/ssafy/api/v1/edu/demandDeposit/createDemandDepositAccount")
-            .body(createAccountRequest)
+            .body(createAccountSsafyApiRequest)
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, (reqSpec, res) -> {
                 String errorBody = new BufferedReader(new InputStreamReader(res.getBody()))
