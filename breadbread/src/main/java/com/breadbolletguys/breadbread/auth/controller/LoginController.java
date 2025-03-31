@@ -41,10 +41,10 @@ public class LoginController {
 
         ResponseCookie cookie = ResponseCookie.from("refresh-token", userTokens.getRefreshToken())
                 .maxAge(ONE_WEEK_SECONDS)
-//                .secure(true)
+                .secure(true)
                 .httpOnly(true)
                 .sameSite("None")
-                .domain(".breadbread.net")
+                .domain("j12a209.p.ssafy.io")
                 .path("/")
                 .build();
 
