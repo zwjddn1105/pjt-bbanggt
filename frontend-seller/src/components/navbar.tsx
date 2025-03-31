@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import { isLoggedIn, logout } from "@/lib/auth";
+import { isLoggedIn } from "@/lib/auth";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -29,12 +29,6 @@ export default function Navbar() {
       // 로그인 페이지로 이동
       window.location.href = "/";
     }
-  };
-
-  // 로그아웃 처리
-  const handleLogout = async () => {
-    await logout();
-    setIsUserLoggedIn(false);
   };
 
   return (
@@ -101,16 +95,7 @@ export default function Navbar() {
               {isUserLoggedIn ? "마이페이지" : "로그인"}
             </Button>
 
-            {/* 로그인 상태일 때만 로그아웃 버튼 표시 (선택적) */}
-            {isUserLoggedIn && (
-              <Button
-                onClick={handleLogout}
-                variant="ghost"
-                className="ml-2 text-gray-600 hover:text-orange-500"
-              >
-                로그아웃
-              </Button>
-            )}
+            {/* 로그아웃 버튼 제거 */}
           </div>
 
           {/* 모바일 메뉴 버튼 */}
@@ -177,19 +162,7 @@ export default function Navbar() {
               {isUserLoggedIn ? "마이페이지" : "로그인"}
             </Button>
 
-            {/* 로그인 상태일 때만 로그아웃 버튼 표시 (모바일) */}
-            {isUserLoggedIn && (
-              <Button
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  handleLogout();
-                }}
-                variant="ghost"
-                className="w-full mt-2 text-gray-600 hover:text-orange-500"
-              >
-                로그아웃
-              </Button>
-            )}
+            {/* 모바일 로그아웃 버튼도 제거 */}
           </div>
         </div>
       </div>
