@@ -1,5 +1,14 @@
 package com.breadbolletguys.breadbread.chat.application;
 
+import static com.breadbolletguys.breadbread.common.exception.ErrorCode.ALREADY_EXIST_CHAT_ROOM_BETWEEN_OWNER_AND_CUSTOMER;
+import static com.breadbolletguys.breadbread.common.exception.ErrorCode.BAKERY_NOT_FOUND;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.breadbolletguys.breadbread.bakery.domain.Bakery;
 import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
 import com.breadbolletguys.breadbread.chat.domain.ChatRoom;
@@ -13,15 +22,8 @@ import com.breadbolletguys.breadbread.chat.domain.repository.ChatRoomRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.model.PageInfo;
 import com.breadbolletguys.breadbread.user.domain.User;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static com.breadbolletguys.breadbread.common.exception.ErrorCode.ALREADY_EXIST_CHAT_ROOM_BETWEEN_OWNER_AND_CUSTOMER;
-import static com.breadbolletguys.breadbread.common.exception.ErrorCode.BAKERY_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

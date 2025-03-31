@@ -3,7 +3,7 @@ package com.breadbolletguys.breadbread.common.model;
 import java.util.List;
 import java.util.function.Function;
 
-public record PageInfo<T> (
+public record PageInfo<T>(
         String pageToken,
         List<T> data,
         boolean hasNext

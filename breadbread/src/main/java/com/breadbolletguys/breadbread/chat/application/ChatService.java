@@ -2,16 +2,16 @@ package com.breadbolletguys.breadbread.chat.application;
 
 import static com.breadbolletguys.breadbread.common.exception.ErrorCode.*;
 
-import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatResponse;
-import com.breadbolletguys.breadbread.common.model.PageInfo;
 import org.springframework.stereotype.Service;
 
 import com.breadbolletguys.breadbread.chat.domain.Chat;
 import com.breadbolletguys.breadbread.chat.domain.ChatRoom;
 import com.breadbolletguys.breadbread.chat.domain.dto.request.ChatRequest;
+import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatResponse;
 import com.breadbolletguys.breadbread.chat.domain.repository.ChatRepository;
 import com.breadbolletguys.breadbread.chat.domain.repository.ChatRoomRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
+import com.breadbolletguys.breadbread.common.model.PageInfo;
 import com.breadbolletguys.breadbread.user.domain.User;
 
 import lombok.RequiredArgsConstructor;

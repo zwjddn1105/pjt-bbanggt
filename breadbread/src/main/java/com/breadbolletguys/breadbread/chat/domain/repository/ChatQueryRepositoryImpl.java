@@ -1,19 +1,20 @@
 package com.breadbolletguys.breadbread.chat.domain.repository;
 
-import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatQueryResponse;
-import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatResponse;
-import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomQueryResponse;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-
 import static com.breadbolletguys.breadbread.chat.domain.QChat.chat;
 import static com.breadbolletguys.breadbread.chat.domain.QChatRoom.chatRoom;
 import static com.breadbolletguys.breadbread.user.domain.QUser.user;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatQueryResponse;
+import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatResponse;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor

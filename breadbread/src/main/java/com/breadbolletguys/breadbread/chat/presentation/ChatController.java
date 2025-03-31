@@ -1,12 +1,7 @@
 package com.breadbolletguys.breadbread.chat.presentation;
 
-import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
-import com.breadbolletguys.breadbread.chat.application.ChatService;
-import com.breadbolletguys.breadbread.chat.domain.dto.request.ChatRequest;
-import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatResponse;
-import com.breadbolletguys.breadbread.common.model.PageInfo;
-import com.breadbolletguys.breadbread.user.domain.User;
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
+import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
+import com.breadbolletguys.breadbread.chat.application.ChatService;
+import com.breadbolletguys.breadbread.chat.domain.dto.request.ChatRequest;
+import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatResponse;
+import com.breadbolletguys.breadbread.common.model.PageInfo;
+import com.breadbolletguys.breadbread.user.domain.User;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor

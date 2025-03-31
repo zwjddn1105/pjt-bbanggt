@@ -1,13 +1,15 @@
 package com.breadbolletguys.breadbread.chat.domain.repository;
 
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
 import com.breadbolletguys.breadbread.chat.domain.Chat;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatQueryResponse;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatResponse;
 import com.breadbolletguys.breadbread.common.model.PageInfo;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
