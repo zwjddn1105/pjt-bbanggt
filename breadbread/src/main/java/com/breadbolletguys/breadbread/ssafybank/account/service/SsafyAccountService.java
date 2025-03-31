@@ -35,7 +35,7 @@ public class SsafyAccountService {
         String apiKey = ssafyBankUtil.userApiKey;
 
         RestClient restClient = RestClient.create();
-        var header = SsafyBankRequestHeader.of(ApiName.INQUIRE_ACCOUNT, apiKey, null);
+        var header = SsafyBankRequestHeader.of(ApiName.INQUIRE_DEPOSIT_LIST, apiKey, null);
         FindProductSsafyApiRequest findProductSsafyApiRequest = new FindProductSsafyApiRequest(header);
 
         return restClient.post()

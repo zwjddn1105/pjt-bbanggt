@@ -5,8 +5,9 @@ import lombok.Getter;
 @Getter
 public enum ApiName {
     CREATE_ACCOUNT("createDemandDepositAccount"),
-    INQUIRE_ACCOUNT("inquireDemandDepositList"),
-    INQUIRE_ACCOUNT_LIST("inquireDemandDepositAccountList");
+    INQUIRE_DEPOSIT_LIST("inquireDemandDepositList"),
+    INQUIRE_ACCOUNT_LIST("inquireDemandDepositAccountList"),
+    WITHDRAW_ACCOUNT("updateDemandDepositAccountWithdrawal");
 
     private String apiName;
 
