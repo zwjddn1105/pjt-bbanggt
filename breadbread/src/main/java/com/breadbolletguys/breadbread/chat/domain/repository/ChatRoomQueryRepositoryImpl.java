@@ -45,6 +45,6 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
             return null;
         }
 
-        return chatRoom.id.loe(Long.valueOf(pageToken));
+        return chatRoom.id.lt(Long.valueOf(pageToken));
     }
 }

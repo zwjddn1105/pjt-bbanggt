@@ -58,6 +58,6 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
             return null;
         }
 
-        return chat.id.loe(Long.valueOf(pageToken));
+        return chat.id.lt(Long.valueOf(pageToken));
     }
 }
