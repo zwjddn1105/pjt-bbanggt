@@ -41,7 +41,7 @@ export default function StoreDetailModal({
     }
   }, [isOpen])
 
-  // 빵굿보기 버튼 클릭 핸들러
+  // 빵긋긋보기 버튼 클릭 핸들러
   const handleViewBread = () => {
     setCurrentView("detail")
   }
@@ -123,10 +123,10 @@ export default function StoreDetailModal({
 
               {/* 재고 정보 */}
               <div className="mb-4">
-                <p className="text-sm mb-1">남은 빵굿: 13/30</p>
+                <p className="text-sm mb-1">남은 빵긋: 13/30</p>
                 <p className="text-sm mb-1">남은 빵 종류: 2</p>
                 <p className="text-sm flex justify-between">
-                  <span>참여 빵굿: 3</span>
+                  <span>참여 빵긋: 3</span>
                   <button className="text-orange-500 font-medium bg-orange-100 px-2 py-1 rounded-md">목록보기</button>
                 </p>
               </div>
@@ -146,7 +146,7 @@ export default function StoreDetailModal({
                   onClick={handleViewBread}
                   className="flex-1 py-3 bg-orange-400 text-white rounded-md font-medium"
                 >
-                  빵굿보기
+                  빵긋보기
                 </button>
               </div>
             </div>

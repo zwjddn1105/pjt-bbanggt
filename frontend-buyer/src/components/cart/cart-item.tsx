@@ -16,6 +16,24 @@ interface CartItemProps {
   onDelete: (id: number) => void
 }
 
+/**
+ * 장바구니 아이템 컴포넌트
+ *
+ * @param id - 아이템 ID
+ * @param name - 상품 이름
+ * @param bakery - 빵집 이름
+ * @param quantity - 수량
+ * @param price - 가격
+ * @param image - 이미지 경로
+ * @param isSelected - 선택 여부
+ * @param onSelectChange - 선택 상태 변경 핸들러
+ * @param onDelete - 삭제 핸들러
+ *
+ * @remarks
+ * API 연동 시 수정 사항:
+ * - 이미지 경로가 없는 경우 기본 이미지 사용
+ * - 삭제 버튼 클릭 시 실제 API 호출 필요
+ */
 export default function CartItem({
   id,
   name,
@@ -41,10 +59,9 @@ export default function CartItem({
     onSelectChange(id, newSelected)
   }
 
-  // 아이템 삭제 (API 연동 시 구현)
+  // 아이템 삭제
   const handleDelete = () => {
     console.log(`아이템 삭제: ${id}`)
-    // API 호출 예시: deleteCartItem(id)
     onDelete(id)
   }
 
@@ -62,7 +79,17 @@ export default function CartItem({
 
       {/* 상품 이미지 */}
       <div className="w-14 h-14 relative rounded-md overflow-hidden mr-3">
-        <Image src={image || "/bread-pattern.png"} alt={name} fill className="object-cover" />
+        <Image
+          src={image || "/placeholder.svg"}
+          alt={name}
+          fill
+          className="object-cover"
+          onError={(e) => {
+            // 이미지 로드 실패 시 기본 이미지로 대체
+            const target = e.target as HTMLImageElement
+            target.src = "/bread-pattern.png"
+          }}
+        />
       </div>
 
       {/* 상품 정보 */}

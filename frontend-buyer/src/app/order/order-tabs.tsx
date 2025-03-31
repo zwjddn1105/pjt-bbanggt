@@ -87,7 +87,7 @@ export default function OrderTabs() {
             {/* 주문 가능 시간 안내 */}
             <OrderTimeNotice />
 
-            {/* 상품(빵굿 매장) 목록 카드 반복 */}
+            {/* 상품(빵긋 매장) 목록 카드 반복 */}
             {storeItems.map((item) => (
               <OrderItem
                 key={item.id}

@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image"
+
 // API 연동 시 이 인터페이스를 API 응답 구조에 맞게 수정해야 함
 interface PaymentHistoryItemProps {
   date: string
@@ -25,7 +27,7 @@ interface PaymentHistoryItemProps {
  *
  * @remarks
  * API 연동 시 수정 사항:
- * 1. 더미 이미지를 실제 매장/상품 이미지로 ���체
+ * 1. 더미 이미지를 실제 매장/상품 이미지로 교체
  * 2. 결제 상태를 API에서 받아온 실제 상태로 표시
  * 3. 결제 상세 내역 페이지로 이동하는 기능 추가
  * 4. 결제 상태에 따른 조건부 UI 표시
@@ -37,15 +39,15 @@ interface PaymentHistoryItemProps {
  * - 결제 상태별 색상 코드 적용 (완료, 취소, 환불 등)
  */
 export function PaymentHistoryItem({ date, storeName, items, amount, status }: PaymentHistoryItemProps) {
-  // 결제 상태에 따른 스타일 변경 (API 연동 후 구현)
-  // const statusColor = status === '결제완료' ? 'text-primary-custom' :
-  //                     status === '환불' ? 'text-red-500' :
-  //                     'text-gray-500';
+  // 결제 상태에 따른 스타일 변경
+  const statusColor =
+    status === "결제완료" ? "text-primary-custom" : status === "환불" ? "text-red-500" : "text-gray-500"
 
   // 상세 내역 페이지로 이동 함수 (API 연동 후 구현)
   const handleItemClick = () => {
     // 결제 상세 내역 페이지로 이동
     // router.push(`/mypage/payment-detail/${paymentId}`);
+    console.log("결제 상세 내역으로 이동", { date, storeName, items, amount, status })
   }
 
   return (
@@ -57,7 +59,9 @@ export function PaymentHistoryItem({ date, storeName, items, amount, status }: P
       <div className="flex justify-between items-center">
         <div className="flex items-center">
           {/* 매장/상품 이미지 - API 연동 시 실제 이미지로 교체 필요 */}
-          <div className="w-10 h-10 bg-orange-100 rounded-md mr-3"></div>
+          <div className="w-10 h-10 bg-orange-100 rounded-md mr-3 flex items-center justify-center overflow-hidden">
+            <Image src="/mascot.png" alt="빵 이미지" width={30} height={30} className="object-contain" />
+          </div>
           <div>
             <div className="font-medium">{storeName}</div>
             <div className="text-sm text-gray-500">{items}</div>
@@ -65,7 +69,7 @@ export function PaymentHistoryItem({ date, storeName, items, amount, status }: P
         </div>
         <div className="text-right">
           <div className="font-medium">{amount.toLocaleString()}원</div>
-          <div className="text-xs text-primary-custom">{status}</div>
+          <div className={`text-xs ${statusColor}`}>{status}</div>
         </div>
       </div>
     </div>

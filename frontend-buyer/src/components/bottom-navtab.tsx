@@ -17,7 +17,7 @@ export default function BottomNavTab() {
   ]
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
       <div className="flex justify-around items-end h-16 px-2">
         {tabs.map((tab) => {
           // 경로가 정확히 일치하거나, 하위 경로인 경우 활성화 (예: /mypage/payment-history)
