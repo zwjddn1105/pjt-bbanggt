@@ -8,5 +8,7 @@ public record SsafyApiExceptionResponse(
     public record Header(
         @JsonProperty("responseCode") String responseCode,
         @JsonProperty("responseMessage") String responseMessage
-    ) {}
+    ) {
+
+    }
 }

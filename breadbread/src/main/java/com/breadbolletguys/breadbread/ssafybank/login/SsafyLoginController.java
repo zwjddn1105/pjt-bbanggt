@@ -1,10 +1,7 @@
 package com.breadbolletguys.breadbread.ssafybank.login;
 
-import com.breadbolletguys.breadbread.ssafybank.login.request.UserCreateRequest;
-import com.breadbolletguys.breadbread.ssafybank.login.response.CreateUserSsafyApiResponse;
-import com.breadbolletguys.breadbread.ssafybank.login.response.FindSsafyUserResponse;
-import com.breadbolletguys.breadbread.ssafybank.login.service.SsafyLoginService;
-import lombok.RequiredArgsConstructor;
+import static org.springframework.http.HttpStatus.CREATED;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static org.springframework.http.HttpStatus.CREATED;
+import com.breadbolletguys.breadbread.ssafybank.login.request.UserCreateRequest;
+import com.breadbolletguys.breadbread.ssafybank.login.response.CreateUserSsafyApiResponse;
+import com.breadbolletguys.breadbread.ssafybank.login.response.FindSsafyUserResponse;
+import com.breadbolletguys.breadbread.ssafybank.login.service.SsafyLoginService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/ssafy/login")

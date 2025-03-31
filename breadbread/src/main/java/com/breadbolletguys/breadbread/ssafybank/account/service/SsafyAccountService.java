@@ -1,5 +1,13 @@
 package com.breadbolletguys.breadbread.ssafybank.account.service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
+
+import org.springframework.http.HttpStatusCode;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
 import com.breadbolletguys.breadbread.common.exception.SsafyApiException;
 import com.breadbolletguys.breadbread.ssafybank.account.dto.CreateAccountRequestDto;
 import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountRequest;
@@ -11,14 +19,8 @@ import com.breadbolletguys.breadbread.ssafybank.common.request.SsafyBankRequestH
 import com.breadbolletguys.breadbread.ssafybank.common.response.SsafyBankErrorResponse;
 import com.breadbolletguys.breadbread.ssafybank.common.util.SsafyBankUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
