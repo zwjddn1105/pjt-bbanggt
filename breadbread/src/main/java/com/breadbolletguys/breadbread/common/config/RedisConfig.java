@@ -1,5 +1,8 @@
 package com.breadbolletguys.breadbread.common.config;
 
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +20,10 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
+
+    private static final String ADDRESS_FORMAT = "%s%s:%s";
+    private static final String REDISSON_HOST_PREFIX = "redis://";
+
     private final ObjectMapper objectMapper;
 
     @Value("${spring.data.redis.host}")
@@ -42,5 +49,12 @@ public class RedisConfig {
     @Bean
     public GeoOperations<String, String> geoOperations(RedisTemplate<String, String> template) {
         return template.opsForGeo();
+    }
+
+    @Bean
+    public RedissonClient redissonClient() {
+        Config config = new Config();
+        config.useSingleServer().setAddress(String.format(ADDRESS_FORMAT, REDISSON_HOST_PREFIX, host, port));
+        return Redisson.create(config);
     }
 }
