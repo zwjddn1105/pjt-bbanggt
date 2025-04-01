@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +25,8 @@ import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderSummaryResponse;
 import com.breadbolletguys.breadbread.order.domain.repository.OrderRepository;
-import com.breadbolletguys.breadbread.transaction.domain.Transaction;
-import com.breadbolletguys.breadbread.transaction.domain.repository.TransactionJpaRepository;
+import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountTransferRequest;
+import com.breadbolletguys.breadbread.ssafybank.transfer.service.SsafyTransferService;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SpaceResponse;
@@ -37,10 +39,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class OrderService {
+    @Value("${app.admin.userId}")
+    private String adminId;
+
+    @Value("{app.admin.userKey}")
+    private String adminKey;
+
+    @Value("{app.admin.account}")
+    private String adminAccount;
+
     private final BakeryRepository bakeryRepository;
     private final OrderRepository orderRepository;
     private final SpaceRepository spaceRepository;
-    private final TransactionJpaRepository transactionJpaRepository;
+    private final SsafyTransferService ssafyTransferService;
 
     @Transactional(readOnly = true)
     public List<SpaceResponse> getOrdersByVendingMachineId(Long vendingMachineId) {
@@ -82,38 +93,6 @@ public class OrderService {
         return orderRepository.findStocksBySellerId(user.getId());
     }
 
-//    @Transactional
-//    public void save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
-//        List<Order> orders = new ArrayList<>();
-//        Long bakeryId = bakeryRepository.findByUserId(user.getId())
-//                .orElseThrow(() -> new BadRequestException(ErrorCode.BAKERY_NOT_FOUND))
-//                .getId();
-//        for (OrderRequest orderRequest : orderRequests) {
-//            LocalDateTime expirationDate = LocalDateTime.now()
-//                    .plusDays(1)
-//                    .withHour(10)
-//                    .withMinute(0)
-//                    .withSecond(0)
-//                    .withNano(0);
-//
-//            Order order = Order.builder()
-//                    .bakeryId(bakeryId)
-//                    .sellerId(user.getId())
-//                    .spaceId(spaceId)
-//                    .buyerId(null)
-//                    .price(orderRequest.getPrice())
-//                    .discount(orderRequest.getDiscount() * 1.0 / 100)
-//                    .count(orderRequest.getCount())
-//                    .image(null)
-//                    .expirationDate(expirationDate)
-//                    .productState(ProductState.AVAILABLE)
-//                    .breadType(orderRequest.getBreadType())
-//                    .build();
-//            orders.add(order);
-//        }
-//        orderRepository.saveAll(orders);
-//    }
-
     @Transactional
     public void save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
         Long bakeryId = bakeryRepository.findByUserId(user.getId())
@@ -127,31 +106,27 @@ public class OrderService {
         }
     }
 
-
-    @Transactional
-    public void selectOrder(User user, Long orderId) {
+    public void payForOrder(User user, Long orderId, String accountNo) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
+
         if (!order.getProductState().equals(ProductState.AVAILABLE)) {
-            throw new BadRequestException(ErrorCode.UNABLE_TO_RESERVE_PRODUCT);
-        }
-        order.setBuyerId(user.getId());
-        order.setProductState(ProductState.RESERVED);
-    }
-
-    @Transactional
-    public void payForOrder(User user, Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
-
-        if (!order.getBuyerId().equals(user.getId())) {
             throw new BadRequestException(ErrorCode.FORBIDDEN_ORDER_ACCESS);
         }
-
-        if (!order.getProductState().equals(ProductState.RESERVED)) {
-            throw new BadRequestException(ErrorCode.UNABLE_TO_PURCHASE_PRODUCT);
-        }
+        order.setBuyerId(user.getId());
         order.setProductState(ProductState.SOLD_OUT);
+        int discountPrice = (int) (order.getPrice() * order.getDiscount());
+
+        AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
+                user.getUserKey(),
+                accountNo,
+                adminAccount,
+                "입금",
+                (long) discountPrice,
+                accountNo,
+                "출금"
+        );
+        ssafyTransferService.accountTransfer(accountTransferRequest);
     }
 
     @Scheduled(cron = "0 10 10 * * *")
@@ -234,8 +209,6 @@ public class OrderService {
         orderRepository.save(mixedOrder);
     }
 
-
-
     private LocalDateTime getExpirationDate() {
         return LocalDateTime.now()
                 .plusDays(1)
@@ -244,6 +217,4 @@ public class OrderService {
                 .withSecond(0)
                 .withNano(0);
     }
-
-
 }

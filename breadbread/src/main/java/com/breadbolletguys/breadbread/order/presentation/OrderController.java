@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
 import com.breadbolletguys.breadbread.order.application.OrderService;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
+import com.breadbolletguys.breadbread.order.domain.dto.request.PayRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.user.domain.User;
@@ -56,21 +58,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByIdAndVendingMachineId(id, vendingMachineId));
     }
 
-    @PostMapping("/reserve/{orderId}")
-    public ResponseEntity<Void> reserveOrder(
-            @AuthUser User user,
-            @PathVariable("orderId") Long orderId
-    ) {
-        orderService.selectOrder(user, orderId);
-        return ResponseEntity.ok().build();
-    }
 
-    @PostMapping("/pay/{orderId}")
+    @PostMapping("/{orderId}/pay")
     public ResponseEntity<Void> payForOrder(
             @AuthUser User user,
-            @PathVariable("orderId") Long orderId
-    ) {
-        orderService.payForOrder(user, orderId);
+            @PathVariable("orderId") Long orderId,
+            @RequestBody PayRequest payRequest
+            ) {
+        orderService.payForOrder(user, orderId, payRequest.getAccountNo());
         return ResponseEntity.ok().build();
     }
 

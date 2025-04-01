@@ -7,5 +7,5 @@ package com.breadbolletguys.breadbread.order.domain;
  * EXPIRED : 유통기한 지남
  */
 public enum ProductState {
-    AVAILABLE, RESERVED, SOLD_OUT, EXPIRED
+    AVAILABLE, SOLD_OUT, EXPIRED
 }
