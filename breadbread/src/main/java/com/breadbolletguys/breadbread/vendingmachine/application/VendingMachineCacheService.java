@@ -10,6 +10,10 @@ import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.GeoOperations;
 import org.springframework.stereotype.Service;
 
+
+import com.breadbolletguys.breadbread.common.util.JsonUtil;
+import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachine;
+import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachineRedisEntity;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.VendingMachineResponse;
 import com.breadbolletguys.breadbread.vendingmachine.domain.repository.VendingMachineRepository;
 
@@ -23,18 +27,25 @@ public class VendingMachineCacheService {
 
     private final GeoOperations<String, String> geoOperations;
     private final VendingMachineRepository vendingMachineRepository;
+    private final JsonUtil jsonUtil;
 
     public void save(
             Double latitude,
             Double longitude,
-            Long vendingMachineId
+            VendingMachine vendingMachine
     ) {
         Point point = new Point(longitude, latitude);
-        geoOperations.add(VENDING_MACHINE_KEY, point, String.valueOf(vendingMachineId));
+        var vendingMachineRedisEntity = VendingMachineRedisEntity.builder()
+                .id(vendingMachine.getId().toString())
+                .address(vendingMachine.getAddress())
+                .name(vendingMachine.getName())
+                .build();
+
+        geoOperations.add(VENDING_MACHINE_KEY, point, jsonUtil.convertToJson(vendingMachineRedisEntity));
     }
 
-    public void delete(Long vendingMachineId) {
-        geoOperations.remove(VENDING_MACHINE_KEY, String.valueOf(vendingMachineId));
+    public void delete(VendingMachineRedisEntity vendingMachineRedisEntity) {
+        geoOperations.remove(VENDING_MACHINE_KEY, jsonUtil.convertToJson(vendingMachineRedisEntity));
     }
 
     public List<VendingMachineResponse> findNearByVendingMachine(
@@ -55,8 +66,14 @@ public class VendingMachineCacheService {
                 .map(geoResult -> {
                     var location = geoResult.getContent();
                     var distanceVal = geoResult.getDistance();
+                    var vendingMachineRedisEntity = jsonUtil.convertToObject(
+                            location.getName(),
+                            VendingMachineRedisEntity.class
+                    );
                     return new VendingMachineResponse(
-                            Long.valueOf(location.getName()),
+                            vendingMachineRedisEntity.getId(),
+                            vendingMachineRedisEntity.getName(),
+                            vendingMachineRedisEntity.getAddress(),
                             location.getPoint().getX(),
                             location.getPoint().getY(),
                             distanceVal.getValue()
@@ -65,12 +82,17 @@ public class VendingMachineCacheService {
     }
 
     public void warmUp() {
-        var vendingMachineGeoInfo = vendingMachineRepository.findAllGeoInfo();
-        vendingMachineGeoInfo.forEach(geoInfo ->
+        var vendingMachines = vendingMachineRepository.findAll();
+
+        vendingMachines.forEach(vendingMachine ->
                 geoOperations.add(
                         VENDING_MACHINE_KEY,
-                        new Point(geoInfo.longitude(), geoInfo.latitude()),
-                        String.valueOf(geoInfo.id())
+                        new Point(vendingMachine.getLongitude(), vendingMachine.getLatitude()),
+                        jsonUtil.convertToJson(VendingMachineRedisEntity.builder()
+                                .id(vendingMachine.getId().toString())
+                                .name(vendingMachine.getName())
+                                .address(vendingMachine.getAddress())
+                                .build())
                 )
         );
     }

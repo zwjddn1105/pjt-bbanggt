@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderResponse {
     private Long id;
-    private String memo;
+    private String address;
     private String bakeryName;
     private int price;
     private int salePrice;

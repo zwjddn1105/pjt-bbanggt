@@ -2,6 +2,7 @@ package com.breadbolletguys.breadbread.vendingmachine.application;
 
 import static com.breadbolletguys.breadbread.common.exception.ErrorCode.*;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
 import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachine;
+import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachineRedisEntity;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.request.VendingMachineCreateJsonRequest;
 import com.breadbolletguys.breadbread.vendingmachine.domain.repository.SpaceRepository;
 import com.breadbolletguys.breadbread.vendingmachine.domain.repository.VendingMachineRepository;
@@ -25,7 +27,7 @@ public class VendingMachineService {
     private final SpaceRepository spaceRepository;
 
     @Transactional
-    public Long save(
+    public VendingMachine save(
             VendingMachineCreateJsonRequest request,
             List<String> vendingMachineImageUrls
     ) {
@@ -35,7 +37,7 @@ public class VendingMachineService {
                 .height(request.row())
                 .width(request.column())
                 .imageUrls(vendingMachineImageUrls)
-                .memo(request.memo())
+                .address(request.address())
                 .longitude(request.longitude())
                 .latitude(request.latitude())
                 .name(request.name())
@@ -56,14 +58,13 @@ public class VendingMachineService {
         }
 
         spaceRepository.saveAll(spaces);
-        return vendingMachine.getId();
+        return vendingMachine;
     }
 
     @Transactional
-    public void delete(Long id) {
-        if (!vendingMachineRepository.existsById(id)) {
-            throw new BadRequestException(NOT_FOUND_VENDING_MACHINE);
-        }
+    public VendingMachineRedisEntity delete(Long id) {
+        VendingMachine vendingMachine = vendingMachineRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_VENDING_MACHINE));
 
         List<Space> spaces = spaceRepository.findByVendingMachineId(id);
         validateCanRemove(spaces);
@@ -72,6 +73,12 @@ public class VendingMachineService {
 
         spaceRepository.deleteAll(spaceIds);
         vendingMachineRepository.delete(id);
+
+        return VendingMachineRedisEntity.builder()
+                .address(vendingMachine.getAddress())
+                .name(vendingMachine.getName())
+                .id(vendingMachine.getId().toString())
+                .build();
     }
 
     private List<Long> convertToSpaceIds(List<Space> spaces) {
