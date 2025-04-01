@@ -19,6 +19,8 @@ import com.breadbolletguys.breadbread.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 @Transactional
@@ -58,6 +60,7 @@ public class LoginService {
                         .name(nickname)
                         .userRole(UserRole.BUYER)
                         .noticeCheck(true)
+                        .email(UUID.randomUUID() + "@ssafy.co.kr")
                         .deleted(false)
                         .build()
         );
