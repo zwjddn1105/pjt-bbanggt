@@ -34,7 +34,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .select(Projections.constructor(
                         OrderResponse.class,
                         qOrder.id,
-                        qVendingMachine.memo,
+                        qVendingMachine.address,
                         qBakery.name,
                         qOrder.price,
                         Expressions.numberTemplate(
@@ -66,7 +66,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .select(Projections.constructor(
                         OrderResponse.class,
                         qOrder.id,
-                        qVendingMachine.memo,
+                        qVendingMachine.address,
                         qBakery.name,
                         qOrder.price,
                         Expressions.numberTemplate(
@@ -98,7 +98,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .select(Projections.constructor(
                         OrderStackResponse.class,
                         qOrder.id,
-                        qVendingMachine.memo,
+                        qVendingMachine.address,
                         qOrder.count,
                         qOrder.productState
                 ))
@@ -119,7 +119,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .select(Projections.constructor(
                         OrderResponse.class,
                         qOrder.id,
-                        qVendingMachine.memo,
+                        qVendingMachine.address,
                         qBakery.name,
                         qOrder.price,
                         Expressions.numberTemplate(
