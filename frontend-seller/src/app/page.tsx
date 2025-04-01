@@ -2,8 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { useLoading } from "@/components/loading-provider";
+import { BreadIcon, KakaoIcon, CheckIcon } from "@/components/icons";
 
 export default function Home() {
+  const { setLoading } = useLoading();
   // 마운트 상태 추가
   const [mounted, setMounted] = useState(false);
 
@@ -13,8 +16,14 @@ export default function Home() {
 
   // 컴포넌트가 마운트되면 마운트 상태를 true로 설정
   useEffect(() => {
+    // 페이지 로딩 시작
+    setLoading(true);
+
     setMounted(true);
-  }, []);
+
+    // 페이지 로딩 완료
+    setLoading(false);
+  }, [setLoading]);
 
   // 컴포넌트가 마운트되면 애니메이션 시작
   useEffect(() => {
@@ -51,23 +60,26 @@ export default function Home() {
 
   // 카카오 로그인 처리 함수
   const handleKakaoLogin = () => {
+    // 로그인 처리 시작 - 로딩 표시
+    setLoading(true);
+
     const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI;
 
     if (!clientId || !redirectUri) {
       console.error("카카오 로그인 환경 변수가 설정되지 않았습니다.");
+      setLoading(false); // 에러 발생 시 로딩 종료
       return;
     }
 
+    // 카카오 로그인 페이지로 리다이렉트
+    // 참고: 실제 리다이렉트가 발생하므로 setLoading(false)는 실행되지 않습니다.
     window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
   };
 
   // 마운트되지 않았으면 아무것도 렌더링하지 않음
   if (!mounted) {
-    return null; // 또는 로딩 인디케이터를 표시할 수 있습니다
-    // return <div className="min-h-screen flex items-center justify-center">
-    //   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-    // </div>
+    return null;
   }
 
   return (
@@ -159,15 +171,6 @@ export default function Home() {
   );
 }
 
-// 카카오 아이콘 컴포넌트
-function KakaoIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M12 3C6.48 3 2 6.48 2 10.8c0 2.76 1.56 5.04 3.96 6.48l-.96 3.6c-.12.36.24.72.6.6l4.08-1.68c.72.12 1.44.12 2.28.12 5.52 0 10-3.48 10-7.8S17.52 3 12 3z" />
-    </svg>
-  );
-}
-
 // 특징 아이템 컴포넌트 - 애니메이션 추가
 function FeatureItem({ text, isActive }: { text: string; isActive: boolean }) {
   return (
@@ -183,36 +186,5 @@ function FeatureItem({ text, isActive }: { text: string; isActive: boolean }) {
       </div>
       <span className="text-white font-medium">{text}</span>
     </div>
-  );
-}
-
-// 체크 아이콘 컴포넌트
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <polyline points="20 6 9 17 4 12"></polyline>
-    </svg>
-  );
-}
-
-// 빵 아이콘 컴포넌트
-function BreadIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-    >
-      <path d="M12,2C9.01,2 6.17,3.59 5.19,5.77C4.29,5.67 3.44,5.81 2.75,6.17C1.78,6.68 1,7.74 1,9C1,10.54 2.39,12 4,12L5,12C5,12.55 5.45,13 6,13H18C18.55,13 19,12.55 19,12H20C21.61,12 23,10.54 23,9C23,7.74 22.22,6.68 21.25,6.17C20.56,5.81 19.71,5.67 18.81,5.77C17.83,3.59 14.99,2 12,2M12,4C14.21,4 16.17,5.15 16.66,6.71C16.13,6.95 15.66,7.29 15.28,7.71C14.92,8.12 14.66,8.61 14.53,9.16C14.33,9.07 14.09,9 13.83,9H10.17C9.91,9 9.67,9.07 9.47,9.16C9.34,8.61 9.08,8.12 8.72,7.71C8.34,7.29 7.87,6.95 7.34,6.71C7.83,5.15 9.79,4 12,4M6,14C5.45,14 5,14.45 5,15V19C5,20.66 6.34,22 8,22H16C17.66,22 19,20.66 19,19V15C19,14.45 18.55,14 18,14H6Z" />
-    </svg>
   );
 }

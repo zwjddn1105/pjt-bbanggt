@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import Navbar from "@/components/navbar";
+import { LoadingProvider } from "@/components/loading-provider";
 
 // Noto Sans Korean 폰트 설정 (한글 지원이 우수한 폰트)
 const notoSansKr = Noto_Sans_KR({
@@ -25,8 +26,10 @@ export default function RootLayout({
   return (
     <html lang="ko" className={notoSansKr.variable}>
       <body className={`font-sans bg-gray-50 pt-2`}>
-        <Navbar />
-        <main>{children}</main>
+        <LoadingProvider>
+          <Navbar />
+          <main>{children}</main>
+        </LoadingProvider>
       </body>
     </html>
   );

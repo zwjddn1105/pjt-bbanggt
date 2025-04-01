@@ -16,10 +16,12 @@ import {
   Settings,
   Star,
 } from "lucide-react";
+import { useLoading } from "@/components/loading-provider";
+import { BreadIcon } from "@/components/icons";
 
 export default function MyPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const { setLoading } = useLoading();
   const [businessName, setBusinessName] = useState("빵긋 베이커리");
   const [userName, setUserName] = useState("김싸피");
   const [isEditingBusiness, setIsEditingBusiness] = useState(false);
@@ -29,6 +31,9 @@ export default function MyPage() {
   const [activeTab, setActiveTab] = useState("profile");
 
   useEffect(() => {
+    // 로딩 시작
+    setLoading(true);
+
     // 로그인 상태 확인
     if (!isLoggedIn()) {
       // 로그인되지 않은 경우 홈으로 리다이렉트
@@ -36,8 +41,12 @@ export default function MyPage() {
       return;
     }
 
+    // 여기서 사용자 데이터를 가져오는 API 호출을 할 수 있습니다
+    // 예: fetchUserData()
+
+    // 데이터 로딩 완료
     setLoading(false);
-  }, [router]);
+  }, [router, setLoading]);
 
   const handleEditBusiness = () => {
     if (isEditingBusiness) {
@@ -62,17 +71,10 @@ export default function MyPage() {
   // 로그아웃 처리 함수
   const handleLogout = async () => {
     console.log("로그아웃 버튼 클릭");
+    setLoading(true); // 로그아웃 처리 중 로딩 표시
     await logout();
     router.push("/"); // 로그아웃 후 홈페이지로 이동
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-orange-50/50">
@@ -87,18 +89,9 @@ export default function MyPage() {
         </div>
 
         <div className="container max-w-6xl mx-auto px-4 h-full flex items-center">
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-white p-1 shadow-lg flex items-center justify-center">
-                <div className="w-full h-full rounded-full bg-orange-100 flex items-center justify-center text-orange-800 text-3xl font-bold">
-                  {userName.charAt(0)}
-                </div>
-              </div>
-            </div>
-            <div className="text-white">
-              <h1 className="text-3xl font-bold">{userName}</h1>
-              <p className="text-white/80">{businessName}</p>
-            </div>
+          <div className="text-white">
+            <h1 className="text-3xl font-bold">{userName}</h1>
+            <p className="text-white/80">{businessName}</p>
           </div>
         </div>
       </div>
@@ -365,18 +358,5 @@ export default function MyPage() {
         </div>
       </div>
     </div>
-  );
-}
-
-// 빵 아이콘 컴포넌트
-function BreadIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-    >
-      <path d="M12,2C9.01,2 6.17,3.59 5.19,5.77C4.29,5.67 3.44,5.81 2.75,6.17C1.78,6.68 1,7.74 1,9C1,10.54 2.39,12 4,12L5,12C5,12.55 5.45,13 6,13H18C18.55,13 19,12.55 19,12H20C21.61,12 23,10.54 23,9C23,7.74 22.22,6.68 21.25,6.17C20.56,5.81 19.71,5.67 18.81,5.77C17.83,3.59 14.99,2 12,2M12,4C14.21,4 16.17,5.15 16.66,6.71C16.13,6.95 15.66,7.29 15.28,7.71C14.92,8.12 14.66,8.61 14.53,9.16C14.33,9.07 14.09,9 13.83,9H10.17C9.91,9 9.67,9.07 9.47,9.16C9.34,8.61 9.08,8.12 8.72,7.71C8.34,7.29 7.87,6.95 7.34,6.71C7.83,5.15 9.79,4 12,4M6,14C5.45,14 5,14.45 5,15V19C5,20.66 6.34,22 8,22H16C17.66,22 19,20.66 19,19V15C19,14.45 18.55,14 18,14H6Z" />
-    </svg>
   );
 }
