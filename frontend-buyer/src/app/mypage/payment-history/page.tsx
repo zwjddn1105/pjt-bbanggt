@@ -6,7 +6,11 @@ import { PaymentHistoryItem } from "@/components/mypage/payment-history-item"
 import Link from "next/link"
 import { OrderService } from "@/services"
 import type { OrderResponse, ProductState, BreadType } from "@/types/api-types"
-
+import { apiClient } from '@/config/api'
+const fetchOrder = async () => {
+  const res = await apiClient.get('/api/v1/order/myOrder')
+  return res.data
+}
 /**
  * 결제 내역 페이지
  *
