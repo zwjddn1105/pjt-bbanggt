@@ -1,5 +1,7 @@
 package com.breadbolletguys.breadbread.auth.service;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +20,6 @@ import com.breadbolletguys.breadbread.user.domain.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.UUID;
 
 @Service
 @Slf4j
