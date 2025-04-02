@@ -1,6 +1,8 @@
 package com.breadbolletguys.breadbread.vendingmachine.application;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.data.geo.Circle;
 import org.springframework.data.geo.Distance;
@@ -10,7 +12,12 @@ import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.GeoOperations;
 import org.springframework.stereotype.Service;
 
+import com.breadbolletguys.breadbread.common.util.JsonUtil;
+import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachine;
+import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachineRedisEntity;
+import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SpaceCountQueryResponse;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.VendingMachineResponse;
+import com.breadbolletguys.breadbread.vendingmachine.domain.repository.SpaceRepository;
 import com.breadbolletguys.breadbread.vendingmachine.domain.repository.VendingMachineRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,18 +30,28 @@ public class VendingMachineCacheService {
 
     private final GeoOperations<String, String> geoOperations;
     private final VendingMachineRepository vendingMachineRepository;
+    private final SpaceRepository spaceRepository;
+    private final JsonUtil jsonUtil;
 
     public void save(
             Double latitude,
             Double longitude,
-            Long vendingMachineId
+            VendingMachine vendingMachine
     ) {
         Point point = new Point(longitude, latitude);
-        geoOperations.add(VENDING_MACHINE_KEY, point, String.valueOf(vendingMachineId));
+        int remainSpaceCount = spaceRepository.countNotOccupiedSpaceByVendingMachineId(vendingMachine.getId());
+        var vendingMachineRedisEntity = VendingMachineRedisEntity.builder()
+                .id(vendingMachine.getId().toString())
+                .address(vendingMachine.getAddress())
+                .name(vendingMachine.getName())
+                .remainSpaceCount(remainSpaceCount)
+                .build();
+
+        geoOperations.add(VENDING_MACHINE_KEY, point, jsonUtil.convertToJson(vendingMachineRedisEntity));
     }
 
-    public void delete(Long vendingMachineId) {
-        geoOperations.remove(VENDING_MACHINE_KEY, String.valueOf(vendingMachineId));
+    public void delete(VendingMachineRedisEntity vendingMachineRedisEntity) {
+        geoOperations.remove(VENDING_MACHINE_KEY, jsonUtil.convertToJson(vendingMachineRedisEntity));
     }
 
     public List<VendingMachineResponse> findNearByVendingMachine(
@@ -55,8 +72,15 @@ public class VendingMachineCacheService {
                 .map(geoResult -> {
                     var location = geoResult.getContent();
                     var distanceVal = geoResult.getDistance();
+                    var vendingMachineRedisEntity = jsonUtil.convertToObject(
+                            location.getName(),
+                            VendingMachineRedisEntity.class
+                    );
                     return new VendingMachineResponse(
-                            Long.valueOf(location.getName()),
+                            vendingMachineRedisEntity.getId(),
+                            vendingMachineRedisEntity.getName(),
+                            vendingMachineRedisEntity.getAddress(),
+                            vendingMachineRedisEntity.getRemainSpaceCount(),
                             location.getPoint().getX(),
                             location.getPoint().getY(),
                             distanceVal.getValue()
@@ -65,13 +89,37 @@ public class VendingMachineCacheService {
     }
 
     public void warmUp() {
-        var vendingMachineGeoInfo = vendingMachineRepository.findAllGeoInfo();
-        vendingMachineGeoInfo.forEach(geoInfo ->
+        var vendingMachines = vendingMachineRepository.findAll();
+        List<Long> vendingMachineIds = convertToVendingMachineIds(vendingMachines);
+        var spaceCounts = spaceRepository.findSpaceCountsByVendingMachineIds(vendingMachineIds);
+        var vendingMachineIdToRemainSpaceCount = mapVendingMachineIdToRemainSpaceCount(spaceCounts);
+
+        vendingMachines.forEach(vendingMachine ->
                 geoOperations.add(
                         VENDING_MACHINE_KEY,
-                        new Point(geoInfo.longitude(), geoInfo.latitude()),
-                        String.valueOf(geoInfo.id())
+                        new Point(vendingMachine.getLongitude(), vendingMachine.getLatitude()),
+                        jsonUtil.convertToJson(VendingMachineRedisEntity.builder()
+                                .id(vendingMachine.getId().toString())
+                                .name(vendingMachine.getName())
+                                .address(vendingMachine.getAddress())
+                                .remainSpaceCount(vendingMachineIdToRemainSpaceCount
+                                        .getOrDefault(vendingMachine.getId(), 0))
+                                .build())
                 )
         );
+    }
+
+    private Map<Long, Integer> mapVendingMachineIdToRemainSpaceCount(List<SpaceCountQueryResponse> spaceCounts) {
+        return spaceCounts.stream()
+                .collect(Collectors.toMap(
+                        SpaceCountQueryResponse::vendingMachineId,
+                        SpaceCountQueryResponse::count
+                ));
+    }
+
+    private List<Long> convertToVendingMachineIds(List<VendingMachine> vendingMachines) {
+        return vendingMachines.stream()
+                .map(VendingMachine::getId)
+                .toList();
     }
 }

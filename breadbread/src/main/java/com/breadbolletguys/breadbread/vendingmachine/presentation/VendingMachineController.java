@@ -49,15 +49,15 @@ public class VendingMachineController {
             @RequestPart("jsonRequest") VendingMachineCreateJsonRequest jsonRequest,
             @RequestPart("files") List<MultipartFile> files
     ) {
-        List<String> imageUrls = s3Service.uploadFiles(files);
-        Long vendingMachineId = vendingMachineService.save(jsonRequest, imageUrls);
+        var imageUrls = s3Service.uploadFiles(files);
+        var vendingMachine = vendingMachineService.save(jsonRequest, imageUrls);
         vendingMachineCacheService.save(
                 jsonRequest.latitude(),
                 jsonRequest.longitude(),
-                vendingMachineId
+                vendingMachine
         );
 
-        return ResponseEntity.created(URI.create("/api/v1/vending-machines/" + vendingMachineId)).build();
+        return ResponseEntity.created(URI.create("/api/v1/vending-machines/" + vendingMachine.getId())).build();
     }
 
     /**
@@ -69,8 +69,8 @@ public class VendingMachineController {
             @AdminUser User user,
             @PathVariable(name = "vendingMachineId") Long vendingMachineId
     ) {
-        vendingMachineService.delete(vendingMachineId);
-        vendingMachineCacheService.delete(vendingMachineId);
+        var vendingMachineRedisEntity = vendingMachineService.delete(vendingMachineId);
+        vendingMachineCacheService.delete(vendingMachineRedisEntity);
         return ResponseEntity.noContent().build();
     }
 
@@ -84,7 +84,7 @@ public class VendingMachineController {
             @AuthUser User user,
             @RequestParam(name = "latitude") Double latitude,
             @RequestParam(name = "longitude") Double longitude,
-            @RequestParam(name = "distance") Integer distance
+            @RequestParam(name = "distance", defaultValue = "3") Integer distance
     ) {
         return ResponseEntity.ok(
                 vendingMachineCacheService.findNearByVendingMachine(
