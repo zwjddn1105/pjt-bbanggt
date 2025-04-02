@@ -51,6 +51,9 @@ public class User extends BaseTimeEntity {
     @Column(name = "userKey", length = 60, nullable = false)
     private String userKey;
 
+    @Column(name = "tickets", nullable = false)
+    private int tickets;
+
     @Builder
     public User(
             String socialId,
@@ -68,6 +71,7 @@ public class User extends BaseTimeEntity {
         this.deleted = deleted;
         this.email = email;
         this.userKey = userKey;
+        this.tickets = 5;
     }
 
     public boolean isAdmin() {

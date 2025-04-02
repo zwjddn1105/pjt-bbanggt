@@ -62,6 +62,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         QOrder qOrder = QOrder.order;
         QBakery qBakery = QBakery.bakery;
         QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
+        LocalDateTime now = LocalDateTime.now();
         return queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
@@ -84,7 +85,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
                 .where(qOrder.buyerId.eq(userId)
-                        .and(qOrder.productState.eq(ProductState.SOLD_OUT)))
+                        .and(qOrder.productState.eq(ProductState.SOLD_OUT))
+                        .and(qOrder.expirationDate.between(now, now.plusDays(1))))
                 .fetch();
     }
 

@@ -3,11 +3,12 @@ package com.breadbolletguys.breadbread.account.application;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import org.springframework.stereotype.Service;
 
 import com.breadbolletguys.breadbread.account.domain.Account;
 import com.breadbolletguys.breadbread.account.domain.dto.response.AccountResponse;
-import com.breadbolletguys.breadbread.account.domain.repository.AccountJpaRepository;
+import com.breadbolletguys.breadbread.account.domain.repository.AccountRepository;
 import com.breadbolletguys.breadbread.ssafybank.account.dto.UserAccountDto;
 import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.request.SingleAccountRequest;
@@ -25,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class AccountService {
 
     private final SsafyAccountService ssafyAccountService;
-    private final AccountJpaRepository accountJpaRepository;
+    private final AccountRepository accountRepository;
 
     public void createAccount(User user) {
         CreateAccountRequest createAccountRequest = new CreateAccountRequest(user.getUserKey());
@@ -34,7 +35,7 @@ public class AccountService {
                         .userId(user.getId())
                         .accountNo(createAccountResponse.REC().accountNo())
                         .build();
-        accountJpaRepository.save(account);
+        accountRepository.save(account);
     }
 
     public List<AccountResponse> getAccountList(User user) {

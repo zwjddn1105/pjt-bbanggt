@@ -38,7 +38,8 @@ public class OrderController {
             @AuthUser User user,
             @PathVariable("spaceId") Long spaceId,
             @RequestPart("orderRequests") List<OrderRequest> orderRequests,
-            @RequestPart("image") MultipartFile image) {
+            @RequestPart("image") MultipartFile image
+    ) {
         orderService.save(user, spaceId, orderRequests, image);
         return ResponseEntity.ok().build();
     }
@@ -64,8 +65,17 @@ public class OrderController {
             @AuthUser User user,
             @PathVariable("orderId") Long orderId,
             @RequestBody PayRequest payRequest
-            ) {
+    ) {
         orderService.payForOrder(user, orderId, payRequest.getAccountNo());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/refund")
+    public ResponseEntity<Void> refundOrder(
+            @AuthUser User user,
+            @PathVariable("orderId") Long orderId
+    ) {
+        orderService.refundOrder(user, orderId);
         return ResponseEntity.ok().build();
     }
 
@@ -81,5 +91,23 @@ public class OrderController {
             @AuthUser User user
     ) {
         return ResponseEntity.ok(orderService.getMyOrderStocks(user));
+    }
+
+
+    @PostMapping("/{orderId}/test/pay")
+    public ResponseEntity<Void> testOrder(
+            @PathVariable("orderId") Long orderId,
+            @RequestBody PayRequest payRequest
+    ) {
+        orderService.testOrder(orderId, payRequest.getAccountNo());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/test/refund")
+    public ResponseEntity<Void> testRefund(
+            @PathVariable("orderId") Long orderId
+    ) {
+        orderService.testRefund(orderId);
+        return ResponseEntity.ok().build();
     }
 }
