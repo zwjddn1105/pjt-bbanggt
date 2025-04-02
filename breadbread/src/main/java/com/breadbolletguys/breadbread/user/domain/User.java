@@ -69,6 +69,10 @@ public class User extends BaseTimeEntity {
         return userRole == UserRole.ADMIN;
     }
 
+    public boolean isSeller() {
+        return userRole.equals(UserRole.SELLER);
+    }
+
     public void changeSeller() {
         if (this.userRole == UserRole.SELLER) {
             throw new BadRequestException(ErrorCode.ALREADY_SELLER);
