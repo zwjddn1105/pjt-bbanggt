@@ -1,15 +1,13 @@
 "use client"
 
-import { ShoppingCart } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Header } from "@/components/ui/header"
 import PickupTimer from "@/components/pickup-timer"
 import { PickupItem } from "@/components/pickup/pickup-item"
-import { useCartCount } from "@/hooks/use-cart-count"
+
 
 export default function PickupPage() {
-  // 장바구니 아이템 수 가져오기
-  const { count } = useCartCount()
+
 
   // 픽업 가능 시간 여부 상태
   const [isPickupAvailable, setIsPickupAvailable] = useState<boolean>(true)
@@ -47,7 +45,7 @@ export default function PickupPage() {
 
   return (
     <main className="pb-20">
-      <Header title="빵긋 픽업" icon={ShoppingCart} count={count} />
+      <Header title="빵긋 픽업"/>
 
       {/* 픽업 타이머 */}
       <div className="p-4">

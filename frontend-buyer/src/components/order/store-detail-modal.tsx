@@ -205,12 +205,12 @@ export default function StoreDetailModal({
 
             {/* 하단 네비게이션 - 장바구니 아이콘과 버튼 */}
             <div className="flex items-center justify-between p-4 border-t">
-              <div className="relative">
+              {/* <div className="relative">
                 <ShoppingCart size={32} />
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   3
                 </span>
-              </div>
+              </div> */}
 
               <div className="flex gap-3 flex-1 ml-4">
                 <button
