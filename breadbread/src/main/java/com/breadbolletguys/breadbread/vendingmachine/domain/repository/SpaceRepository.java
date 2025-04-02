@@ -1,10 +1,12 @@
 package com.breadbolletguys.breadbread.vendingmachine.domain.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
+import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SpaceCountQueryResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,5 +27,21 @@ public class SpaceRepository {
 
     public void deleteAll(List<Long> spaceIds) {
         spaceJpaRepository.deleteAll(spaceIds);
+    }
+
+    public Optional<Space> findById(Long spaceId) {
+        return spaceJpaRepository.findById(spaceId);
+    }
+
+    public Space save(Space space) {
+        return spaceJpaRepository.save(space);
+    }
+
+    public int countNotOccupiedSpaceByVendingMachineId(Long id) {
+        return spaceJpaRepository.countNotOccupiedSpaceByVendingMachineId(id);
+    }
+
+    public List<SpaceCountQueryResponse> findSpaceCountsByVendingMachineIds(List<Long> vendingMachineIds) {
+        return spaceJpaRepository.findSpaceCountsByVendingMachineIds(vendingMachineIds);
     }
 }

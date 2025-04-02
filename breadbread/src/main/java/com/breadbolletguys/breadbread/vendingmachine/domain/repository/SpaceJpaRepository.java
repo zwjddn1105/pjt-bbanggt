@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
 
-public interface SpaceJpaRepository extends JpaRepository<Space, Long> {
+public interface SpaceJpaRepository extends JpaRepository<Space, Long>, SpaceQueryRepository {
     List<Space> findAllByVendingMachineId(Long vendingMachineId);
 
     @Query("""
@@ -18,4 +18,12 @@ public interface SpaceJpaRepository extends JpaRepository<Space, Long> {
         """)
     @Modifying(clearAutomatically = true)
     void deleteAll(List<Long> ids);
+
+    @Query("""
+        SELECT COUNT(*)
+        FROM Space s
+        WHERE s.vendingMachineId = :vendingMachineId
+        AND s.occupied = false
+        """)
+    int countNotOccupiedSpaceByVendingMachineId(Long vendingMachineId);
 }
