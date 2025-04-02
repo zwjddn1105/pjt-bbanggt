@@ -30,6 +30,9 @@ public class Space {
     @Column(name = "occupied", nullable = false)
     private boolean occupied;
 
+    @Column(name = "seller_id")
+    private Long sellerId;
+
     @Column(name = "width", nullable = false)
     private int width;
 
@@ -51,5 +54,10 @@ public class Space {
         this.height = height;
         this.occupied = false;
         this.deleted = deleted;
+    }
+
+    public void buy(Long sellerId) {
+        this.sellerId = sellerId;
+        this.occupied = true;
     }
 }
