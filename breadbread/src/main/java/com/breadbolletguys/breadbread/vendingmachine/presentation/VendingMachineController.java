@@ -84,7 +84,7 @@ public class VendingMachineController {
             @AuthUser User user,
             @RequestParam(name = "latitude") Double latitude,
             @RequestParam(name = "longitude") Double longitude,
-            @RequestParam(name = "distance", defaultValue = "5") Integer distance
+            @RequestParam(name = "distance", defaultValue = "3") Integer distance
     ) {
         return ResponseEntity.ok(
                 vendingMachineCacheService.findNearByVendingMachine(
