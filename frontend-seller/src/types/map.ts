@@ -10,6 +10,7 @@ export interface KakaoMapAPI {
       options?: KakaoMarkerImageOptions
     ) => KakaoMarkerImage;
     Size: new (width: number, height: number) => KakaoSize;
+    Point: new (x: number, y: number) => KakaoPoint; // Point 타입 추가
     InfoWindow: new (options: KakaoInfoWindowOptions) => KakaoInfoWindow;
     Circle: new (options: KakaoCircleOptions) => KakaoCircle;
     event: {
@@ -21,6 +22,14 @@ export interface KakaoMapAPI {
     };
     load: (callback: () => void) => void;
   };
+}
+
+// 카카오 포인트 인터페이스 추가
+export interface KakaoPoint {
+  x: number;
+  y: number;
+  equals(point: KakaoPoint): boolean;
+  toString(): string;
 }
 
 // 카카오 이벤트 인터페이스
@@ -93,16 +102,16 @@ export interface KakaoSize {
 
 // 카카오 마커 이미지 옵션 인터페이스
 export interface KakaoMarkerImageOptions {
-  offset?: KakaoSize;
-  spriteOrigin?: KakaoSize;
+  offset?: KakaoPoint; // KakaoSize에서 KakaoPoint로 변경
+  spriteOrigin?: KakaoPoint; // KakaoSize에서 KakaoPoint로 변경
   spriteSize?: KakaoSize;
 }
 
 // 카카오 마커 이미지 인터페이스
 export interface KakaoMarkerImage {
   getSize(): KakaoSize;
-  getOffset(): KakaoSize;
-  getSpriteOrigin(): KakaoSize;
+  getOffset(): KakaoPoint; // KakaoSize에서 KakaoPoint로 변경
+  getSpriteOrigin(): KakaoPoint; // KakaoSize에서 KakaoPoint로 변경
   getSpriteSize(): KakaoSize;
 }
 
