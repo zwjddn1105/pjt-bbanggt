@@ -37,10 +37,9 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                 ))
                 .from(chatRoom)
                 .leftJoin(user).on(chatRoom.customerId.eq(user.id))
-                .where((chatRoom.ownerId.eq(userId)
-                        .or(chatRoom.customerId.eq(userId))
-                                .and(isInRange(pageToken))
-                )).orderBy(chatRoom.id.desc())
+                .where(chatRoom.customerId.eq(userId)
+                                .and(isInRange(pageToken)))
+                .orderBy(chatRoom.id.desc())
                 .limit(pageSize + 1)
                 .fetch();
     }
@@ -59,9 +58,8 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                         )).from(chatRoom)
                 .from(chatRoom)
                 .leftJoin(user).on(chatRoom.customerId.eq(user.id))
-                .where((chatRoom.ownerId.eq(userId)
-                        .or(chatRoom.customerId.eq(userId))
-                )).orderBy(chatRoom.id.desc())
+                .where((chatRoom.ownerId.eq(userId))
+                ).orderBy(chatRoom.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -69,8 +67,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         long total = queryFactory
                 .select(chatRoom)
                 .from(chatRoom)
-                .where(chatRoom.customerId.eq(chatRoom.customerId)
-                        .or(chatRoom.ownerId.eq(chatRoom.ownerId)))
+                .where(chatRoom.customerId.eq(chatRoom.customerId))
                 .fetchCount();
 
         return new PageImpl<>(data, pageable, total);
