@@ -77,12 +77,9 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.price,
                         Expressions.numberTemplate(
                                 Integer.class,
-                                "CAST({0} * (1 - {1}) AS SIGNED)",
-                                order.price,
-                                order.discount,
                                 "CAST({0} * (1 - {1}) AS INTEGER)",
-                                QOrder.order.price,
-                                QOrder.order.discount
+                                order.price,
+                                order.discount
                         ),
                         qOrder.count,
                         qOrder.image,
