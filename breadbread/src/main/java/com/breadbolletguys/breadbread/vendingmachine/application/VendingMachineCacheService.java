@@ -1,7 +1,9 @@
 package com.breadbolletguys.breadbread.vendingmachine.application;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.geo.Circle;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 import com.breadbolletguys.breadbread.common.util.JsonUtil;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.repository.OrderRepository;
+import com.breadbolletguys.breadbread.user.domain.User;
+import com.breadbolletguys.breadbread.user.domain.repository.BookmarkRepository;
 import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachine;
 import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachineRedisEntity;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SpaceCountQueryResponse;
@@ -33,6 +37,7 @@ public class VendingMachineCacheService {
     private final GeoOperations<String, String> geoOperations;
     private final VendingMachineRepository vendingMachineRepository;
     private final SpaceRepository spaceRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final OrderRepository orderRepository;
     private final JsonUtil jsonUtil;
 
@@ -93,6 +98,34 @@ public class VendingMachineCacheService {
                             distanceVal.getValue()
                     );
                 }).toList();
+    }
+
+    public List<VendingMachineResponse> findNearByAndBookmarkVendingMachine(
+            User user,
+            Double longitude,
+            Double latitude,
+            Integer distance
+    ) {
+        List<VendingMachineResponse> nearbyVendingMachines = findNearByVendingMachine(longitude, latitude, distance);
+        List<Long> bookmarkedBakeryIds = bookmarkRepository.findBakeryIdsByUserId(user.getId());
+
+        if (bookmarkedBakeryIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> spaceIdsWithBookmarkedBakery = orderRepository.findSpaceIdsByBakeryIds(bookmarkedBakeryIds);
+
+        if (spaceIdsWithBookmarkedBakery.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> vendingMachineIdsWithBookmarkedBread =
+                spaceRepository.findVendingMachineIdsBySpaceIds(spaceIdsWithBookmarkedBakery);
+        Set<Long> targetVendingMachineIds = new HashSet<>(vendingMachineIdsWithBookmarkedBread);
+
+        return nearbyVendingMachines.stream()
+                .filter(vm -> targetVendingMachineIds.contains(Long.parseLong(vm.id())))
+                .collect(Collectors.toList());
     }
 
     public void warmUp() {

@@ -17,7 +17,7 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(1007, "요청 ID에 해당하는 빵이 존재하지 않습니다."),
     ALREADY_FOLLOWED(1008, "이미 팔로우 되어 요청 오류가 발생했습니다."),
     ALREADY_REQUESTED(1009, "이미 팔로우 요청 되어 오류가 발생했습니다."),
-    UNABLE_TO_RESERVE_PRODUCT(10010, "해당 상태의 빵은 선점할 수 없습니다."),
+    UNABLE_TO_REFUND_PRODUCT(10010, "해당 상태의 빵은 환불할 수 없습니다."),
     UNABLE_TO_PURCHASE_PRODUCT(10011, "해당 상태의 빵은 결제할 수 없습니다."),
     DUPLICATE_BOOKMARK(10012, "이미 북마크한 빵집입니다."),
     BOOKMARK_NOT_FOUND(10013, "북마크가 존재하지 않습니다."),
@@ -41,6 +41,8 @@ public enum ErrorCode {
 
     MINUS_BALANCE_ERROR(5000, "잔고에 음수가 들어올 수 없습니다."),
     MINUS_REVIEW_ERROR(5001, "리뷰에 음수가 들어올 수 없습니다."),
+    CURRENCY_CODE_NOT_EXIST_ERROR(5002, "해당 유형의 통화는 사용할 수 없습니다."),
+    BANK_CODE_NOT_EXIST_ERROR(5003, "해당 유형의 은행은 존재하지 않습니다."),
 
     SCORE_RANGE_ERROR(6000, "리뷰 점수의 범위는 1-5점입니다."),
 
@@ -55,8 +57,14 @@ public enum ErrorCode {
 
     NOT_FOUND_CHAT_ROOM(10000, "해당 문의 채팅방이 존재하지 않습니다."),
     USER_NOT_IN_CHAT_ROOM(10001, "문의방에 존재하지 않는 유저입니다."),
-    ALREADY_EXIST_CHAT_ROOM_BETWEEN_OWNER_AND_CUSTOMER(10002, "이미 둘 사이에 문의채팅방이 존재합니다.");
+    ALREADY_EXIST_CHAT_ROOM_BETWEEN_OWNER_AND_CUSTOMER(10002, "이미 둘 사이에 문의채팅방이 존재합니다."),
+
+    ACCOUNT_NOT_FOUND(11000, "요청 UserID에 해당하는 계좌가 존재하지 않습니다."),
+
+    Transaction_NOT_FOUND(12000, "요청 OrderID에 해당하는 거래 내역이 존재하지 않습니다."),
+    REFUND_TIME_EXCEEDED(12001, "환불 시간이 불가능한 상품입니다.");
 
     private final int code;
     private final String message;
 }
+

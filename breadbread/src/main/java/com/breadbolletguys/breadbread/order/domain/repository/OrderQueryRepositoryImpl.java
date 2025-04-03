@@ -67,6 +67,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         QOrder qOrder = order;
         QBakery qBakery = QBakery.bakery;
         QVendingMachine qVendingMachine = vendingMachine;
+        LocalDateTime now = LocalDateTime.now();
         return queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
@@ -78,18 +79,23 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                                 Integer.class,
                                 "CAST({0} * (1 - {1}) AS SIGNED)",
                                 order.price,
-                                order.discount
+                                order.discount,
+                                "CAST({0} * (1 - {1}) AS INTEGER)",
+                                QOrder.order.price,
+                                QOrder.order.discount
                         ),
                         qOrder.count,
                         qOrder.image,
-                        qOrder.productState
+                        qOrder.productState,
+                        qOrder.breadType
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
                 .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
                 .where(qOrder.buyerId.eq(userId)
-                        .and(qOrder.productState.eq(ProductState.RESERVED)))
+                        .and(qOrder.productState.eq(ProductState.SOLD_OUT))
+                        .and(qOrder.expirationDate.between(now, now.plusDays(1))))
                 .fetch();
     }
 

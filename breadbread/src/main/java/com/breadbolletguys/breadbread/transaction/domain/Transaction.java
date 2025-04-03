@@ -25,53 +25,44 @@ public class Transaction {
     @Column(name = "transaction_id")
     private Long id;
 
+    @Column(name = "order_id", nullable = false)
+    private Long orderId;
+
     @Column(name = "sender_account", length = 32, nullable = false)
     private String senderAccount;
 
     @Column(name = "receiver_account", length = 32, nullable = false)
     private String receiverAccount;
 
-    @Column(name = "amount")
-    private int amount;
+    @Column(name = "transaction_balance", nullable = false)
+    private Long transactionBalance;
 
     @Column(name = "transaction_date", nullable = false)
     private LocalDateTime transactionDate;
-
-    @Column(name = "sender_account_swiftCode", length = 8, nullable = false)
-    private String senderAccountSwiftCode;
-
-    @Column(name = "receiver_account_swiftCode", length = 8, nullable = false)
-    private String receiverAccountSwiftCode;
-
-    @Column(name = "sender_name", length = 32, nullable = false)
-    private String senderName;
-
-    @Column(name = "receiver_name", length = 32, nullable = false)
-    private String receiverName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
     private TransactionType transactionType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_status", nullable = false)
+    private TransactionStatus transactionStatus;
+
     @Builder
     public Transaction(
+            Long orderId,
             String senderAccount,
             String receiverAccount,
-            int amount,
-            String senderAccountSwiftCode,
-            String receiverAccountSwiftCode,
-            String senderName,
-            String receiverName,
-            TransactionType transactionType
+            Long transactionBalance,
+            TransactionType transactionType,
+            TransactionStatus transactionStatus
     ) {
+        this.orderId = orderId;
         this.senderAccount = senderAccount;
         this.receiverAccount = receiverAccount;
-        this.amount = amount;
+        this.transactionBalance = transactionBalance;
         this.transactionDate = LocalDateTime.now();
-        this.senderAccountSwiftCode = senderAccountSwiftCode;
-        this.receiverAccountSwiftCode = receiverAccountSwiftCode;
-        this.senderName = senderName;
-        this.receiverName = receiverName;
         this.transactionType = transactionType;
+        this.transactionStatus = transactionStatus;
     }
 }

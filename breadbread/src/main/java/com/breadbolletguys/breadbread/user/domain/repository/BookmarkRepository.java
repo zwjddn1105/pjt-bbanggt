@@ -1,5 +1,7 @@
 package com.breadbolletguys.breadbread.user.domain.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.user.domain.Bookmark;
@@ -21,5 +23,9 @@ public class BookmarkRepository {
 
     public boolean exisitBookmark(Long userId, Long bakeryId) {
         return bookmarkJpaRepository.existsByUserIdAndBakeryId(userId, bakeryId);
+    }
+
+    public List<Long> findBakeryIdsByUserId(Long userId) {
+        return bookmarkJpaRepository.findBakeryIdsByUserId(userId);
     }
 }

@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
+
 
 public interface SpaceJpaRepository extends JpaRepository<Space, Long>, SpaceQueryRepository {
     List<Space> findAllByVendingMachineId(Long vendingMachineId);
@@ -26,4 +28,7 @@ public interface SpaceJpaRepository extends JpaRepository<Space, Long>, SpaceQue
         AND s.occupied = false
         """)
     int countNotOccupiedSpaceByVendingMachineId(Long vendingMachineId);
+
+    @Query("SELECT s.vendingMachineId FROM Space s WHERE s.id IN :spaceIds")
+    List<Long> findVendingMachineIdsBySpaceIds(@Param("spaceIds") List<Long> spaceIds);
 }
