@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
+import com.breadbolletguys.breadbread.image.application.S3Service;
 import com.breadbolletguys.breadbread.order.application.OrderService;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.request.PayRequest;
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderController {
     private final OrderService orderService;
+    private final S3Service s3Service;
 
     @PostMapping(value = "/createOrder/{spaceId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -39,7 +41,8 @@ public class OrderController {
             @RequestPart("orderRequests") List<OrderRequest> orderRequests,
             @RequestPart("image") MultipartFile image
     ) {
-        orderService.save(user, spaceId, orderRequests, image);
+        String imageUrl = s3Service.uploadFile(image);
+        orderService.save(user, spaceId, orderRequests, imageUrl);
         return ResponseEntity.ok().build();
     }
 
