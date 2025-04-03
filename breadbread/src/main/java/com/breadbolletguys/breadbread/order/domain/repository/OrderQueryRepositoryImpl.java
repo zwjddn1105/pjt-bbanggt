@@ -72,13 +72,14 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.price,
                         Expressions.numberTemplate(
                                 Integer.class,
-                                "CAST({0} * (1 - {1}) AS SIGNED)",
+                                "CAST({0} * (1 - {1}) AS INTEGER)",
                                 QOrder.order.price,
                                 QOrder.order.discount
                         ),
                         qOrder.count,
                         qOrder.image,
-                        qOrder.productState
+                        qOrder.productState,
+                        qOrder.breadType
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
