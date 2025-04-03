@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.order.domain.Order;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 
@@ -51,5 +52,13 @@ public class OrderRepository {
 
     public List<Order> findAvailableOrdersBySpaceIds(List<Long> spaceIds) {
         return orderQueryRepository.findAvailableOrdersBySpaceIds(spaceIds);
+    }
+
+    public int countAvailableOrderByVendingMachineId(Long vendingMachineId) {
+        return orderQueryRepository.countAvailableOrderByVendingMachineId(vendingMachineId);
+    }
+
+    public List<OrderCountQueryResponse> findAvailableCountsByVendingMachineIds(List<Long> vendingMachineIds) {
+        return orderQueryRepository.findAvailableCountsByVendingMachineIds(vendingMachineIds);
     }
 }

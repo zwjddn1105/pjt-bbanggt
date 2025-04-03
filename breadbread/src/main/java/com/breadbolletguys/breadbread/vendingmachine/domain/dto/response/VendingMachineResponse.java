@@ -5,6 +5,7 @@ public record VendingMachineResponse(
         String name,
         String address,
         int remainSpaceCount,
+        int availableCount,
         Double longitude,
         Double latitude,
         Double distance

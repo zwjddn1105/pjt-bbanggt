@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.breadbolletguys.breadbread.common.annotation.RedisLock;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
+import com.breadbolletguys.breadbread.order.domain.repository.OrderRepository;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
 import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachine;
@@ -22,6 +23,7 @@ public class SpaceService {
     private final SpaceRepository spaceRepository;
     private final VendingMachineRepository vendingMachineRepository;
     private final VendingMachineCacheService vendingMachineCacheService;
+    private final OrderRepository orderRepository;
 
     @RedisLock(key = "'spaceId:' + #spaceId")
     public void save(User user, Long spaceId) {
@@ -39,12 +41,14 @@ public class SpaceService {
         VendingMachine vendingMachine = vendingMachineRepository.findById(space.getVendingMachineId())
                 .orElseThrow(() -> new BadRequestException(NOT_FOUND_VENDING_MACHINE));
         int remainSpaceCount = spaceRepository.countNotOccupiedSpaceByVendingMachineId(vendingMachine.getId());
+        int availableCount = orderRepository.countAvailableOrderByVendingMachineId(vendingMachine.getId());
 
         var vendingMachineDeleteRedisEntity = VendingMachineRedisEntity.builder()
                 .id(vendingMachine.getId().toString())
                 .address(vendingMachine.getAddress())
                 .name(vendingMachine.getName())
                 .remainSpaceCount(remainSpaceCount)
+                .availableCount(availableCount)
                 .build();
 
         space.buy(user.getId());
