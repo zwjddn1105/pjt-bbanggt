@@ -33,7 +33,7 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                         chatRoom.createdAt
                 ))
                 .from(chatRoom)
-                .leftJoin(user).on(chatRoom.customerId.eq(userId))
+                .leftJoin(user).on(chatRoom.customerId.eq(user.id))
                 .where((chatRoom.ownerId.eq(userId)
                         .or(chatRoom.customerId.eq(userId))
                                 .and(isInRange(pageToken))
