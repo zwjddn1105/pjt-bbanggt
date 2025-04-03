@@ -97,7 +97,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     }
 
     @Override
-    public List<OrderStackResponse> findStocksBySellerId(Long userId) {
+    public List<OrderStackResponse> findStocksBySellerId(Long userId, String pageToken, int size) {
         QSpace qSpace = space;
         QOrder qOrder = order;
         QVendingMachine qVendingMachine = vendingMachine;
@@ -114,8 +114,33 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
                 .where(qOrder.sellerId.eq(userId)
-                        .and(qOrder.productState.eq(ProductState.AVAILABLE)
-                                .or(qOrder.productState.eq(ProductState.SOLD_OUT))))
+                        .and(qOrder.productState.eq(ProductState.AVAILABLE)))
+                .orderBy(qOrder.id.desc())
+                .limit(size + 1)
+                .fetch();
+    }
+
+    @Override
+    public List<OrderStackResponse> findSoldoutBySellerId(Long userId, String pageToken, int size) {
+        QSpace qSpace = space;
+        QOrder qOrder = order;
+        QVendingMachine qVendingMachine = vendingMachine;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        OrderStackResponse.class,
+                        qOrder.id,
+                        qVendingMachine.address,
+                        qOrder.count,
+                        qOrder.productState
+                ))
+                .from(qOrder)
+                .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
+                .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
+                .where(qOrder.sellerId.eq(userId)
+                        .and(qOrder.productState.eq(ProductState.SOLD_OUT)))
+                .orderBy(qOrder.id.desc())
+                .limit(size + 1)
                 .fetch();
     }
 
