@@ -25,12 +25,12 @@ spring:
             user-name-attribute: id
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://43.203.248.254:3306/bread?&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/bread?&characterEncoding=UTF-8
     username: root
     password: 1234
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
