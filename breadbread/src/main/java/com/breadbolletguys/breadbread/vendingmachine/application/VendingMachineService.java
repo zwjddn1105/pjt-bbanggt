@@ -98,15 +98,20 @@ public class VendingMachineService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_VENDING_MACHINE));
         List<Space> spaces = spaceRepository.findByVendingMachineId(id);
 
-        List<SlotResponse> slotResponses = spaces.stream().map(space -> {
+        List<SlotResponse> slotResponses = new ArrayList<>();
+
+        for (int i = 0; i < spaces.size(); i++) {
+            Space space = spaces.get(i);
             Optional<Order> orderOpt =
                     orderRepository.findBySpaceIdAndProductState(space.getId(), ProductState.AVAILABLE);
+
             OrderSummaryResponse orderSummaryResponse = orderOpt.map(order -> {
                 boolean isMark = bookmarkRepository.existsByUserIdAndBakeryId(user.getId(), order.getBakeryId());
-                return new OrderSummaryResponse(order.getId(), order.getBreadType(), isMark);
+                return new OrderSummaryResponse(order.getId(), order.getBreadType(), isMark, order.getProductState());
             }).orElse(null);
-            return new SlotResponse(1, orderSummaryResponse);
-        }).toList();
+
+            slotResponses.add(new SlotResponse(i + 1, orderSummaryResponse));
+        }
 
         return new VendingMachineSlotResponse(
                 vendingMachine.getName(),
