@@ -11,4 +11,6 @@ public interface ChatRoomQueryRepository {
     List<ChatRoomQueryResponse> findAllByBuyerId(Long userId, String pageToken, int pageSize);
 
     Page<ChatRoomQueryResponse> findAllBySellerId(Long userId, Pageable pageable);
+
+    boolean existsByOwnerIdAndCustomerId(Long ownerId, Long customerId);
 }
