@@ -95,6 +95,24 @@ public class VendingMachineController {
         );
     }
 
+    @GetMapping("/bookmarked")
+    @Operation(description = "위경도와 거리를 입력받아 현재 위치 기준으로 북마크한 빵집의 빵이 담긴 일정 거리 내의 자판기 리스트를 조회한다.")
+    public ResponseEntity<List<VendingMachineResponse>> findAllByBookmark(
+            @AuthUser User user,
+            @RequestParam(name = "latitude") Double latitude,
+            @RequestParam(name = "longitude") Double longitude,
+            @RequestParam(name = "distance", defaultValue = "3") Integer distance
+    ) {
+        return ResponseEntity.ok(
+                vendingMachineCacheService.findNearByAndBookmarkVendingMachine(
+                        user,
+                        longitude,
+                        latitude,
+                        distance
+                )
+        );
+    }
+
     @PostMapping("/warm-up")
     @Operation(description = "어드민 전용 api, 최초 서버를 오픈할 때 cache warm-up 용도이다.")
     public ResponseEntity<Void> warpUp(@AdminUser User user) {
