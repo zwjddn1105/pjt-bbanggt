@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatQueryResponse;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatResponse;
+import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatSummary;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -40,17 +41,28 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
     }
 
     @Override
-    public List<ChatQueryResponse> findAllLastChatByRoomIds(List<Long> chatRoomIds) {
+    public List<ChatQueryResponse> findAllLastChatIdByRoomIds(List<Long> chatRoomIds) {
         return queryFactory.select(
                 Projections.constructor(
                         ChatQueryResponse.class,
                         chat.chatRoomId,
-                        chat.content
+                        chat.id.max()
                 )).from(chat)
                 .leftJoin(chatRoom).on(chatRoom.id.eq(chat.chatRoomId))
                 .where(chat.chatRoomId.in(chatRoomIds))
-                .orderBy(chat.id.desc())
-                .limit(1)
+                .groupBy(chatRoom.id)
+                .fetch();
+    }
+
+    @Override
+    public List<ChatSummary> findAllChatContentByIdIn(List<Long> lastChatIds) {
+        return queryFactory.select(
+                Projections.constructor(
+                        ChatSummary.class,
+                        chat.id,
+                        chat.content
+                )).from(chat)
+                .where(chat.id.in(lastChatIds))
                 .fetch();
     }
 
