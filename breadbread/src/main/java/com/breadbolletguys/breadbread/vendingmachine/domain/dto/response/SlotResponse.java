@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpaceResponse {
-    private Long id;
+public class SlotResponse {
+    private int slotNumber;
     private OrderSummaryResponse orderSummaryResponse;
 }

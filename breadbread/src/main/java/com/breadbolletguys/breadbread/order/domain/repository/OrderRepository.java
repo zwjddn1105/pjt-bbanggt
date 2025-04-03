@@ -3,10 +3,12 @@ package com.breadbolletguys.breadbread.order.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.repository.query.Param;
+
+
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.order.domain.Order;
+import com.breadbolletguys.breadbread.order.domain.ProductState;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
@@ -69,5 +71,9 @@ public class OrderRepository {
 
     public List<Long> findSpaceIdsByBakeryIds(List<Long> bakeryIds) {
         return orderJpaRepository.findSpaceIdsByBakeryIds(bakeryIds);
+    }
+
+    public Optional<Order> findBySpaceIdAndProductState(Long spaceId, ProductState productState) {
+        return orderJpaRepository.findBySpaceIdAndProductState(spaceId, productState);
     }
 }

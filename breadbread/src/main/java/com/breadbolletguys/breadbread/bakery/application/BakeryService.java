@@ -75,7 +75,7 @@ public class BakeryService {
 
     @Transactional
     public void addBookmark(User user, Long bakeryId) {
-        if (bookmarkRepository.exisitBookmark(user.getId(), bakeryId)) {
+        if (bookmarkRepository.existsByUserIdAndBakeryId(user.getId(), bakeryId)) {
             throw new BadRequestException(ErrorCode.DUPLICATE_BOOKMARK);
         }
         Bookmark bookmark = Bookmark.builder()
@@ -87,7 +87,7 @@ public class BakeryService {
 
     @Transactional
     public void removeBookmark(User user, Long bakeryId) {
-        if (!bookmarkRepository.exisitBookmark(user.getId(), bakeryId)) {
+        if (!bookmarkRepository.existsByUserIdAndBakeryId(user.getId(), bakeryId)) {
             throw new NotFoundException(ErrorCode.BOOKMARK_NOT_FOUND);
         }
         bookmarkRepository.deleteByUserIdAndBakeryId(user.getId(), bakeryId);
@@ -95,6 +95,6 @@ public class BakeryService {
 
     @Transactional(readOnly = true)
     public boolean hasBookmark(User user, Long bakeryId) {
-        return bookmarkRepository.exisitBookmark(user.getId(), bakeryId);
+        return bookmarkRepository.existsByUserIdAndBakeryId(user.getId(), bakeryId);
     }
 }
