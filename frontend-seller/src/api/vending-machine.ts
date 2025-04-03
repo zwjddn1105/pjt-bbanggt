@@ -47,8 +47,8 @@ export const fetchVendingMachines = async (
       latitude: item.latitude,
       longitude: item.longitude,
       distance: item.distance?.toString() || "",
-      category: item.category || "",
-      rating: item.rating || 0,
+      remainSpaceCount: item.remainSpaceCount,
+      availableCount: item.availableCount,
     }));
   } catch (error) {
     console.error("빵긋 자판기 조회 실패:", error);

@@ -1,0 +1,129 @@
+import { create } from "zustand";
+import { fetchChatRooms, fetchNextChatRooms } from "../api/chatRooms";
+import type { ChatRoom, ChatRoomsResponse, ChatFilter } from "../types/chat";
+
+interface ChatState {
+  // 채팅방 목록 상태
+  chatRooms: ChatRoom[];
+  setChatRooms: (chatRooms: ChatRoom[]) => void;
+
+  // 현재 응답 데이터 (페이지네이션 토큰 포함)
+  currentResponse: ChatRoomsResponse | null;
+  setCurrentResponse: (response: ChatRoomsResponse | null) => void;
+
+  // 로딩 상태
+  isLoading: boolean;
+  setIsLoading: (isLoading: boolean) => void;
+
+  // 에러 상태
+  error: string | null;
+  setError: (error: string | null) => void;
+
+  // 선택된 채팅방 상태
+  selectedChatRoom: ChatRoom | null;
+  setSelectedChatRoom: (chatRoom: ChatRoom | null) => void;
+
+  // 데이터 로드 액션
+  loadChatRooms: () => Promise<void>;
+  loadNextPage: () => Promise<void>;
+
+  // 필터 상태
+  filterStatus: ChatFilter;
+  setFilterStatus: (status: ChatFilter) => void;
+
+  // 필터링된 채팅방 목록 가져오기
+  getFilteredChatRooms: () => ChatRoom[];
+}
+
+export const useChatStore = create<ChatState>((set, get) => ({
+  // 초기 상태
+  chatRooms: [],
+  setChatRooms: (chatRooms) => set({ chatRooms }),
+
+  currentResponse: null,
+  setCurrentResponse: (response) => set({ currentResponse: response }),
+
+  isLoading: false,
+  setIsLoading: (isLoading) => set({ isLoading }),
+
+  error: null,
+  setError: (error) => set({ error }),
+
+  selectedChatRoom: null,
+  setSelectedChatRoom: (chatRoom) => set({ selectedChatRoom: chatRoom }),
+
+  filterStatus: "전체",
+  setFilterStatus: (status) => set({ filterStatus: status }),
+
+  // 필터링된 채팅방 목록 가져오기
+  getFilteredChatRooms: () => {
+    const { chatRooms, filterStatus } = get();
+
+    if (filterStatus === "전체") {
+      return chatRooms;
+    } else if (filterStatus === "답장함") {
+      return chatRooms.filter((room) => room.isOwner);
+    } else {
+      return chatRooms.filter((room) => !room.isOwner);
+    }
+  },
+
+  // 채팅방 목록 로드 액션
+  loadChatRooms: async () => {
+    const { setIsLoading, setError, setChatRooms, setCurrentResponse } = get();
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetchChatRooms();
+      setChatRooms(response.data);
+      setCurrentResponse(response);
+    } catch (error) {
+      console.error("채팅방 목록을 불러오는 중 오류가 발생했습니다:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "채팅방 목록을 불러오는 중 오류가 발생했습니다"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  },
+
+  // 다음 페이지 로드 액션
+  loadNextPage: async () => {
+    const {
+      currentResponse,
+      setIsLoading,
+      setError,
+      setChatRooms,
+      setCurrentResponse,
+      chatRooms,
+    } = get();
+
+    if (!currentResponse || !currentResponse.hasNext) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const nextResponse = await fetchNextChatRooms(currentResponse);
+
+      if (nextResponse) {
+        // 기존 채팅방 목록에 새로운 데이터 추가
+        setChatRooms([...chatRooms, ...nextResponse.data]);
+        setCurrentResponse(nextResponse);
+      }
+    } catch (error) {
+      console.error("다음 페이지를 불러오는 중 오류가 발생했습니다:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "다음 페이지를 불러오는 중 오류가 발생했습니다"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  },
+}));

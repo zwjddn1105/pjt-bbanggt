@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -8,77 +8,85 @@ import {
   User,
   Calendar,
   ChevronDown,
+  AlertCircle,
+  Loader2,
+  Check,
+  X,
 } from "lucide-react";
-
-// 더미 데이터 - API 연동 전 사용
-const inquiryData = [
-  {
-    id: 1,
-    customer: "고수정",
-    content: "오늘 몇 번째 나왔죠?",
-    date: "2023-11-15 14:30",
-  },
-  {
-    id: 2,
-    customer: "우성훈",
-    content: "가격 더 내려주시면 안될까요...",
-    date: "2023-11-15 13:22",
-  },
-  { id: 3, customer: "배준", content: "서울에", date: "2023-11-15 11:45" },
-  { id: 4, customer: "곤두우두", content: "5", date: "2023-11-14 18:30" },
-  {
-    id: 5,
-    customer: "고수",
-    content: "너무 맛있어요!!",
-    date: "2023-11-14 16:15",
-  },
-  {
-    id: 6,
-    customer: "정하니",
-    content: "빵에서 머리카락 나왔어요",
-    date: "2023-11-14 15:40",
-  },
-  {
-    id: 7,
-    customer: "김민지",
-    content: "재입고 언제 되나요?",
-    date: "2023-11-14 14:20",
-  },
-  {
-    id: 8,
-    customer: "이준호",
-    content: "결제 오류가 발생했어요",
-    date: "2023-11-14 12:10",
-  },
-  {
-    id: 9,
-    customer: "박서연",
-    content: "배송이 늦어지고 있어요",
-    date: "2023-11-13 17:45",
-  },
-  {
-    id: 10,
-    customer: "최지우",
-    content: "교환 가능한가요?",
-    date: "2023-11-13 16:30",
-  },
-];
+import { useChatStore } from "../../store/chat-store";
+import type { ChatFilter } from "../../types/chat";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
 
 export default function InquiriesPage() {
+  const {
+    isLoading,
+    error,
+    loadChatRooms,
+    filterStatus,
+    setFilterStatus,
+    loadNextPage,
+    currentResponse,
+    getFilteredChatRooms,
+  } = useChatStore();
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedStatus, setSelectedStatus] = useState("전체");
   const itemsPerPage = 6;
-  const totalPages = Math.ceil(inquiryData.length / itemsPerPage);
+
+  // 컴포넌트 마운트 시 채팅방 목록 로드
+  useEffect(() => {
+    loadChatRooms();
+  }, [loadChatRooms]);
+
+  // 필터링된 채팅방 목록
+  const filteredChatRooms = getFilteredChatRooms();
 
   // 현재 페이지에 표시할 데이터
-  const currentItems = inquiryData.slice(
+  const currentItems = filteredChatRooms.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  // 총 페이지 수 계산
+  const totalPages = Math.ceil(filteredChatRooms.length / itemsPerPage);
+
   // 페이지 변경 함수
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+
+    // 마지막 페이지이고 다음 데이터가 있으면 다음 페이지 로드
+    if (page === totalPages && currentResponse?.hasNext) {
+      loadNextPage();
+    }
+  };
+
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
+    } catch {
+      return dateString;
+    }
+  };
+
+  // 채팅방 클릭 핸들러 (실제 구현은 나중에)
+  const handleChatRoomClick = (chatRoomId: number) => {
+    console.log(`채팅방 ${chatRoomId}로 이동합니다.`);
+    // 실제 구현은 나중에
+  };
+
+  // 필터 변경 핸들러
+  const handleFilterChange = (filter: ChatFilter) => {
+    setFilterStatus(filter);
+    setCurrentPage(1); // 필터 변경 시 첫 페이지로 이동
   };
 
   // 페이지네이션 렌더링
@@ -185,12 +193,27 @@ export default function InquiriesPage() {
           </div>
 
           <div className="relative">
-            <div className="flex items-center border border-gray-200 rounded-lg px-3 py-2 bg-white cursor-pointer hover:border-orange-300 transition-colors">
-              <span className="text-sm text-gray-700 mr-2">
-                상태: {selectedStatus}
-              </span>
-              <ChevronDown className="w-4 h-4 text-gray-500" />
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center border border-gray-200 rounded-lg px-3 py-2 bg-white cursor-pointer hover:border-orange-300 transition-colors">
+                <span className="text-sm text-gray-700 mr-2">
+                  상태: {filterStatus}
+                </span>
+                <ChevronDown className="w-4 h-4 text-gray-500" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => handleFilterChange("전체")}>
+                  전체
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleFilterChange("답장함")}>
+                  답장함
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => handleFilterChange("답장 안함")}
+                >
+                  답장 안함
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -201,43 +224,72 @@ export default function InquiriesPage() {
             <div className="col-span-3 text-center">일시</div>
           </div>
 
-          {currentItems.map((item) => (
-            <div
-              key={item.id}
-              className="grid grid-cols-12 px-6 py-4 items-center hover:bg-orange-50 transition-colors"
-            >
-              <div className="col-span-2 flex items-center">
-                <User className="w-4 h-4 text-orange-500 mr-2 flex-shrink-0" />
-                <span className="text-gray-700 font-medium">
-                  {item.customer}
-                </span>
-              </div>
-              <div className="col-span-7">
-                <p className="text-gray-700 truncate">{item.content}</p>
-              </div>
-              <div className="col-span-3 flex items-center justify-end space-x-3">
-                <div className="flex items-center text-gray-500 text-sm">
-                  <Calendar className="w-3 h-3 mr-1" />
-                  {item.date}
-                </div>
-                <button className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-3 py-1.5 rounded-full transition-colors flex items-center">
-                  자세히
-                  <ChevronRight className="w-3 h-3 ml-1" />
-                </button>
-              </div>
+          {isLoading && filteredChatRooms.length === 0 ? (
+            <div className="py-12 text-center text-gray-500 flex flex-col items-center justify-center">
+              <Loader2 className="w-8 h-8 text-orange-500 animate-spin mb-2" />
+              <p>문의 내역을 불러오는 중입니다...</p>
             </div>
-          ))}
-
-          {currentItems.length === 0 && (
+          ) : error ? (
+            <div className="py-12 text-center text-red-500 flex flex-col items-center justify-center">
+              <AlertCircle className="w-8 h-8 mb-2" />
+              <p>{error}</p>
+              <button
+                onClick={() => loadChatRooms()}
+                className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
+              >
+                다시 시도
+              </button>
+            </div>
+          ) : currentItems.length === 0 ? (
             <div className="py-12 text-center text-gray-500">
               문의 내역이 없습니다.
             </div>
+          ) : (
+            currentItems.map((item) => (
+              <div
+                key={item.chatRoomId}
+                className="grid grid-cols-12 px-6 py-4 items-center hover:bg-orange-50 transition-colors cursor-pointer"
+                onClick={() => handleChatRoomClick(item.chatRoomId)}
+              >
+                <div className="col-span-2 flex items-center">
+                  <User className="w-4 h-4 text-orange-500 mr-2 flex-shrink-0" />
+                  <span className="text-gray-700 font-medium">
+                    {item.customerName}
+                  </span>
+                </div>
+                <div className="col-span-7 flex items-center">
+                  <p className="text-gray-700 truncate mr-2">
+                    {item.lastContent}
+                  </p>
+                  {/* 답장 상태 표시 */}
+                  {item.isOwner ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                      <Check className="w-3 h-3 mr-1" />
+                      답장함
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                      <X className="w-3 h-3 mr-1" />
+                      답장 필요
+                    </span>
+                  )}
+                </div>
+                <div className="col-span-3 flex items-center justify-end">
+                  <div className="flex items-center text-gray-500 text-sm">
+                    <Calendar className="w-3 h-3 mr-1" />
+                    {formatDate(item.createdAt)}
+                  </div>
+                </div>
+              </div>
+            ))
           )}
         </div>
 
-        <div className="p-4 flex justify-center">
-          <div className="flex space-x-1">{renderPagination()}</div>
-        </div>
+        {!isLoading && !error && filteredChatRooms.length > 0 && (
+          <div className="p-4 flex justify-center">
+            <div className="flex space-x-1">{renderPagination()}</div>
+          </div>
+        )}
       </div>
     </div>
   );

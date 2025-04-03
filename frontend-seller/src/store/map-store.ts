@@ -29,6 +29,18 @@ interface MapState {
   // 현재 위치 상태
   userLocation: { lat: number; lng: number } | null;
   setUserLocation: (location: { lat: number; lng: number } | null) => void;
+
+  // 선택된 자판기 상태
+  selectedVendingMachine: VendingMachine | null;
+  setSelectedVendingMachine: (machine: VendingMachine | null) => void;
+
+  // 사이드 패널 표시 상태
+  showSidePanel: boolean;
+  setShowSidePanel: (show: boolean) => void;
+
+  // 범례 표시 상태
+  showLegend: boolean;
+  setShowLegend: (show: boolean) => void;
 }
 
 export const useMapStore = create<MapState>((set) => ({
@@ -59,4 +71,17 @@ export const useMapStore = create<MapState>((set) => ({
   // 현재 위치 상태
   userLocation: null,
   setUserLocation: (location) => set({ userLocation: location }),
+
+  // 선택된 자판기 상태
+  selectedVendingMachine: null,
+  setSelectedVendingMachine: (machine) =>
+    set({ selectedVendingMachine: machine }),
+
+  // 사이드 패널 표시 상태
+  showSidePanel: false,
+  setShowSidePanel: (show) => set({ showSidePanel: show }),
+
+  // 범례 표시 상태
+  showLegend: true,
+  setShowLegend: (show) => set({ showLegend: show }),
 }));

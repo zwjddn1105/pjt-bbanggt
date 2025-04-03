@@ -13,6 +13,9 @@ export interface KakaoMapAPI {
     Point: new (x: number, y: number) => KakaoPoint; // Point 타입 추가
     InfoWindow: new (options: KakaoInfoWindowOptions) => KakaoInfoWindow;
     Circle: new (options: KakaoCircleOptions) => KakaoCircle;
+    CustomOverlay: new (
+      options: KakaoCustomOverlayOptions
+    ) => KakaoCustomOverlay; // CustomOverlay 추가
     event: {
       addListener: (
         target: object,
@@ -92,6 +95,8 @@ export interface KakaoMarker {
   getClickable(): boolean;
   setZIndex(zIndex: number): void;
   getZIndex(): number;
+  setImage(image: KakaoMarkerImage): void; // 이 메서드 추가
+  getImage(): KakaoMarkerImage; // 이 메서드도 추가
 }
 
 // 카카오 사이즈 인터페이스
@@ -159,6 +164,31 @@ export interface KakaoCircle {
   getRadius(): number;
 }
 
+// 카카오 커스텀 오버레이 옵션 인터페이스 추가
+export interface KakaoCustomOverlayOptions {
+  position: KakaoLatLng;
+  content: HTMLElement | string;
+  map?: KakaoMap | null;
+  clickable?: boolean;
+  xAnchor?: number;
+  yAnchor?: number;
+  zIndex?: number;
+}
+
+// 카카오 커스텀 오버레이 인터페이스 추가
+export interface KakaoCustomOverlay {
+  setMap(map: KakaoMap | null): void;
+  getMap(): KakaoMap | null;
+  setPosition(position: KakaoLatLng): void;
+  getPosition(): KakaoLatLng;
+  setContent(content: HTMLElement | string): void;
+  getContent(): HTMLElement | string;
+  setVisible(visible: boolean): void;
+  getVisible(): boolean;
+  setZIndex(zIndex: number): void;
+  getZIndex(): number;
+}
+
 // Window 인터페이스 확장
 declare global {
   interface Window {
@@ -184,24 +214,24 @@ export interface BakeryPosition {
 
 // 빵긋 자판기 정보 타입
 export interface VendingMachine {
-  id: number;
+  id: number | string;
   name: string;
   address: string;
   latitude: number;
   longitude: number;
-  distance?: string;
-  category?: string;
-  rating?: number;
+  distance?: string | number;
+  remainSpaceCount?: number; // 남은 공간 수
+  availableCount?: number; // 사용 가능한 수 (다른 앱에서 사용)
 }
 
 // API 응답 데이터 타입
 export interface VendingMachineApiResponse {
-  id: number;
+  id: number | string;
   name?: string;
   address?: string;
   latitude: number;
   longitude: number;
   distance?: number;
-  category?: string;
-  rating?: number;
+  remainSpaceCount?: number; // 남은 공간 수
+  availableCount?: number; // 사용 가능한 수 (다른 앱에서 사용)
 }
