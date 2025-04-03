@@ -121,13 +121,11 @@ public class OrderService {
         if (!order.getProductState().equals(ProductState.AVAILABLE)) {
             throw new BadRequestException(ErrorCode.FORBIDDEN_ORDER_ACCESS);
         }
-        order.setBuyerId(user.getId());
-        order.setProductState(ProductState.SOLD_OUT);
-        int discountPrice = (int) (order.getPrice() * order.getDiscount());
+        order.completePurchase(user.getId());
+        int discountPrice = (int) (order.getPrice() * (1.0 - order.getDiscount()));
 
         AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
                 user.getUserKey(),
-                accountNo,
                 adminAccount,
                 "입금",
                 discountPrice / 100L,
@@ -146,6 +144,8 @@ public class OrderService {
     }
 
     public void refundOrder(User user, Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
         Transaction transaction = transactionService.findByOrderId(orderId);
         Account account = accountRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
@@ -162,7 +162,6 @@ public class OrderService {
 
         AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
                 adminKey,
-                adminAccount,
                 transaction.getSenderAccount(),
                 "환불 입금",
                 transaction.getTransactionBalance() / 100,
@@ -170,6 +169,7 @@ public class OrderService {
                 "환불 송금"
         );
         ssafyTransferService.accountTransfer(accountTransferRequest);
+        order.cancelPurchase();
         transactionService.recordTransaction(
                 orderId,
                 transaction.getSenderAccount(),
@@ -201,7 +201,6 @@ public class OrderService {
             String sellerAccount = sellerAccountMap.get(sellerId);
             AccountTransferRequest accountTransferRequest  = new AccountTransferRequest(
                     adminKey,
-                    adminAccount,
                     sellerAccount,
                     "정산 입금",
                     transaction.getTransactionBalance() / 100L,
@@ -324,17 +323,10 @@ public class OrderService {
 
         User user = userRepository.findById(1L)
                         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-        order.setBuyerId(user.getId());
-        order.setProductState(ProductState.SOLD_OUT);
-        int discountPrice = (int) (order.getPrice() * order.getDiscount());
-        log.info("User Key : {}", user.getUserKey());
-        log.info("User Account : {}", accountNo);
-
-        log.info("Admin Key : {}", adminKey);
-        log.info("Admin Account : {}", adminAccount);
+        order.completePurchase(user.getId());
+        int discountPrice = (int) (order.getPrice() * (1.0 - order.getDiscount()));
         AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
                 user.getUserKey(),
-                accountNo,
                 adminAccount,
                 "입금",
                 discountPrice / 100L,
@@ -342,7 +334,7 @@ public class OrderService {
                 "송금"
         );
         ssafyTransferService.accountTransfer(accountTransferRequest);
-        String sellerAccount = sellerAccount(orderId);
+       // String sellerAccount = sellerAccount(orderId);
         transactionService.recordTransaction(orderId,
                 accountNo,
                 adminAccount,
@@ -353,14 +345,16 @@ public class OrderService {
     }
 
     public void testRefund(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
         User user = userRepository.findById(1L)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
         Transaction transaction = transactionService.findByOrderId(orderId);
         Account account = accountRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
-        String sellerAccount = sellerAccount(orderId);
+        //String sellerAccount = sellerAccount(orderId);
         if (!account.getAccountNo().equals(transaction.getSenderAccount())
-                || !sellerAccount.equals(transaction.getReceiverAccount())
+            //    || !sellerAccount.equals(transaction.getReceiverAccount())
         ) {
             throw new BadRequestException(ErrorCode.UNABLE_TO_REFUND_PRODUCT);
         }
@@ -371,14 +365,14 @@ public class OrderService {
 
         AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
                 adminKey,
-                adminAccount,
                 transaction.getSenderAccount(),
                 "환불 입금",
                 transaction.getTransactionBalance() / 100,
-                transaction.getSenderAccount(),
+                transaction.getReceiverAccount(),
                 "환불 송금"
         );
         ssafyTransferService.accountTransfer(accountTransferRequest);
+        order.cancelPurchase();
         transactionService.recordTransaction(
                 orderId,
                 transaction.getSenderAccount(),
