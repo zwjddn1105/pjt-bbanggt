@@ -113,7 +113,9 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
-                .where(qOrder.sellerId.eq(userId))
+                .where(qOrder.sellerId.eq(userId)
+                        .and(qOrder.productState.eq(ProductState.AVAILABLE)
+                                .or(qOrder.productState.eq(ProductState.SOLD_OUT))))
                 .fetch();
     }
 
