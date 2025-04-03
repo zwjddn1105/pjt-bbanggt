@@ -3,6 +3,7 @@ package com.breadbolletguys.breadbread.vendingmachine.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
@@ -43,5 +44,9 @@ public class SpaceRepository {
 
     public List<SpaceCountQueryResponse> findSpaceCountsByVendingMachineIds(List<Long> vendingMachineIds) {
         return spaceJpaRepository.findSpaceCountsByVendingMachineIds(vendingMachineIds);
+    }
+
+    public List<Long> findVendingMachineIdsBySpaceIds(List<Long> spaceIds) {
+        return spaceJpaRepository.findVendingMachineIdsBySpaceIds(spaceIds);
     }
 }

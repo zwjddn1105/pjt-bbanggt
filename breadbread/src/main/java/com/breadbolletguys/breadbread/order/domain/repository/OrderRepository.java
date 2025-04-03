@@ -3,6 +3,7 @@ package com.breadbolletguys.breadbread.order.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.order.domain.Order;
@@ -55,5 +56,9 @@ public class OrderRepository {
 
     public List<Order> findAllById(Iterable<Long> ids) {
         return orderJpaRepository.findAllById(ids);
+    }
+
+    public List<Long> findSpaceIdsByBakeryIds(List<Long> bakeryIds) {
+        return orderJpaRepository.findSpaceIdsByBakeryIds(bakeryIds);
     }
 }
