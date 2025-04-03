@@ -58,13 +58,13 @@ export default function Home() {
         },
         (error) => {
           console.error("현재 위치를 가져오는데 실패했습니다:", error)
-          setCurrentLocation({ lat: 37.5665, lng: 126.978 })
+          setCurrentLocation({ lat: 37.4979, lng: 127.035 })
           fetchData(37.5665, 126.978, showBookmarkedOnly)
         },
       )
     } else {
-      setCurrentLocation({ lat: 37.5665, lng: 126.978 })
-      fetchData(37.5665, 126.978, showBookmarkedOnly)
+      setCurrentLocation({ lat: 37.4979, lng: 126.035 })
+      fetchData(37.4979, 126.035, showBookmarkedOnly)
     }
   }
 
@@ -76,7 +76,7 @@ export default function Home() {
         const uniqueVendingMachines = removeDuplicateById(bookmarkedVendingMachines)
         setVendingMachines(uniqueVendingMachines)
       } else {
-        const vendingData = await fetchVendingMachines(lat, lng, 5)
+        const vendingData = await fetchVendingMachines(lat, lng, 20)
         const uniqueVendingMachines = removeDuplicateById(vendingData)
         setVendingMachines(uniqueVendingMachines)
       }
@@ -132,8 +132,8 @@ export default function Home() {
   }
 
   const handleBookmarkClick = () => {
-    const lat = currentLocation?.lat ?? 37.5665
-    const lng = currentLocation?.lng ?? 126.978
+    const lat = currentLocation?.lat ?? 37.4979
+    const lng = currentLocation?.lng ?? 126.0375
 
     setShowBookmarkedOnly(true)
 
