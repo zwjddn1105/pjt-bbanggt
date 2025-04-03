@@ -45,7 +45,7 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
         return queryFactory.select(
                 Projections.constructor(
                         ChatQueryResponse.class,
-                        chat.chatRoomId,
+                        chat.chatRoomId.max(),
                         chat.id.max()
                 )).from(chat)
                 .leftJoin(chatRoom).on(chatRoom.id.eq(chat.chatRoomId))
