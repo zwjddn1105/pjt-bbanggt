@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.order.domain.Order;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 
@@ -54,8 +55,16 @@ public class OrderRepository {
         return orderQueryRepository.findAvailableOrdersBySpaceIds(spaceIds);
     }
 
-    public List<Order> findAllById(Iterable<Long> ids) {
-        return orderJpaRepository.findAllById(ids);
+    public int countAvailableOrderByVendingMachineId(Long vendingMachineId) {
+        return orderQueryRepository.countAvailableOrderByVendingMachineId(vendingMachineId);
+    }
+
+    public List<OrderCountQueryResponse> findAvailableCountsByVendingMachineIds(List<Long> vendingMachineIds) {
+        return orderQueryRepository.findAvailableCountsByVendingMachineIds(vendingMachineIds);
+    }
+
+    public List<Order> findAllById(List<Long> ids) {
+        return orderJpaRepository.findAllByIdIn(ids);
     }
 
     public List<Long> findSpaceIdsByBakeryIds(List<Long> bakeryIds) {

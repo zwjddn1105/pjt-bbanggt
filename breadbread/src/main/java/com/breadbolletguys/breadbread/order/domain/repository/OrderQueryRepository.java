@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.breadbolletguys.breadbread.order.domain.Order;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 
@@ -19,4 +20,8 @@ public interface OrderQueryRepository {
     List<Order> findAllByExpirationDateBefore();
 
     List<Order> findAvailableOrdersBySpaceIds(List<Long> spaceIds);
+
+    Integer countAvailableOrderByVendingMachineId(Long vendingMachineId);
+
+    List<OrderCountQueryResponse> findAvailableCountsByVendingMachineIds(List<Long> vendingMachineIds);
 }

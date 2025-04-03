@@ -1,5 +1,9 @@
 package com.breadbolletguys.breadbread.order.domain.repository;
 
+import static com.breadbolletguys.breadbread.order.domain.QOrder.order;
+import static com.breadbolletguys.breadbread.vendingmachine.domain.QSpace.space;
+import static com.breadbolletguys.breadbread.vendingmachine.domain.QVendingMachine.vendingMachine;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -9,6 +13,7 @@ import com.breadbolletguys.breadbread.bakery.domain.QBakery;
 import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.ProductState;
 import com.breadbolletguys.breadbread.order.domain.QOrder;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.vendingmachine.domain.QSpace;
@@ -26,10 +31,10 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 
     @Override
     public List<OrderResponse> findByVendingMachineId(Long vendingMachineId) {
-        QSpace qSpace = QSpace.space;
-        QOrder qOrder = QOrder.order;
+        QSpace qSpace = space;
+        QOrder qOrder = order;
         QBakery qBakery = QBakery.bakery;
-        QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
+        QVendingMachine qVendingMachine = vendingMachine;
         return queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
@@ -40,8 +45,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         Expressions.numberTemplate(
                                 Integer.class,
                                 "CAST({0} * (1 - {1}) AS INTEGER)",
-                                QOrder.order.price,
-                                QOrder.order.discount
+                                order.price,
+                                order.discount
                         ),
                         qOrder.count,
                         qOrder.image,
@@ -58,10 +63,10 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 
     @Override
     public List<OrderResponse> findByBuyerId(Long userId) {
-        QSpace qSpace = QSpace.space;
-        QOrder qOrder = QOrder.order;
+        QSpace qSpace = space;
+        QOrder qOrder = order;
         QBakery qBakery = QBakery.bakery;
-        QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
+        QVendingMachine qVendingMachine = vendingMachine;
         LocalDateTime now = LocalDateTime.now();
         return queryFactory
                 .select(Projections.constructor(
@@ -72,6 +77,9 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.price,
                         Expressions.numberTemplate(
                                 Integer.class,
+                                "CAST({0} * (1 - {1}) AS SIGNED)",
+                                order.price,
+                                order.discount,
                                 "CAST({0} * (1 - {1}) AS INTEGER)",
                                 QOrder.order.price,
                                 QOrder.order.discount
@@ -93,9 +101,9 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 
     @Override
     public List<OrderStackResponse> findStocksBySellerId(Long userId) {
-        QSpace qSpace = QSpace.space;
-        QOrder qOrder = QOrder.order;
-        QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
+        QSpace qSpace = space;
+        QOrder qOrder = order;
+        QVendingMachine qVendingMachine = vendingMachine;
 
         return queryFactory
                 .select(Projections.constructor(
@@ -114,10 +122,10 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 
     @Override
     public OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId) {
-        QSpace qSpace = QSpace.space;
-        QOrder qOrder = QOrder.order;
+        QSpace qSpace = space;
+        QOrder qOrder = order;
         QBakery qBakery = QBakery.bakery;
-        QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
+        QVendingMachine qVendingMachine = vendingMachine;
         return queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
@@ -128,8 +136,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         Expressions.numberTemplate(
                                 Integer.class,
                                 "CAST({0} * (1 - {1}) AS INTEGER)",
-                                QOrder.order.price,
-                                QOrder.order.discount
+                                order.price,
+                                order.discount
                         ),
                         qOrder.count,
                         qOrder.image,
@@ -148,7 +156,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 
     @Override
     public List<Order> findAllByExpirationDateBefore() {
-        QOrder qOrder = QOrder.order;
+        QOrder qOrder = order;
         LocalDateTime endOfToday = LocalDateTime.now();
         return queryFactory
                 .selectFrom(qOrder)
@@ -159,11 +167,37 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
 
     @Override
     public List<Order> findAvailableOrdersBySpaceIds(List<Long> spaceIds) {
-        QOrder qOrder = QOrder.order;
+        QOrder qOrder = order;
         return queryFactory
                 .selectFrom(qOrder)
                 .where(qOrder.spaceId.in(spaceIds)
                         .and(qOrder.productState.eq(ProductState.AVAILABLE)))
+                .fetch();
+    }
+
+    @Override
+    public Integer countAvailableOrderByVendingMachineId(Long vendingMachineId) {
+        return queryFactory.select(order.count().intValue())
+                .from(order)
+                .leftJoin(space).on(order.spaceId.eq(space.id))
+                .leftJoin(vendingMachine).on(space.vendingMachineId.eq(vendingMachineId))
+                .where(order.productState.eq(ProductState.AVAILABLE)
+                        .and(space.vendingMachineId.eq(vendingMachineId)))
+                .fetchOne();
+    }
+
+    @Override
+    public List<OrderCountQueryResponse> findAvailableCountsByVendingMachineIds(List<Long> vendingMachineIds) {
+        return queryFactory.select(
+                Projections.constructor(
+                        OrderCountQueryResponse.class,
+                        order.count().intValue(),
+                        vendingMachine.id
+                )).from(order)
+                .leftJoin(space).on(order.spaceId.eq(space.id))
+                .leftJoin(vendingMachine).on(space.vendingMachineId.eq(space.vendingMachineId))
+                .where(vendingMachine.id.in(vendingMachineIds))
+                .groupBy(vendingMachine.id)
                 .fetch();
     }
 }

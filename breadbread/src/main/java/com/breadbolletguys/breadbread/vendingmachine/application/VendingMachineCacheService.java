@@ -15,6 +15,7 @@ import org.springframework.data.redis.core.GeoOperations;
 import org.springframework.stereotype.Service;
 
 import com.breadbolletguys.breadbread.common.util.JsonUtil;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.repository.OrderRepository;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.user.domain.repository.BookmarkRepository;
@@ -47,11 +48,14 @@ public class VendingMachineCacheService {
     ) {
         Point point = new Point(longitude, latitude);
         int remainSpaceCount = spaceRepository.countNotOccupiedSpaceByVendingMachineId(vendingMachine.getId());
+        int availableCount = orderRepository.countAvailableOrderByVendingMachineId(vendingMachine.getId());
+
         var vendingMachineRedisEntity = VendingMachineRedisEntity.builder()
                 .id(vendingMachine.getId().toString())
                 .address(vendingMachine.getAddress())
                 .name(vendingMachine.getName())
                 .remainSpaceCount(remainSpaceCount)
+                .availableCount(availableCount)
                 .build();
 
         geoOperations.add(VENDING_MACHINE_KEY, point, jsonUtil.convertToJson(vendingMachineRedisEntity));
@@ -88,6 +92,7 @@ public class VendingMachineCacheService {
                             vendingMachineRedisEntity.getName(),
                             vendingMachineRedisEntity.getAddress(),
                             vendingMachineRedisEntity.getRemainSpaceCount(),
+                            vendingMachineRedisEntity.getAvailableCount(),
                             location.getPoint().getX(),
                             location.getPoint().getY(),
                             distanceVal.getValue()
@@ -127,7 +132,10 @@ public class VendingMachineCacheService {
         var vendingMachines = vendingMachineRepository.findAll();
         List<Long> vendingMachineIds = convertToVendingMachineIds(vendingMachines);
         var spaceCounts = spaceRepository.findSpaceCountsByVendingMachineIds(vendingMachineIds);
+        var availableCounts = orderRepository.findAvailableCountsByVendingMachineIds(vendingMachineIds);
+
         var vendingMachineIdToRemainSpaceCount = mapVendingMachineIdToRemainSpaceCount(spaceCounts);
+        var vendingMachineIdToAvailableCount = mapVendingMachineIdToAvailableCount(availableCounts);
 
         vendingMachines.forEach(vendingMachine ->
                 geoOperations.add(
@@ -139,9 +147,19 @@ public class VendingMachineCacheService {
                                 .address(vendingMachine.getAddress())
                                 .remainSpaceCount(vendingMachineIdToRemainSpaceCount
                                         .getOrDefault(vendingMachine.getId(), 0))
+                                .availableCount(vendingMachineIdToAvailableCount
+                                        .getOrDefault(vendingMachine.getId(), 0))
                                 .build())
                 )
         );
+    }
+
+    private Map<Long, Integer> mapVendingMachineIdToAvailableCount(List<OrderCountQueryResponse> availableCounts) {
+        return availableCounts.stream()
+                .collect(Collectors.toMap(
+                        OrderCountQueryResponse::vendingMachineId,
+                        OrderCountQueryResponse::count
+                ));
     }
 
     private Map<Long, Integer> mapVendingMachineIdToRemainSpaceCount(List<SpaceCountQueryResponse> spaceCounts) {
