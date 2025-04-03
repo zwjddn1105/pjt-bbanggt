@@ -73,6 +73,17 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
         return new PageImpl<>(data, pageable, total);
     }
 
+    @Override
+    public boolean existsByOwnerIdAndCustomerId(Long ownerId, Long customerId) {
+        long count = queryFactory.select(
+                        chatRoom
+                ).from(chatRoom)
+                .where((chatRoom.ownerId.eq(ownerId).and(chatRoom.customerId.eq(customerId)))
+                        .or(chatRoom.ownerId.eq(customerId).and(chatRoom.customerId.eq(ownerId))))
+                .fetchCount();
+        return count > 0;
+    }
+
     private BooleanExpression isInRange(String pageToken) {
         if (pageToken == null) {
             return null;
