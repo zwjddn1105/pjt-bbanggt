@@ -76,15 +76,15 @@ public class OrderService {
     }
 
     @Transactional
-    public void save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
+    public void save(User user, Long spaceId, List<OrderRequest> orderRequests, String imageUrl) {
         Long bakeryId = bakeryRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.BAKERY_NOT_FOUND))
                 .getId();
 
         if (orderRequests.size() == 1) {
-            saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), image);
+            saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), imageUrl);
         } else {
-            saveMixedBreadOrder(user, spaceId, bakeryId, orderRequests, image);
+            saveMixedBreadOrder(user, spaceId, bakeryId, orderRequests, imageUrl);
         }
     }
 
@@ -208,7 +208,8 @@ public class OrderService {
             Long spaceId,
             Long bakeryId,
             OrderRequest request,
-            MultipartFile image) {
+            String imageUrl
+    ) {
         LocalDateTime expirationDate = getExpirationDate();
 
         Order order = Order.builder()
@@ -219,20 +220,21 @@ public class OrderService {
                 .price(request.getPrice())
                 .discount(request.getDiscount() * 1.0 / 100)
                 .count(request.getCount())
-                .image(null) // 이미지 업로드 시 로직 필요
+                .image(imageUrl) // 이미지 업로드 시 로직 필요
                 .expirationDate(expirationDate)
                 .productState(ProductState.AVAILABLE)
                 .breadType(request.getBreadType())
                 .build();
-
         orderRepository.save(order);
     }
 
-    private void saveMixedBreadOrder(User user,
-                                     Long spaceId,
-                                     Long bakeryId,
-                                     List<OrderRequest> requests,
-                                     MultipartFile image) {
+    private void saveMixedBreadOrder(
+            User user,
+            Long spaceId,
+            Long bakeryId,
+            List<OrderRequest> requests,
+            String imageUrl
+    ) {
         LocalDateTime expirationDate = getExpirationDate();
 
         int totalOriginalPrice = 0;
@@ -258,7 +260,7 @@ public class OrderService {
                 .price(totalOriginalPrice)
                 .discount(totalDiscountRate)
                 .count(totalCount)
-                .image(null) // 이미지 업로드 시 로직 필요
+                .image(imageUrl) // 이미지 업로드 시 로직 필요
                 .expirationDate(expirationDate)
                 .productState(ProductState.AVAILABLE)
                 .breadType(BreadType.MIXED_BREAD)
