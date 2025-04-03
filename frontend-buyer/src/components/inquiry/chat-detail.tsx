@@ -5,17 +5,8 @@ import type React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { fetchChatMessages, sendChatMessage } from "@/lib/chat"
-import type { ChatResponse } from "@/types/chat"
-
-// 메시지 타입 정의
-interface ChatMessage {
-  id: number
-  senderId: number
-  roomId: number
-  content: string
-  createdAt: string
-}
+import { fetchChatMessages, sendChatMessage, fetchChatRooms } from "@/lib/chat"
+import type { ChatResponse, ChatRoomBuyerOnlyResponse } from "@/types/chat"
 
 interface ChatDetailProps {
   chatRoomId: number
@@ -29,9 +20,67 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
   const [bakeryName, setBakeryName] = useState("")
   const [pageToken, setPageToken] = useState<string | null>(null)
   const [hasMore, setHasMore] = useState(true)
-  const [userId, setUserId] = useState<number>(0) // 실제 구현에서는 로그인 사용자 ID를 가져와야 함
+  const [userId, setUserId] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+
+  // 사용자 ID 가져오기
+  useEffect(() => {
+    // 로컬 스토리지에서 사용자 ID 가져오기
+    const getUserId = () => {
+      if (typeof window !== "undefined") {
+        const userIdFromStorage = localStorage.getItem("user_id")
+        if (userIdFromStorage) {
+          return parseInt(userIdFromStorage, 10)
+        }
+      }
+      return null
+    }
+
+    const fetchedUserId = getUserId()
+    if (fetchedUserId) {
+      setUserId(fetchedUserId)
+    } else {
+      // 로컬 스토리지에 사용자 ID가 없는 경우
+      // 첫 번째 메시지를 보낸 후 해당 메시지의 senderId를 사용자 ID로 설정
+      const firstMessage = messages[0]
+      if (firstMessage && messages.length > 0) {
+        setUserId(firstMessage.senderId)
+        // 로컬 스토리지에 저장 (선택 사항)
+        if (typeof window !== "undefined") {
+          localStorage.setItem("user_id", firstMessage.senderId.toString())
+        }
+      }
+    }
+  }, [messages])
+
+  // 채팅방 정보 가져오기 (빵집 이름 포함)
+  const fetchChatRoomInfo = useCallback(async () => {
+    try {
+      // 채팅방 목록 API를 호출하여 모든 채팅방 정보를 가져옵니다
+      const response = await fetchChatRooms(null)
+      
+      // 현재 채팅방 ID와 일치하는 채팅방 찾기
+      const chatRoom = response.data.find(room => room.chatRoomId === chatRoomId)
+      
+      // 채팅방을 찾았으면 빵집 이름 설정
+      if (chatRoom) {
+        setBakeryName(chatRoom.name)
+      } else {
+        // 채팅방을 찾지 못한 경우 기본값 설정
+        setBakeryName("베이커리")
+      }
+    } catch (error) {
+      console.error("채팅방 정보를 가져오는 중 오류가 발생했습니다:", error)
+      // 오류 발생 시 기본값 설정
+      setBakeryName("베이커리")
+    }
+  }, [chatRoomId])
+
+  // 컴포넌트 마운트 시 채팅방 정보 가져오기
+  useEffect(() => {
+    fetchChatRoomInfo()
+  }, [fetchChatRoomInfo])
 
   // 메시지 목록 가져오기
   const loadMessages = useCallback(
@@ -46,12 +95,6 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
 
         if (refresh) {
           setMessages(response.data.reverse()) // 최신 메시지가 아래에 오도록 역순 정렬
-          // 첫 로딩 시 베이커리 이름 설정 (실제 구현에서는 API에서 가져와야 함)
-          if (response.data.length > 0 && !bakeryName) {
-            // 여기서는 임시로 "베이커리"라는 이름을 사용
-            // 실제로는 API에서 베이커리 정보를 가져와야 함
-            setBakeryName("베이커리")
-          }
         } else {
           // 이전 메시지는 위에 추가
           setMessages((prev) => [...response.data.reverse(), ...prev])
@@ -65,7 +108,7 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
         setLoading(false)
       }
     },
-    [chatRoomId, pageToken, bakeryName],
+    [chatRoomId, pageToken],
   )
 
   // 폴링 설정
@@ -141,6 +184,24 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
     }
   }
 
+  // 메시지가 내 메시지인지 확인하는 함수
+  const isMyMessage = (message: ChatResponse) => {
+    // 첫 번째 방법: 사용자 ID가 있는 경우 비교
+    if (userId !== null) {
+      return message.senderId === userId
+    }
+    
+    // 두 번째 방법: 메시지 패턴 분석 (예: 구매자가 보낸 메시지는 항상 짝수 ID)
+    // 이 부분은 실제 데이터 패턴에 맞게 수정해야 합니다
+    // return message.senderId % 2 === 0; // 예시: 짝수 ID는 구매자
+    
+    // 세 번째 방법: 메시지 내용이나 시간 패턴 분석
+    // 이 부분도 실제 데이터 패턴에 맞게 수정해야 합니다
+    
+    // 임시 해결책: 모든 메시지를 구매자 메시지로 처리 (오른쪽에 표시)
+    return true
+  }
+
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       {/* 헤더 */}
@@ -176,7 +237,7 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
 
             {/* 메시지 목록 */}
             {messages.map((message, index) => {
-              const isMyMessage = message.senderId === userId
+              const myMessage = isMyMessage(message)
 
               return (
                 <div key={message.id}>
@@ -188,16 +249,16 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
                     </div>
                   )}
 
-                  <div className={`flex ${isMyMessage ? "justify-end" : "justify-start"}`}>
+                  <div className={`flex ${myMessage ? "justify-end" : "justify-start"}`}>
                     <div className="max-w-[70%]">
-                      {!isMyMessage && (
+                      {!myMessage && (
                         <div className="mb-1 ml-1">
                           <span className="font-semibold text-sm">{bakeryName}</span>
                         </div>
                       )}
 
                       <div className="flex items-end gap-2">
-                        {!isMyMessage && (
+                        {!myMessage && (
                           <div className="order-1">
                             <span className="text-xs text-gray-500">{formatTime(message.createdAt)}</span>
                           </div>
@@ -205,7 +266,7 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
 
                         <div
                           className={`px-4 py-2 rounded-2xl ${
-                            isMyMessage
+                            myMessage
                               ? "bg-gray-100 rounded-tr-none"
                               : "bg-white border border-gray-200 rounded-tl-none"
                           }`}
@@ -213,7 +274,7 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
                           <p>{message.content}</p>
                         </div>
 
-                        {isMyMessage && (
+                        {myMessage && (
                           <div>
                             <span className="text-xs text-gray-500">{formatTime(message.createdAt)}</span>
                           </div>
@@ -251,4 +312,3 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
     </div>
   )
 }
-

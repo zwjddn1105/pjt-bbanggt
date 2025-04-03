@@ -1,9 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Bookmark, MapPin, Clock, Navigation, X } from "lucide-react"
+import { Bookmark, MapPin, Clock, Navigation, X, Package, Info } from "lucide-react"
 import { addBakeryBookmark, removeBakeryBookmark } from "@/services/breadgut-api"
 import type { VendingMachine } from "@/types/vending-machine"
+import VendingMachineDetail from "./vending-machine-detail"
+import BreadDetail from "./bread-detail"
 
 interface MarkerDetailProps {
   vendingMachine: VendingMachine
@@ -14,6 +16,9 @@ interface MarkerDetailProps {
 export default function MarkerDetail({ vendingMachine, onClose, onBookmarkChange }: MarkerDetailProps) {
   const [isBookmarked, setIsBookmarked] = useState(vendingMachine.isBookmarked || false)
   const [isLoading, setIsLoading] = useState(false)
+  const [showVendingMachineDetail, setShowVendingMachineDetail] = useState(false)
+  const [showBreadDetail, setShowBreadDetail] = useState(false)
+  const [selectedBread, setSelectedBread] = useState<{ slotId: number; breadType: number } | null>(null)
 
   const handleBookmarkToggle = async () => {
     if (isLoading) return
@@ -46,59 +51,97 @@ export default function MarkerDetail({ vendingMachine, onClose, onBookmarkChange
     window.open(kakaoMapUrl, "_blank")
   }
 
+  const handleDetailClick = () => {
+    setShowVendingMachineDetail(true)
+  }
+
+  const handleBreadDetailClick = (slotId: number, breadType: number) => {
+    setSelectedBread({ slotId, breadType })
+    setShowVendingMachineDetail(false)
+    setShowBreadDetail(true)
+  }
+
   return (
-    <div className="fixed bottom-16 left-0 right-0 bg-white rounded-t-2xl shadow-lg p-4 z-20">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">{vendingMachine.name}</h2>
-        <button onClick={onClose} className="p-1" aria-label="닫기">
-          <X className="w-6 h-6" />
-        </button>
-      </div>
-
-      <div className="flex items-center mb-2">
-        <span className="text-gray-600">빵긋 자판기</span>
-        <button
-          onClick={handleBookmarkToggle}
-          disabled={isLoading}
-          className="ml-auto p-1"
-          aria-label={isBookmarked ? "북마크 제거" : "북마크 추가"}
-        >
-          <Bookmark className={`w-6 h-6 ${isBookmarked ? "fill-orange-500 text-orange-500" : "text-gray-400"}`} />
-        </button>
-      </div>
-
-      {vendingMachine.address && (
-        <div className="flex items-start mb-2">
-          <MapPin className="w-5 h-5 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
-          <span className="text-gray-700">{vendingMachine.address}</span>
+    <>
+      <div className="fixed bottom-16 left-0 right-0 max-h-[60vh] overflow-y-auto bg-white rounded-t-2xl shadow-lg p-4 z-20">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">{vendingMachine.name}</h2>
+          <button onClick={onClose} className="p-1" aria-label="닫기">
+            <X className="w-6 h-6" />
+          </button>
         </div>
+
+        <div className="flex items-center mb-2">
+          <span className="text-gray-600">빵긋 자판기</span>
+          <button
+            onClick={handleBookmarkToggle}
+            disabled={isLoading}
+            className="ml-auto p-1"
+            aria-label={isBookmarked ? "북마크 제거" : "북마크 추가"}
+          >
+            <Bookmark className={`w-6 h-6 ${isBookmarked ? "fill-orange-500 text-orange-500" : "text-gray-400"}`} />
+          </button>
+        </div>
+
+        {vendingMachine.address && (
+          <div className="flex items-start mb-2">
+            <MapPin className="w-5 h-5 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
+            <span className="text-gray-700">{vendingMachine.address}</span>
+          </div>
+        )}
+
+        <div className="flex items-start mb-2">
+          <Clock className="w-5 h-5 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
+          <span className="text-gray-700">24시간 운영</span>
+        </div>
+
+        <div className="flex items-start mb-2">
+          <Package className="w-5 h-5 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
+          <span className="text-gray-700">
+            현재 재고:{" "}
+            <span className={`font-bold ${vendingMachine.availableCount > 0 ? "text-green-600" : "text-red-600"}`}>
+              {vendingMachine.availableCount > 0 ? `${vendingMachine.availableCount}개` : "품절"}
+            </span>
+          </span>
+        </div>
+
+        <div className="mt-4 flex justify-between">
+          <button
+            onClick={handleNavigation}
+            className="flex-1 mr-2 py-2 bg-orange-500 text-white rounded-lg flex items-center justify-center"
+          >
+            <Navigation className="w-5 h-5 mr-1" />
+            길찾기
+          </button>
+          <button
+            onClick={handleDetailClick}
+            className="flex-1 ml-2 py-2 border border-gray-300 text-gray-600 rounded-lg flex items-center justify-center"
+          >
+            <Info className="w-5 h-5 mr-1" />
+            자세히 보기
+          </button>
+        </div>
+      </div>
+
+      {/* 빵긋 자판기 상세 정보 모달 */}
+      {showVendingMachineDetail && (
+        <VendingMachineDetail
+          vendingMachine={vendingMachine}
+          onClose={() => setShowVendingMachineDetail(false)}
+          onBreadDetailClick={handleBreadDetailClick}
+        />
       )}
 
-      <div className="flex items-start mb-2">
-        <Clock className="w-5 h-5 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
-        <span className="text-gray-700">24시간 운영</span>
-      </div>
-
-      <div className="mt-4 flex justify-between">
-        <button
-          onClick={handleNavigation}
-          className="flex-1 mr-2 py-2 bg-orange-500 text-white rounded-lg flex items-center justify-center"
-        >
-          <Navigation className="w-5 h-5 mr-1" />
-          길찾기
-        </button>
-        <button
-          onClick={handleBookmarkToggle}
-          disabled={isLoading}
-          className={`flex-1 ml-2 py-2 border rounded-lg flex items-center justify-center ${
-            isBookmarked ? "border-orange-500 text-orange-500" : "border-gray-300 text-gray-600"
-          }`}
-        >
-          <Bookmark className={`w-5 h-5 mr-1 ${isBookmarked ? "fill-orange-500" : ""}`} />
-          {isBookmarked ? "저장됨" : "저장하기"}
-        </button>
-      </div>
-    </div>
+      {/* 빵 상세 정보 모달 */}
+      {showBreadDetail && selectedBread && (
+        <BreadDetail
+          vendingMachine={vendingMachine}
+          slotId={selectedBread.slotId}
+          breadType={selectedBread.breadType}
+          onClose={() => setShowBreadDetail(false)}
+        />
+      )}
+    </>
   )
 }
 

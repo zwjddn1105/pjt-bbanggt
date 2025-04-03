@@ -14,6 +14,13 @@ export default function ChatList() {
   const [pageToken, setPageToken] = useState<string | null>(null)
   const [hasMore, setHasMore] = useState(true)
 
+  // 중복 제거 로직
+  const mergeUniqueRooms = (prev: ChatRoomBuyerOnlyResponse[], next: ChatRoomBuyerOnlyResponse[]) => {
+    const combined = [...prev, ...next]
+    const unique = Array.from(new Map(combined.map((room) => [room.chatRoomId, room])).values())
+    return unique
+  }
+
   // 채팅방 목록 가져오기
   const loadChatRooms = useCallback(
     async (refresh = false) => {
@@ -24,11 +31,15 @@ export default function ChatList() {
 
         const token = refresh ? null : pageToken
         const response = await fetchChatRooms(token)
+        console.log(
+          "중복 확인용",
+          response.data.map((r) => r.chatRoomId),
+        )
 
         if (refresh) {
-          setChatRooms(response.data)
+          setChatRooms(mergeUniqueRooms([], response.data))
         } else {
-          setChatRooms((prev) => [...prev, ...response.data])
+          setChatRooms((prev) => mergeUniqueRooms(prev, response.data))
         }
 
         setPageToken(response.pageToken)
@@ -46,7 +57,6 @@ export default function ChatList() {
   useEffect(() => {
     loadChatRooms(true)
 
-    // 30초마다 채팅방 목록 업데이트
     const intervalId = setInterval(() => {
       loadChatRooms(true)
     }, 30000)

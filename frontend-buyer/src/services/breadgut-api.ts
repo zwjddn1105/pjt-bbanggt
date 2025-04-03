@@ -52,9 +52,13 @@ export const fetchVendingMachines = async (
 }
 
 // 북마크된 빵긋(자판기) 위치 정보 가져오기
-export const fetchBookmarkedVendingMachines = async (): Promise<VendingMachine[]> => {
+export const fetchBookmarkedVendingMachines = async (
+  latitude: number,
+  longitude: number,
+  distance = 5,
+): Promise<VendingMachine[]> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/v1/vending-machines/bookmarks`, {
+    const response = await fetch(`${API_BASE_URL}/api/v1/vending-machines/bookmarked?latitude=${latitude}&longitude=${longitude}&distance=${distance}`, {
       method: "GET",
       headers: createHeaders(),
     })

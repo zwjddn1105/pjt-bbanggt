@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface FilterButtonsProps {
   onFilterChange?: (showBookmarkedOnly: boolean) => void
@@ -11,13 +11,14 @@ export default function FilterButtons({ onFilterChange, onBookmarkClick }: Filte
   const [showBookmarkedOnly, setShowBookmarkedOnly] = useState<boolean>(false)
 
   const handleBookmarkedFilterClick = () => {
-    const newValue = !showBookmarkedOnly
-    setShowBookmarkedOnly(newValue)
-
-    if (onFilterChange) {
-      onFilterChange(newValue)
-    }
+    setShowBookmarkedOnly((prev) => !prev)
   }
+
+  useEffect(() => {
+    if (onFilterChange) {
+      onFilterChange(showBookmarkedOnly)
+    }
+  }, [showBookmarkedOnly])
 
   return (
     <div className="flex gap-2 overflow-x-auto py-2 no-scrollbar">
@@ -38,4 +39,3 @@ export default function FilterButtons({ onFilterChange, onBookmarkClick }: Filte
     </div>
   )
 }
-
