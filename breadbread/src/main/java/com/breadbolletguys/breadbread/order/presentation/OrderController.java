@@ -20,7 +20,6 @@ import com.breadbolletguys.breadbread.order.domain.dto.request.PayRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.user.domain.User;
-import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SpaceResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,12 +43,6 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/vendor/{vendingMachineId}")
-    public ResponseEntity<List<SpaceResponse>> getOrdersByVendingMachineId(
-            @PathVariable("vendingMachineId") Long vendingMachineId
-    ) {
-        return ResponseEntity.ok(orderService.getOrdersByVendingMachineId(vendingMachineId));
-    }
 
     @GetMapping("/vendor/{vendingMachineId}/{id}")
     public ResponseEntity<OrderResponse> getOrdersByIdAndVendingMachineId(

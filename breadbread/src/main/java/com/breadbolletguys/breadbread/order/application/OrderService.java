@@ -34,7 +34,6 @@ import com.breadbolletguys.breadbread.transaction.domain.TransactionType;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.user.domain.repository.UserRepository;
 import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
-import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SpaceResponse;
 import com.breadbolletguys.breadbread.vendingmachine.domain.repository.SpaceRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -60,31 +59,6 @@ public class OrderService {
     private final UserRepository userRepository;
     private final SsafyTransferService ssafyTransferService;
     private final TransactionService transactionService;
-
-    @Transactional(readOnly = true)
-    public List<SpaceResponse> getOrdersByVendingMachineId(Long vendingMachineId) {
-        List<Space> spaces = spaceRepository.findByVendingMachineId(vendingMachineId);
-        int maxWidth = getWidth(spaces) + 1;
-        Map<Long, Order> orderMap = orderRepository.findAvailableOrdersBySpaceIds(
-                spaces.stream().map(Space::getId).toList()
-        ).stream().collect(Collectors.toMap(Order::getSpaceId, o -> o));
-
-        List<SpaceResponse> spaceResponses = new ArrayList<>();
-        for (Space space : spaces) {
-            Order order = orderMap.get(space.getId());
-            if (order == null) {
-                spaceResponses.add(new SpaceResponse(space.getId(), null));
-                continue;
-            }
-            OrderSummaryResponse summaryResponse = new OrderSummaryResponse(
-                    order.getId(),
-                    (space.getHeight() * maxWidth) + space.getWidth() + 1,
-                    List.of(order.getBreadType())
-            );
-            spaceResponses.add(new SpaceResponse(space.getId(), summaryResponse));
-        }
-        return spaceResponses;
-    }
 
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersByBuyerId(User user) {

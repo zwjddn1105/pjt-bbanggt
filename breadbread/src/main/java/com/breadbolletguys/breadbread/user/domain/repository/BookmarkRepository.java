@@ -21,11 +21,11 @@ public class BookmarkRepository {
         bookmarkJpaRepository.deleteByUserIdAndBakeryId(userId, bakeryId);
     }
 
-    public boolean exisitBookmark(Long userId, Long bakeryId) {
-        return bookmarkJpaRepository.existsByUserIdAndBakeryId(userId, bakeryId);
-    }
-
     public List<Long> findBakeryIdsByUserId(Long userId) {
         return bookmarkJpaRepository.findBakeryIdsByUserId(userId);
+    }
+
+    public boolean existsByUserIdAndBakeryId(Long userId, Long bakeryId) {
+        return bookmarkJpaRepository.existsByUserIdAndBakeryId(userId, bakeryId);
     }
 }

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderSummaryResponse {
-    private Long id;
-    private int slotNumber;
-    private List<BreadType> breadTypes;
+    private Long orderId;
+    private BreadType breadType;
+    private boolean isMark;
 }

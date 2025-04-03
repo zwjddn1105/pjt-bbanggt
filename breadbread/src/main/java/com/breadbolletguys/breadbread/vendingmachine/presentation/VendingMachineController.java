@@ -23,6 +23,7 @@ import com.breadbolletguys.breadbread.vendingmachine.application.VendingMachineC
 import com.breadbolletguys.breadbread.vendingmachine.application.VendingMachineService;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.request.VendingMachineCreateJsonRequest;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.VendingMachineResponse;
+import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.VendingMachineSlotResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -118,5 +119,13 @@ public class VendingMachineController {
     public ResponseEntity<Void> warpUp(@AdminUser User user) {
         vendingMachineCacheService.warmUp();
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{vendingMachineId}")
+    public ResponseEntity<VendingMachineSlotResponse> findVendingMachineById(
+            @AuthUser User user,
+            @PathVariable(name = "vendingMachineId") Long vendingMachineId
+    ) {
+        return ResponseEntity.ok(vendingMachineService.findVendingMachineById(user, vendingMachineId));
     }
 }
