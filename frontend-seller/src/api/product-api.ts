@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { ChatRoomsPageResponse } from "../types/chat";
+import type { Product } from "../types/products";
 
 // 쿠키에서 auth_token 가져오는 함수
 const getAuthToken = (): string | null => {
@@ -15,11 +15,8 @@ const getAuthToken = (): string | null => {
   return null;
 };
 
-// 채팅방 목록 가져오기 함수
-export const fetchChatRooms = async (
-  page = 0,
-  size = 10
-): Promise<ChatRoomsPageResponse> => {
+// 내 상품 재고 목록 가져오기 함수
+export const fetchMyStocks = async (): Promise<Product[]> => {
   const authToken = getAuthToken();
 
   if (!authToken) {
@@ -27,10 +24,9 @@ export const fetchChatRooms = async (
   }
 
   try {
-    const response = await axios.get<ChatRoomsPageResponse>(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/chat-rooms/seller`,
+    const response = await axios.get<Product[]>(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/order/myStocks`,
       {
-        params: { page, size },
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -39,15 +35,7 @@ export const fetchChatRooms = async (
 
     return response.data;
   } catch (error) {
-    console.error("채팅방 목록을 가져오는 중 오류가 발생했습니다:", error);
+    console.error("상품 재고 목록을 가져오는 중 오류가 발생했습니다:", error);
     throw error;
   }
-};
-
-// 다음 페이지 채팅방 목록 가져오기 함수
-export const fetchNextChatRooms = async (
-  currentPage: number,
-  size = 10
-): Promise<ChatRoomsPageResponse> => {
-  return fetchChatRooms(currentPage + 1, size);
 };

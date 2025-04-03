@@ -34,8 +34,8 @@ export default function InquiriesPage() {
     getFilteredChatRooms,
   } = useChatStore();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const [currentPage, setCurrentPage] = useState(0);
+  // 이 줄 제거: const itemsPerPage = 10 // 서버에서 설정한 페이지 크기와 일치시키는 것이 좋습니다
 
   // 컴포넌트 마운트 시 채팅방 목록 로드
   useEffect(() => {
@@ -43,23 +43,20 @@ export default function InquiriesPage() {
   }, [loadChatRooms]);
 
   // 필터링된 채팅방 목록
-  const filteredChatRooms = getFilteredChatRooms();
+  const filteredChatRooms = getFilteredChatRooms() || [];
 
-  // 현재 페이지에 표시할 데이터
-  const currentItems = filteredChatRooms.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // 현재 페이지에 표시할 데이터 - 서버 페이징을 사용하므로 클라이언트 페이징은 필요 없음
+  const currentItems = filteredChatRooms;
 
   // 총 페이지 수 계산
-  const totalPages = Math.ceil(filteredChatRooms.length / itemsPerPage);
+  const totalPages = currentResponse?.totalPages || 1;
 
   // 페이지 변경 함수
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
 
-    // 마지막 페이지이고 다음 데이터가 있으면 다음 페이지 로드
-    if (page === totalPages && currentResponse?.hasNext) {
+    // 다음 페이지 로드
+    if (page > currentPage && currentResponse && !currentResponse.last) {
       loadNextPage();
     }
   };
@@ -86,7 +83,13 @@ export default function InquiriesPage() {
   // 필터 변경 핸들러
   const handleFilterChange = (filter: ChatFilter) => {
     setFilterStatus(filter);
-    setCurrentPage(1); // 필터 변경 시 첫 페이지로 이동
+    setCurrentPage(0); // 필터 변경 시 첫 페이지로 이동
+  };
+
+  // 마지막 페이지 여부 확인
+  const isLastPage = (): boolean => {
+    if (!currentResponse) return true;
+    return currentResponse.last === true;
   };
 
   // 페이지네이션 렌더링
@@ -97,8 +100,8 @@ export default function InquiriesPage() {
     pages.push(
       <button
         key="first"
-        onClick={() => handlePageChange(1)}
-        disabled={currentPage === 1}
+        onClick={() => handlePageChange(0)}
+        disabled={currentPage === 0}
         className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-orange-100 disabled:opacity-50 disabled:hover:bg-transparent"
       >
         <ChevronLeft className="w-4 h-4" />
@@ -111,19 +114,19 @@ export default function InquiriesPage() {
       <button
         key="prev"
         onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
+        disabled={currentPage === 0}
         className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-orange-100 disabled:opacity-50 disabled:hover:bg-transparent"
       >
         <ChevronLeft className="w-4 h-4" />
       </button>
     );
 
-    // 페이지 번호
-    for (let i = 1; i <= totalPages; i++) {
+    // 페이지 번호 (0부터 시작하는 페이지 번호를 1부터 시작하는 것처럼 표시)
+    for (let i = 0; i < totalPages; i++) {
       // 현재 페이지 주변 2개와 첫/마지막 페이지 표시
       if (
-        i === 1 ||
-        i === totalPages ||
+        i === 0 ||
+        i === totalPages - 1 ||
         (i >= currentPage - 1 && i <= currentPage + 1)
       ) {
         pages.push(
@@ -136,12 +139,12 @@ export default function InquiriesPage() {
                 : "hover:bg-orange-100 text-gray-700"
             }`}
           >
-            {i}
+            {i + 1} {/* 화면에는 1부터 시작하는 페이지 번호로 표시 */}
           </button>
         );
       } else if (
-        (i === currentPage - 2 && currentPage > 3) ||
-        (i === currentPage + 2 && currentPage < totalPages - 2)
+        (i === currentPage - 2 && currentPage > 2) ||
+        (i === currentPage + 2 && currentPage < totalPages - 3)
       ) {
         // 생략 부호 표시
         pages.push(
@@ -160,7 +163,7 @@ export default function InquiriesPage() {
       <button
         key="next"
         onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        disabled={currentPage === totalPages - 1 || isLastPage()}
         className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-orange-100 disabled:opacity-50 disabled:hover:bg-transparent"
       >
         <ChevronRight className="w-4 h-4" />
@@ -171,8 +174,8 @@ export default function InquiriesPage() {
     pages.push(
       <button
         key="last"
-        onClick={() => handlePageChange(totalPages)}
-        disabled={currentPage === totalPages}
+        onClick={() => handlePageChange(totalPages - 1)}
+        disabled={currentPage === totalPages - 1 || isLastPage()}
         className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-orange-100 disabled:opacity-50 disabled:hover:bg-transparent"
       >
         <ChevronRight className="w-4 h-4" />
@@ -192,15 +195,21 @@ export default function InquiriesPage() {
             <h2 className="text-xl font-bold text-gray-800">고객문의</h2>
           </div>
 
-          <div className="relative">
+          {/* 드롭다운 메뉴 - 고정 높이와 너비 설정 */}
+          <div className="relative" style={{ height: "40px", width: "120px" }}>
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center border border-gray-200 rounded-lg px-3 py-2 bg-white cursor-pointer hover:border-orange-300 transition-colors">
-                <span className="text-sm text-gray-700 mr-2">
+              <DropdownMenuTrigger className="h-10 w-full flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 bg-white cursor-pointer hover:border-orange-300 transition-colors">
+                <span className="text-sm text-gray-700">
                   상태: {filterStatus}
                 </span>
                 <ChevronDown className="w-4 h-4 text-gray-500" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent
+                sideOffset={5}
+                className="w-[120px]"
+                align="end"
+                forceMount
+              >
                 <DropdownMenuItem onClick={() => handleFilterChange("전체")}>
                   전체
                 </DropdownMenuItem>
@@ -259,7 +268,7 @@ export default function InquiriesPage() {
                 </div>
                 <div className="col-span-7 flex items-center">
                   <p className="text-gray-700 truncate mr-2">
-                    {item.lastContent}
+                    {item.lastContent || "(내용 없음)"}
                   </p>
                   {/* 답장 상태 표시 */}
                   {item.isOwner ? (
@@ -285,11 +294,14 @@ export default function InquiriesPage() {
           )}
         </div>
 
-        {!isLoading && !error && filteredChatRooms.length > 0 && (
-          <div className="p-4 flex justify-center">
-            <div className="flex space-x-1">{renderPagination()}</div>
-          </div>
-        )}
+        {!isLoading &&
+          !error &&
+          filteredChatRooms.length > 0 &&
+          currentResponse && (
+            <div className="p-4 flex justify-center">
+              <div className="flex space-x-1">{renderPagination()}</div>
+            </div>
+          )}
       </div>
     </div>
   );

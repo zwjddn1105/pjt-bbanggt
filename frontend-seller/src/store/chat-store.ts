@@ -1,15 +1,19 @@
 import { create } from "zustand";
 import { fetchChatRooms, fetchNextChatRooms } from "../api/chatRooms";
-import type { ChatRoom, ChatRoomsResponse, ChatFilter } from "../types/chat";
+import type {
+  ChatRoom,
+  ChatRoomsPageResponse,
+  ChatFilter,
+} from "../types/chat";
 
 interface ChatState {
   // 채팅방 목록 상태
   chatRooms: ChatRoom[];
   setChatRooms: (chatRooms: ChatRoom[]) => void;
 
-  // 현재 응답 데이터 (페이지네이션 토큰 포함)
-  currentResponse: ChatRoomsResponse | null;
-  setCurrentResponse: (response: ChatRoomsResponse | null) => void;
+  // 현재 응답 데이터 (페이지네이션 정보 포함)
+  currentResponse: ChatRoomsPageResponse | null;
+  setCurrentResponse: (response: ChatRoomsPageResponse | null) => void;
 
   // 로딩 상태
   isLoading: boolean;
@@ -33,6 +37,10 @@ interface ChatState {
 
   // 필터링된 채팅방 목록 가져오기
   getFilteredChatRooms: () => ChatRoom[];
+
+  // 현재 페이지 번호
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -55,6 +63,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
   filterStatus: "전체",
   setFilterStatus: (status) => set({ filterStatus: status }),
 
+  currentPage: 0,
+  setCurrentPage: (page) => set({ currentPage: page }),
+
   // 필터링된 채팅방 목록 가져오기
   getFilteredChatRooms: () => {
     const { chatRooms, filterStatus } = get();
@@ -70,15 +81,22 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   // 채팅방 목록 로드 액션
   loadChatRooms: async () => {
-    const { setIsLoading, setError, setChatRooms, setCurrentResponse } = get();
+    const {
+      setIsLoading,
+      setError,
+      setChatRooms,
+      setCurrentResponse,
+      setCurrentPage,
+    } = get();
 
     try {
       setIsLoading(true);
       setError(null);
 
       const response = await fetchChatRooms();
-      setChatRooms(response.data);
+      setChatRooms(response.content);
       setCurrentResponse(response);
+      setCurrentPage(0);
     } catch (error) {
       console.error("채팅방 목록을 불러오는 중 오류가 발생했습니다:", error);
       setError(
@@ -94,26 +112,29 @@ export const useChatStore = create<ChatState>((set, get) => ({
   // 다음 페이지 로드 액션
   loadNextPage: async () => {
     const {
+      currentPage,
       currentResponse,
       setIsLoading,
       setError,
       setChatRooms,
       setCurrentResponse,
       chatRooms,
+      setCurrentPage,
     } = get();
 
-    if (!currentResponse || !currentResponse.hasNext) return;
+    if (!currentResponse || currentResponse.last) return;
 
     try {
       setIsLoading(true);
       setError(null);
 
-      const nextResponse = await fetchNextChatRooms(currentResponse);
+      const nextResponse = await fetchNextChatRooms(currentPage);
 
       if (nextResponse) {
         // 기존 채팅방 목록에 새로운 데이터 추가
-        setChatRooms([...chatRooms, ...nextResponse.data]);
+        setChatRooms([...chatRooms, ...nextResponse.content]);
         setCurrentResponse(nextResponse);
+        setCurrentPage(currentPage + 1);
       }
     } catch (error) {
       console.error("다음 페이지를 불러오는 중 오류가 발생했습니다:", error);

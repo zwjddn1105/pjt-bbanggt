@@ -1,10 +1,10 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from "../lib/utils";
+import { Button } from "../components/ui/button";
 import { Menu, X } from "lucide-react";
-import { isLoggedIn } from "@/lib/auth";
+import { isLoggedIn } from "../lib/auth";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -94,8 +94,6 @@ export default function Navbar() {
             >
               {isUserLoggedIn ? "마이페이지" : "로그인"}
             </Button>
-
-            {/* 로그아웃 버튼 제거 */}
           </div>
 
           {/* 모바일 메뉴 버튼 */}
@@ -119,7 +117,7 @@ export default function Navbar() {
       {/* 모바일 메뉴 */}
       <div
         className={cn(
-          "md:hidden shadow-lg",
+          "md:hidden shadow-lg absolute w-full",
           isMobileMenuOpen ? "block" : "hidden"
         )}
       >
@@ -161,8 +159,6 @@ export default function Navbar() {
             >
               {isUserLoggedIn ? "마이페이지" : "로그인"}
             </Button>
-
-            {/* 모바일 로그아웃 버튼도 제거 */}
           </div>
         </div>
       </div>

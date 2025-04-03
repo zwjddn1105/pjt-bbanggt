@@ -7,15 +7,43 @@ export interface ChatRoom {
   isOwner: boolean;
 }
 
-export interface ChatRoomsResponse {
-  pageToken: string;
-  data: ChatRoom[];
-  hasNext: boolean;
+// 페이징 정보 타입
+export interface PageInfo {
+  pageNumber: number;
+  pageSize: number;
+  sort: {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+  };
+  offset: number;
+  paged: boolean;
+  unpaged: boolean;
+}
+
+// 페이지 응답 타입
+export interface ChatRoomsPageResponse {
+  content: ChatRoom[];
+  pageable: PageInfo;
+  totalElements: number;
+  totalPages: number;
+  last: boolean; // null이 아닌 boolean 타입으로 명확하게 지정
+  size: number;
+  number: number;
+  sort: {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+  };
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
 }
 
 // 채팅방 목록 조회 파라미터
 export interface FetchChatRoomsParams {
-  pageToken?: string;
+  page?: number;
+  size?: number;
 }
 
 // 채팅방 필터 타입

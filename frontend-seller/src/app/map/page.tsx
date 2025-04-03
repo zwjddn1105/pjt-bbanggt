@@ -208,23 +208,23 @@ export default function MapPage() {
           content.style.width = "100%";
           content.style.textAlign = "center";
           content.innerHTML = `
-  <div style="
-    position: relative;
-    top: -75px;
-    color: white;
-    font-weight: bold;
-    font-size: 16px;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.7);
-    background-color: rgba(0,0,0,0.6);
-    border-radius: 50%;
-    width: 26px;
-    height: 26px;
-    line-height: 26px;
-    margin: 0 auto;
-    z-index: 10;
-  ">
-    ${machine.remainSpaceCount || 0}
-  </div>
+<div style="
+  position: relative;
+  top: -75px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.7);
+  background-color: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  margin: 0 auto;
+  z-index: 10;
+">
+  ${machine.remainSpaceCount || 0}
+</div>
 `;
 
           const overlay = new window.kakao.maps.CustomOverlay({
@@ -406,11 +406,14 @@ export default function MapPage() {
       const lng = clickPosition.getLng();
       setCurrentLocation({ lat, lng });
 
+      // 검색 거리를 기본값(3km)으로 재설정
+      setSearchDistance(3);
+
       // 검색 반경 원 표시
-      showSearchRadius(lat, lng, searchDistance);
+      showSearchRadius(lat, lng, 3);
 
       // 클릭 위치 기준으로 빵긋 자판기 조회 (조회하기 버튼 대신 클릭 시 바로 API 호출)
-      searchVendingMachines(lat, lng, searchDistance);
+      searchVendingMachines(lat, lng, 3);
 
       // 사이드 패널 닫기
       setShowSidePanel(false);
@@ -421,12 +424,12 @@ export default function MapPage() {
     },
     [
       setSelectedLocation,
-      searchDistance,
       showSearchRadius,
       searchVendingMachines,
       setShowSidePanel,
       setSelectedVendingMachine,
       highlightSelectedMarker,
+      setSearchDistance,
     ]
   );
 
@@ -576,17 +579,17 @@ export default function MapPage() {
         </div>
       </div>
 
-      {/* 검색 컨트롤 패널 */}
-      <div className="absolute top-4 right-4 bg-white p-4 rounded-lg shadow-md z-10 w-64">
-        <div className="mb-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+      {/* 검색 컨트롤 패널 - 크기 증가 */}
+      <div className="absolute top-4 right-4 bg-white p-5 rounded-lg shadow-md z-10 w-80">
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             검색 거리
           </label>
-          <div className="flex space-x-2">
+          <div className="flex space-x-3">
             {[1, 3, 5, 10].map((distance) => (
               <button
                 key={distance}
-                className={`px-3 py-1 text-sm rounded-md ${
+                className={`px-4 py-2 text-sm rounded-md ${
                   searchDistance === distance
                     ? "bg-orange-500 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-orange-100"
@@ -609,63 +612,63 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* 현재 위치로 이동 버튼 */}
+        {/* 현재 위치로 이동 버튼 - 크기 증가 */}
         <button
-          className="w-full py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full py-3 bg-orange-500 text-white rounded-md hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-base"
           onClick={moveToUserLocation}
           disabled={isSearching || !userLocation}
         >
-          <Navigation className="h-5 w-5 mr-1" />내 위치로 이동
+          <Navigation className="h-5 w-5 mr-2" />내 위치로 이동
         </button>
 
         {vendingMachines.length > 0 && (
-          <div className="mt-3 text-sm text-gray-700">
+          <div className="mt-4 text-base text-gray-700">
             {vendingMachines.length}개의 빵긋 자판기를 찾았습니다
           </div>
         )}
 
         {/* 범례 표시 토글 버튼 */}
         <button
-          className="mt-3 text-sm text-orange-500 hover:text-orange-600 underline"
+          className="mt-3 text-base text-orange-500 hover:text-orange-600 underline"
           onClick={() => setShowLegend(!showLegend)}
         >
           {showLegend ? "범례 숨기기" : "범례 보기"}
         </button>
       </div>
 
-      {/* 범례 (오른쪽 하단으로 이동) - 텍스트 변경 */}
+      {/* 범례 (오른쪽 하단으로 이동) - 크기 증가 */}
       {showLegend && (
-        <div className="absolute bottom-8 right-4 bg-orange-500 p-4 rounded-lg shadow-md z-10 text-white">
-          <div className="flex flex-col space-y-3">
+        <div className="absolute bottom-8 right-4 bg-orange-500 p-5 rounded-lg shadow-md z-10 text-white w-80">
+          <div className="flex flex-col space-y-4">
             <div className="flex items-center">
               <Image
                 src="/green-cabinet.png"
                 alt="사용가능"
-                width={30}
-                height={40}
-                className="h-8 mr-2"
+                width={40}
+                height={50}
+                className="h-10 mr-3"
               />
-              <span>사용가능</span>
+              <span className="text-base">사용가능</span>
             </div>
             <div className="flex items-center">
               <Image
                 src="/red-cabinet.png"
                 alt="거의찬 상태"
-                width={30}
-                height={40}
-                className="h-8 mr-2"
+                width={40}
+                height={50}
+                className="h-10 mr-3"
               />
-              <span>거의찬 상태</span>
+              <span className="text-base">거의찬 상태</span>
             </div>
             <div className="flex items-center">
               <Image
                 src="/black-cabinet.png"
                 alt="구매불가"
-                width={30}
-                height={40}
-                className="h-8 mr-2"
+                width={40}
+                height={50}
+                className="h-10 mr-3"
               />
-              <span>구매불가</span>
+              <span className="text-base">구매불가</span>
             </div>
           </div>
         </div>
