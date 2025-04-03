@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.breadbolletguys.breadbread.bakery.domain.Bakery;
@@ -52,12 +55,12 @@ public class ChatRoomService {
         return chatRoomRepository.save(chatRoom).getId();
     }
 
-    public PageInfo<ChatRoomSellerOnlyResponse> findAllSellerOnly(User user, String pageToken) {
-        var chatRooms = chatRoomRepository.findAllByUserId(user.getId(), pageToken);
-        List<Long> chatRoomIds = extractChatRoomIds(chatRooms);
+    public Page<ChatRoomSellerOnlyResponse> findAllSellerOnly(User user, Pageable pageable) {
+        var chatRooms = chatRoomRepository.findAllBySellerId(user.getId(), pageable);
+        List<Long> chatRoomIds = extractChatRoomIds(chatRooms.getContent());
         Map<Long, String> roomIdToLastContent = mapRoomIdToLastContent(chatRoomIds);
 
-        var chatRoomResponses = chatRooms.stream()
+        var chatRoomResponses = chatRooms.getContent().stream()
                 .map(chatRoom -> {
                     return new ChatRoomSellerOnlyResponse(
                             chatRoom.chatRoomId(),
@@ -68,7 +71,7 @@ public class ChatRoomService {
                     );
                 }).toList();
 
-        return PageInfo.of(chatRoomResponses, DEFAULT_PAGE_SIZE, ChatRoomSellerOnlyResponse::chatRoomId);
+        return new PageImpl<>(chatRoomResponses, pageable, chatRooms.getTotalElements());
     }
 
     public PageInfo<ChatRoomBuyerOnlyResponse> findAllBuyerOnly(User user, String pageToken) {

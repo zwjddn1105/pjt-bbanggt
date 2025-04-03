@@ -3,6 +3,8 @@ package com.breadbolletguys.breadbread.chat.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.chat.domain.ChatRoom;
@@ -31,6 +33,10 @@ public class ChatRoomRepository {
     }
 
     public List<ChatRoomQueryResponse> findAllByUserId(Long userId, String pageToken) {
-        return chatRoomJpaRepository.findAllByUserId(userId, pageToken, DEFAULT_PAGE_SIZE);
+        return chatRoomJpaRepository.findAllByBuyerId(userId, pageToken, DEFAULT_PAGE_SIZE);
+    }
+
+    public Page<ChatRoomQueryResponse> findAllBySellerId(Long userId, Pageable pageable) {
+        return chatRoomJpaRepository.findAllBySellerId(userId, pageable);
     }
 }

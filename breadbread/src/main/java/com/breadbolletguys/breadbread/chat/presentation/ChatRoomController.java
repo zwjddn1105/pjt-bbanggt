@@ -2,6 +2,10 @@ package com.breadbolletguys.breadbread.chat.presentation;
 
 import java.net.URI;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,11 +47,11 @@ public class ChatRoomController {
      * 판매자용 문의 내용 조회
      */
     @GetMapping("/seller")
-    public ResponseEntity<PageInfo<ChatRoomSellerOnlyResponse>> findAllSellerOnly(
+    public ResponseEntity<Page<ChatRoomSellerOnlyResponse>> findAllSellerOnly(
             @AuthUser User user,
-            @RequestParam(required = false, name = "pageToken") String pageToken
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(chatRoomService.findAllSellerOnly(user, pageToken));
+        return ResponseEntity.ok(chatRoomService.findAllSellerOnly(user, pageable));
     }
 
     /**
