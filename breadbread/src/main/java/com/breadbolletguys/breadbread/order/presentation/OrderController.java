@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
+import com.breadbolletguys.breadbread.common.model.PageInfo;
 import com.breadbolletguys.breadbread.image.application.S3Service;
 import com.breadbolletguys.breadbread.order.application.OrderService;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
@@ -83,10 +85,19 @@ public class OrderController {
     }
 
     @GetMapping("/myStocks")
-    public ResponseEntity<List<OrderStackResponse>> getMyOrderStocks(
-            @AuthUser User user
+    public ResponseEntity<PageInfo<OrderStackResponse>> getMyOrderStocks(
+            @AuthUser User user,
+            @RequestParam(required = false, name = "pageToken") String pageToken
     ) {
-        return ResponseEntity.ok(orderService.getMyOrderStocks(user));
+        return ResponseEntity.ok(orderService.getMyOrderStocks(user, pageToken));
+    }
+
+    @GetMapping("/mySoldout")
+    public ResponseEntity<PageInfo<OrderStackResponse>> getMyOrderSoldout(
+            @AuthUser User user,
+            @RequestParam(required = false, name = "pageToken") String pageToken
+    ) {
+        return ResponseEntity.ok(orderService.getMyOrderSoldout(user, pageToken));
     }
 
 

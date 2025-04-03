@@ -3,6 +3,7 @@ package com.breadbolletguys.breadbread.order.domain.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.breadbolletguys.breadbread.common.model.PageInfo;
 import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
@@ -13,7 +14,9 @@ public interface OrderQueryRepository {
 
     List<OrderResponse> findByBuyerId(Long userId);
 
-    List<OrderStackResponse> findStocksBySellerId(Long userId);
+    List<OrderStackResponse> findStocksBySellerId(Long userId, String pageToken, int size);
+
+    List<OrderStackResponse> findSoldoutBySellerId(Long userId, String pageToken, int size);
 
     OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId);
 
