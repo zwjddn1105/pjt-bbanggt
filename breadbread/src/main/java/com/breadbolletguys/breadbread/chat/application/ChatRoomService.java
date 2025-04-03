@@ -20,6 +20,7 @@ import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatQueryResponse
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomBuyerOnlyResponse;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomQueryResponse;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomSellerOnlyResponse;
+import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatSummary;
 import com.breadbolletguys.breadbread.chat.domain.repository.ChatRepository;
 import com.breadbolletguys.breadbread.chat.domain.repository.ChatRoomRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
@@ -58,7 +59,12 @@ public class ChatRoomService {
     public Page<ChatRoomSellerOnlyResponse> findAllSellerOnly(User user, Pageable pageable) {
         var chatRooms = chatRoomRepository.findAllBySellerId(user.getId(), pageable);
         List<Long> chatRoomIds = extractChatRoomIds(chatRooms.getContent());
-        Map<Long, String> roomIdToLastContent = mapRoomIdToLastContent(chatRoomIds);
+        var chatQueryResponse = chatRepository.findAllLastChatIdByRoomIds(chatRoomIds);
+        List<Long> lastChatIds = extractLastChatIds(chatQueryResponse);
+        var chatSummaries = chatRepository.findAllChatContentByIdIn(lastChatIds);
+
+        var chatIdToChatContent = mapChatIdToChatContent(chatSummaries);
+        var chatRoomIdToLastChatId = mapChatRoomIdToLastChatId(chatQueryResponse);
 
         var chatRoomResponses = chatRooms.getContent().stream()
                 .map(chatRoom -> {
@@ -66,7 +72,10 @@ public class ChatRoomService {
                             chatRoom.chatRoomId(),
                             chatRoom.customerName(),
                             chatRoom.createdAt(),
-                            roomIdToLastContent.getOrDefault(chatRoom.chatRoomId(), ""),
+                            chatIdToChatContent.getOrDefault(
+                                    chatRoomIdToLastChatId.getOrDefault(chatRoom.chatRoomId(), 0L),
+                                    ""
+                            ),
                             chatRoom.ownerId().equals(user.getId())
                     );
                 }).toList();
@@ -74,17 +83,41 @@ public class ChatRoomService {
         return new PageImpl<>(chatRoomResponses, pageable, chatRooms.getTotalElements());
     }
 
+    private Map<Long, Long> mapChatRoomIdToLastChatId(List<ChatQueryResponse> chatQueryResponse) {
+        return chatQueryResponse.stream()
+                .collect(Collectors.toMap(
+                        ChatQueryResponse::roomId,
+                        ChatQueryResponse::chatId
+                ));
+    }
+
+    private Map<Long, String> mapChatIdToChatContent(List<ChatSummary> summaries) {
+        return summaries.stream()
+                .collect(Collectors.toMap(
+                        ChatSummary::id,
+                        ChatSummary::content
+                ));
+    }
+
     public PageInfo<ChatRoomBuyerOnlyResponse> findAllBuyerOnly(User user, String pageToken) {
         var chatRooms = chatRoomRepository.findAllByUserId(user.getId(), pageToken);
         List<Long> chatRoomIds = extractChatRoomIds(chatRooms);
-        Map<Long, String> roomIdToLastContent = mapRoomIdToLastContent(chatRoomIds);
+        var chatQueryResponse = chatRepository.findAllLastChatIdByRoomIds(chatRoomIds);
+        List<Long> lastChatIds = extractLastChatIds(chatQueryResponse);
+        var chatSummaries = chatRepository.findAllChatContentByIdIn(lastChatIds);
+
+        var chatIdToChatContent = mapChatIdToChatContent(chatSummaries);
+        var chatRoomIdToLastChatId = mapChatRoomIdToLastChatId(chatQueryResponse);
 
         var chatRoomResponses = chatRooms.stream()
                 .map(chatRoom -> {
                     return new ChatRoomBuyerOnlyResponse(
                             chatRoom.chatRoomId(),
                             chatRoom.name(),
-                            roomIdToLastContent.getOrDefault(chatRoom.chatRoomId(), ""),
+                            chatIdToChatContent.getOrDefault(
+                                    chatRoomIdToLastChatId.getOrDefault(chatRoom.chatRoomId(), 0L),
+                                    ""
+                            ),
                             chatRoom.createdAt()
                     );
                 }).toList();
@@ -92,17 +125,15 @@ public class ChatRoomService {
         return PageInfo.of(chatRoomResponses, DEFAULT_PAGE_SIZE, ChatRoomBuyerOnlyResponse::chatRoomId);
     }
 
-    private Map<Long, String> mapRoomIdToLastContent(List<Long> chatRoomIds) {
-        return chatRepository.findAllLastChatByRoomIds(chatRoomIds).stream()
-                .collect(Collectors.toMap(
-                        ChatQueryResponse::roomId,
-                        ChatQueryResponse::content
-                ));
-    }
-
     private List<Long> extractChatRoomIds(List<ChatRoomQueryResponse> chatRooms) {
         return chatRooms.stream()
                 .map(ChatRoomQueryResponse::chatRoomId)
+                .toList();
+    }
+
+    private List<Long> extractLastChatIds(List<ChatQueryResponse> chatQueryResponse) {
+        return chatQueryResponse.stream()
+                .map(ChatQueryResponse::chatId)
                 .toList();
     }
 }

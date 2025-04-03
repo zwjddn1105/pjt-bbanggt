@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.breadbolletguys.breadbread.chat.domain.Chat;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatQueryResponse;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatResponse;
+import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatSummary;
 import com.breadbolletguys.breadbread.common.model.PageInfo;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,11 @@ public class ChatRepository {
         return PageInfo.of(data, DEFAULT_PAGE_SIZE, ChatResponse::id);
     }
 
-    public List<ChatQueryResponse> findAllLastChatByRoomIds(List<Long> chatRoomIds) {
-        return chatJpaRepository.findAllLastChatByRoomIds(chatRoomIds);
+    public List<ChatQueryResponse> findAllLastChatIdByRoomIds(List<Long> chatRoomIds) {
+        return chatJpaRepository.findAllLastChatIdByRoomIds(chatRoomIds);
+    }
+
+    public List<ChatSummary> findAllChatContentByIdIn(List<Long> lastChatIds) {
+        return chatJpaRepository.findAllChatContentByIdIn(lastChatIds);
     }
 }
