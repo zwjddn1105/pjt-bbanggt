@@ -52,4 +52,8 @@ public class OrderRepository {
     public List<Order> findAvailableOrdersBySpaceIds(List<Long> spaceIds) {
         return orderQueryRepository.findAvailableOrdersBySpaceIds(spaceIds);
     }
+
+    public List<Order> findAllById(Iterable<Long> ids) {
+        return orderJpaRepository.findAllById(ids);
+    }
 }

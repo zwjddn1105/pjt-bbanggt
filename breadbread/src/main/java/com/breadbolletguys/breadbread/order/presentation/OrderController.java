@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
 import com.breadbolletguys.breadbread.order.application.OrderService;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
+import com.breadbolletguys.breadbread.order.domain.dto.request.PayRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.user.domain.User;
@@ -36,7 +38,8 @@ public class OrderController {
             @AuthUser User user,
             @PathVariable("spaceId") Long spaceId,
             @RequestPart("orderRequests") List<OrderRequest> orderRequests,
-            @RequestPart("image") MultipartFile image) {
+            @RequestPart("image") MultipartFile image
+    ) {
         orderService.save(user, spaceId, orderRequests, image);
         return ResponseEntity.ok().build();
     }
@@ -56,21 +59,23 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByIdAndVendingMachineId(id, vendingMachineId));
     }
 
-    @PostMapping("/reserve/{orderId}")
-    public ResponseEntity<Void> reserveOrder(
+
+    @PostMapping("/{orderId}/pay")
+    public ResponseEntity<Void> payForOrder(
             @AuthUser User user,
-            @PathVariable("orderId") Long orderId
+            @PathVariable("orderId") Long orderId,
+            @RequestBody PayRequest payRequest
     ) {
-        orderService.selectOrder(user, orderId);
+        orderService.payForOrder(user, orderId, payRequest.getAccountNo());
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/pay/{orderId}")
-    public ResponseEntity<Void> payForOrder(
+    @PostMapping("/{orderId}/refund")
+    public ResponseEntity<Void> refundOrder(
             @AuthUser User user,
             @PathVariable("orderId") Long orderId
     ) {
-        orderService.payForOrder(user, orderId);
+        orderService.refundOrder(user, orderId);
         return ResponseEntity.ok().build();
     }
 
@@ -86,5 +91,23 @@ public class OrderController {
             @AuthUser User user
     ) {
         return ResponseEntity.ok(orderService.getMyOrderStocks(user));
+    }
+
+
+    @PostMapping("/{orderId}/test/pay")
+    public ResponseEntity<Void> testOrder(
+            @PathVariable("orderId") Long orderId,
+            @RequestBody PayRequest payRequest
+    ) {
+        orderService.testOrder(orderId, payRequest.getAccountNo());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/test/refund")
+    public ResponseEntity<Void> testRefund(
+            @PathVariable("orderId") Long orderId
+    ) {
+        orderService.testRefund(orderId);
+        return ResponseEntity.ok().build();
     }
 }

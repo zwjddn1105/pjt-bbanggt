@@ -1,5 +1,7 @@
 package com.breadbolletguys.breadbread.common.exception;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+
 import java.util.Objects;
 
 import org.springframework.http.HttpHeaders;
@@ -54,5 +56,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.warn(exception.getMessage(), exception);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ExceptionResponse(exception.getCode(), exception.getMessage()));
+    }
+
+    @ExceptionHandler(SsafyBankException.class)
+    public ResponseEntity<ExceptionResponse> handleSsafyBankException(SsafyBankException exception) {
+        log.warn(exception.getMessage(), exception);
+        return ResponseEntity.status(BAD_REQUEST)
+            .body(new ExceptionResponse(exception.getCode(), exception.getMessage()));
+    }
+
+    @ExceptionHandler(SsafyApiException.class)
+    public ResponseEntity<SsafyApiExceptionResponse> handleSsafyApiException(SsafyApiException exception) {
+        log.warn(exception.getMessage(), exception);
+        return ResponseEntity.status(BAD_REQUEST)
+            .body(new SsafyApiExceptionResponse(
+                new SsafyApiExceptionResponse.Header(exception.getCode(), exception.getMessage())));
     }
 }
