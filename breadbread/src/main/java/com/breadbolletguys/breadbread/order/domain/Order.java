@@ -40,7 +40,6 @@ public class Order extends BaseTimeEntity {
     private Long spaceId;
 
     @Column(name = "buyer_id")
-    @Setter
     private Long buyerId;
 
     @Column(name = "price", nullable = false)
@@ -60,7 +59,6 @@ public class Order extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "product_state", nullable = false)
-    @Setter
     private ProductState productState;
 
     @Enumerated(EnumType.STRING)
@@ -93,4 +91,15 @@ public class Order extends BaseTimeEntity {
         this.productState = productState;
         this.breadType = breadType;
     }
+
+    public void completePurchase(Long buyerId) {
+        this.buyerId = buyerId;
+        this.productState = ProductState.SOLD_OUT;
+    }
+
+    public void cancelPurchase() {
+        this.buyerId = null;
+        this.productState = ProductState.AVAILABLE;
+    }
+
 }
