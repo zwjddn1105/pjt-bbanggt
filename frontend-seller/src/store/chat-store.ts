@@ -30,6 +30,7 @@ interface ChatState {
   // 데이터 로드 액션
   loadChatRooms: () => Promise<void>;
   loadNextPage: () => Promise<void>;
+  loadSpecificPage: (page: number) => Promise<void>; // 특정 페이지 로드 함수 추가
 
   // 필터 상태
   filterStatus: ChatFilter;
@@ -93,7 +94,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       setIsLoading(true);
       setError(null);
 
-      const response = await fetchChatRooms();
+      const response = await fetchChatRooms(0); // 첫 페이지 로드
       setChatRooms(response.content);
       setCurrentResponse(response);
       setCurrentPage(0);
@@ -142,6 +143,36 @@ export const useChatStore = create<ChatState>((set, get) => ({
         error instanceof Error
           ? error.message
           : "다음 페이지를 불러오는 중 오류가 발생했습니다"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  },
+
+  // 특정 페이지 로드 액션 추가
+  loadSpecificPage: async (page) => {
+    const {
+      setIsLoading,
+      setError,
+      setChatRooms,
+      setCurrentResponse,
+      setCurrentPage,
+    } = get();
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await fetchChatRooms(page);
+      setChatRooms(response.content);
+      setCurrentResponse(response);
+      setCurrentPage(page);
+    } catch (error) {
+      console.error(`${page} 페이지를 불러오는 중 오류가 발생했습니다:`, error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : `${page} 페이지를 불러오는 중 오류가 발생했습니다`
       );
     } finally {
       setIsLoading(false);

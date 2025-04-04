@@ -15,10 +15,9 @@ const getAuthToken = (): string | null => {
   return null;
 };
 
-// 채팅방 목록 가져오기 함수
+// 채팅방 목록 가져오기 함수 - page 파라미터만 전송
 export const fetchChatRooms = async (
-  page = 0,
-  size = 10
+  page = 0
 ): Promise<ChatRoomsPageResponse> => {
   const authToken = getAuthToken();
 
@@ -30,7 +29,7 @@ export const fetchChatRooms = async (
     const response = await axios.get<ChatRoomsPageResponse>(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/chat-rooms/seller`,
       {
-        params: { page, size },
+        params: { page }, // page 파라미터만 전송
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -46,8 +45,7 @@ export const fetchChatRooms = async (
 
 // 다음 페이지 채팅방 목록 가져오기 함수
 export const fetchNextChatRooms = async (
-  currentPage: number,
-  size = 10
+  currentPage: number
 ): Promise<ChatRoomsPageResponse> => {
-  return fetchChatRooms(currentPage + 1, size);
+  return fetchChatRooms(currentPage + 1);
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
@@ -30,17 +31,24 @@ export default function InquiriesPage() {
     filterStatus,
     setFilterStatus,
     loadNextPage,
+    loadSpecificPage,
     currentResponse,
     getFilteredChatRooms,
+    currentPage: storeCurrentPage,
   } = useChatStore();
 
   const [currentPage, setCurrentPage] = useState(0);
-  // 이 줄 제거: const itemsPerPage = 10 // 서버에서 설정한 페이지 크기와 일치시키는 것이 좋습니다
+  const router = useRouter();
 
   // 컴포넌트 마운트 시 채팅방 목록 로드
   useEffect(() => {
     loadChatRooms();
   }, [loadChatRooms]);
+
+  // 스토어의 현재 페이지가 변경되면 로컬 상태도 업데이트
+  useEffect(() => {
+    setCurrentPage(storeCurrentPage);
+  }, [storeCurrentPage]);
 
   // 필터링된 채팅방 목록
   const filteredChatRooms = getFilteredChatRooms() || [];
@@ -51,13 +59,21 @@ export default function InquiriesPage() {
   // 총 페이지 수 계산
   const totalPages = currentResponse?.totalPages || 1;
 
-  // 페이지 변경 함수
+  // 페이지 변경 함수 - 수정된 부분
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    if (page === currentPage) return;
 
-    // 다음 페이지 로드
-    if (page > currentPage && currentResponse && !currentResponse.last) {
+    if (
+      page > currentPage &&
+      page === currentPage + 1 &&
+      currentResponse &&
+      !currentResponse.last
+    ) {
+      // 다음 페이지로만 이동하는 경우
       loadNextPage();
+    } else {
+      // 특정 페이지로 직접 이동하는 경우 (예: 1페이지 → 3페이지)
+      loadSpecificPage(page);
     }
   };
 
@@ -74,16 +90,16 @@ export default function InquiriesPage() {
     }
   };
 
-  // 채팅방 클릭 핸들러 (실제 구현은 나중에)
+  // 채팅방 클릭 핸들러 - 채팅방 상세 페이지로 이동
   const handleChatRoomClick = (chatRoomId: number) => {
-    console.log(`채팅방 ${chatRoomId}로 이동합니다.`);
-    // 실제 구현은 나중에
+    router.push(`/chat/${chatRoomId}`);
   };
 
   // 필터 변경 핸들러
   const handleFilterChange = (filter: ChatFilter) => {
     setFilterStatus(filter);
     setCurrentPage(0); // 필터 변경 시 첫 페이지로 이동
+    loadSpecificPage(0); // 첫 페이지 데이터 로드
   };
 
   // 마지막 페이지 여부 확인
@@ -195,7 +211,7 @@ export default function InquiriesPage() {
             <h2 className="text-xl font-bold text-gray-800">고객문의</h2>
           </div>
 
-          {/* 드롭다운 메뉴 - 고정 높이와 너비 설정 */}
+          {/* 필터 드롭다운 메뉴 */}
           <div className="relative" style={{ height: "40px", width: "120px" }}>
             <DropdownMenu>
               <DropdownMenuTrigger className="h-10 w-full flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 bg-white cursor-pointer hover:border-orange-300 transition-colors">
