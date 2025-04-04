@@ -87,6 +87,12 @@ public class OrderService {
         Long bakeryId = bakeryRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.BAKERY_NOT_FOUND))
                 .getId();
+        Space space = spaceRepository.findById(spaceId)
+                        .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_SPACE));
+        if (space.isOccupied()) {
+            throw new BadRequestException(ErrorCode.ALREADY_PURCHASED_SPACE);
+        }
+        space.buy(user.getId());
         user.useTickets();
         String imageUrl = s3Service.uploadFile(image);
         if (orderRequests.size() == 1) {
@@ -203,35 +209,6 @@ public class OrderService {
                     TransactionType.BREAD_PURCHASE,
                     TransactionStatus.SETTLED);
         }
-    }
-
-    public void payForTicket(User user, String accountNo) {
-        Account account = accountRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
-
-        if (!accountNo.equals(account.getAccountNo())) {
-            throw new BadRequestException(ErrorCode.NOT_OWNED_ACCOUNT_ERROR);
-        }
-
-        log.info("Account : {}", account.getAccountNo());
-        AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
-                user.getUserKey(),
-                adminAccount,
-                "입금",
-                1L,
-                account.getAccountNo(),
-                "송금"
-        );
-        ssafyTransferService.accountTransfer(accountTransferRequest);
-        user.purchaseTicket();
-        transactionService.recordTransaction(
-                null,
-                account.getAccountNo(),
-                adminAccount,
-                100L,
-                TransactionType.TICKET_PURCHASE,
-                TransactionStatus.PURCHASE
-        );
     }
 
     private int getWidth(List<Space> spaces) {
