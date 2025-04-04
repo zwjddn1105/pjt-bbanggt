@@ -9,6 +9,7 @@ import com.breadbolletguys.breadbread.auth.JwtUtil;
 import com.breadbolletguys.breadbread.auth.domain.RefreshToken;
 import com.breadbolletguys.breadbread.auth.domain.UserTokens;
 import com.breadbolletguys.breadbread.auth.domain.request.LoginRequest;
+import com.breadbolletguys.breadbread.auth.domain.response.LoginResponse;
 import com.breadbolletguys.breadbread.auth.infrastructure.KakaoOAuthProvider;
 import com.breadbolletguys.breadbread.auth.infrastructure.KakaoUserInfo;
 import com.breadbolletguys.breadbread.auth.repository.RefreshTokenRepository;
@@ -35,7 +36,7 @@ public class LoginService {
     private final KakaoOAuthProvider kakaoOAuthProvider;
     private final SsafyLoginService ssafyLoginService;
 
-    public UserTokens login(LoginRequest loginRequest) {
+    public LoginResponse login(LoginRequest loginRequest) {
         String kakaoAccessToken = kakaoOAuthProvider.fetchKakaoAccessToken(loginRequest.getCode());
         KakaoUserInfo userInfo = kakaoOAuthProvider.getUserInfo(kakaoAccessToken);
 
@@ -47,7 +48,12 @@ public class LoginService {
         UserTokens userTokens = jwtUtil.createLoginToken(user.getId().toString());
         RefreshToken refreshToken = new RefreshToken(user.getId(), userTokens.getRefreshToken());
         refreshTokenRepository.save(refreshToken);
-        return userTokens;
+        LoginResponse loginResponse = LoginResponse.from(
+                user.getId(),
+                userTokens.getAccessToken(),
+                userTokens.getRefreshToken()
+        );
+        return loginResponse;
     }
 
     private User findOrCreateUser(String socialLoginId, String nickname) {
