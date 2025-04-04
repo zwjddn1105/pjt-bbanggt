@@ -2,6 +2,7 @@ package com.breadbolletguys.breadbread.ai.service;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,13 @@ import lombok.NoArgsConstructor;
 @Service
 @NoArgsConstructor
 public class AiService {
+
+    @Value("${ai.server.ip}")
+    private String serverIp;
+
+    @Value("${ai.server.port}")
+    private String serverPort;
+
 
     public String aiClient(MultipartFile file) throws IOException {
         RestClient restClient = RestClient.create();
@@ -31,7 +39,7 @@ public class AiService {
         body.add("file", resource);
 
         return restClient.post()
-            .uri("http://localhost:8002/predict2")
+            .uri("http://" + serverIp + ":" + serverPort + "/predict2")
             .contentType(MediaType.MULTIPART_FORM_DATA)  // multipart/form-data로 전송
             .body(body)
             .retrieve()
