@@ -50,14 +50,14 @@ public class BakeryController {
         return ResponseEntity.ok(bakeryService.updateBakery(user, bakeryId, bakeryRequest));
     }
 
-    @GetMapping("/bookmark/{bakeryId}")
+    @GetMapping("/{bakeryId}/bookmark")
     @Operation(description = "빵집 id를 PathVariable 로 북마크 등록했는지 확인한다. (등록 존재 : true, 등록 존재하지 않음 : false)")
     public ResponseEntity<Boolean> getBookMark(@AuthUser User user,
                                                @PathVariable("bakeryId") Long bakeryId) {
         return ResponseEntity.ok(bakeryService.hasBookmark(user, bakeryId));
     }
 
-    @PostMapping("/bookmark/{bakeryId}")
+    @PostMapping("/{bakeryId}/bookmark")
     @Operation(description = "빵집 id를 PathVariable 로 북마크 등록한다.")
     public ResponseEntity<Void> createBookmark(@AuthUser User user,
                                                @PathVariable("bakeryId") Long bakeryId) {
@@ -65,7 +65,7 @@ public class BakeryController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/bookmark/{bakeryId}")
+    @DeleteMapping("/{bakeryId}/bookmark")
     @Operation(description = "빵집 id를 PathVariable 로 북마크 삭제한다.")
     public ResponseEntity<Void> deleteBookmark(@AuthUser User user,
                                                @PathVariable("bakeryId") Long bakeryId) {

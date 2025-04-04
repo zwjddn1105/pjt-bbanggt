@@ -41,8 +41,11 @@ public class VendingMachine {
     @Column(name = "image_urls", columnDefinition = "JSON")
     private List<String> imageUrls;
 
-    @Column(name = "memo", length = 256, nullable = false)
-    private String memo;
+    @Column(name = "address", length = 64, nullable = false)
+    private String address;
+
+    @Column(name = "name", length = 32, nullable = false)
+    private String name;
 
     @Column(name = "available_count", nullable = false)
     private int availableCount;
@@ -65,19 +68,21 @@ public class VendingMachine {
             Double longitude,
             Double latitude,
             List<String> imageUrls,
-            String memo,
+            String address,
             int height,
-            int width
+            int width,
+            String name
     ) {
         this.id = id;
         this.longitude = longitude;
         this.latitude = latitude;
         this.imageUrls = imageUrls;
-        this.memo = memo;
+        this.address = address;
         this.height = height;
         this.width = width;
         this.totalCount = height * width;
         this.availableCount = height * width;
         this.deleted = false;
+        this.name = name;
     }
 }

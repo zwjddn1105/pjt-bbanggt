@@ -1,5 +1,7 @@
 package com.breadbolletguys.breadbread.auth.service;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +14,9 @@ import com.breadbolletguys.breadbread.auth.infrastructure.KakaoUserInfo;
 import com.breadbolletguys.breadbread.auth.repository.RefreshTokenRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
+import com.breadbolletguys.breadbread.ssafybank.login.request.UserCreateRequest;
+import com.breadbolletguys.breadbread.ssafybank.login.response.CreateUserSsafyApiResponse;
+import com.breadbolletguys.breadbread.ssafybank.login.service.SsafyLoginService;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.user.domain.UserRole;
 import com.breadbolletguys.breadbread.user.domain.repository.UserRepository;
@@ -28,6 +33,7 @@ public class LoginService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final KakaoOAuthProvider kakaoOAuthProvider;
+    private final SsafyLoginService ssafyLoginService;
 
     public UserTokens login(LoginRequest loginRequest) {
         String kakaoAccessToken = kakaoOAuthProvider.fetchKakaoAccessToken(loginRequest.getCode());
@@ -52,12 +58,17 @@ public class LoginService {
     private User createUser(String socialLoginId, String nickname) {
         String newNickname = generateNewUserNickname(socialLoginId, nickname);
         log.info("new nickname={}", newNickname);
+        String email = UUID.randomUUID() + "@ssafy.co.kr";
+        CreateUserSsafyApiResponse createUserSsafyApiResponse = ssafyLoginService.createSsafyUser(
+                new UserCreateRequest(email));
         return userRepository.save(
                 User.builder()
                         .socialId(socialLoginId)
                         .name(nickname)
                         .userRole(UserRole.BUYER)
                         .noticeCheck(true)
+                        .email(email)
+                        .userKey(createUserSsafyApiResponse.userKey())
                         .deleted(false)
                         .build()
         );

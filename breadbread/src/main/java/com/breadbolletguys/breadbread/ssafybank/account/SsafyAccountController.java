@@ -1,5 +1,7 @@
 package com.breadbolletguys.breadbread.ssafybank.account;
 
+
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountRequest;
+import com.breadbolletguys.breadbread.ssafybank.account.request.SingleAccountRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.response.CreateAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.response.FindAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.response.FindUserAccountResponse;
+import com.breadbolletguys.breadbread.ssafybank.account.response.FindUserSingleAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.service.SsafyAccountService;
 
 import lombok.RequiredArgsConstructor;
@@ -41,6 +45,14 @@ public class SsafyAccountController {
     public ResponseEntity<FindAccountResponse> findAccount() {
         FindAccountResponse account = accountService.findProductAccount();
         return ResponseEntity.ok(account);
+    }
+
+    @GetMapping("/singleAccount")
+    public ResponseEntity<FindUserSingleAccountResponse> findSingleAccount(
+            @RequestBody SingleAccountRequest request
+    ) {
+        FindUserSingleAccountResponse singleAccount = accountService.findUserSingleAccount(request);
+        return ResponseEntity.ok(singleAccount);
     }
 
 }

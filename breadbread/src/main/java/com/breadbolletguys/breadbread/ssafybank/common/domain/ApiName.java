@@ -10,7 +10,7 @@ public enum ApiName {
     WITHDRAW_ACCOUNT("updateDemandDepositAccountWithdrawal"),
     DEPOSIT_ACCOUNT("updateDemandDepositAccountDeposit"),
     TRANSFER_ACCOUNT("updateDemandDepositAccountTransfer"),
-    HISTORY_ACCOUNT("inquireTransactionHistoryList");
+    INQUIRE_ACCOUNT("inquireDemandDepositAccount");
 
     private String apiName;
     ApiName(String apiName) {

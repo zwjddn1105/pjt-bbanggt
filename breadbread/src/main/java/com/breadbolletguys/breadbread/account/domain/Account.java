@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +16,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Account {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,16 +23,15 @@ public class Account {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "account_number", nullable = false)
-    private String accountNumber;
+    @Column(name = "accountNo", length = 16, nullable = false)
+    private String accountNo;
 
-    @Column(name = "swift_code", nullable = false)
-    private String swiftCode;
-
-    @Column(name = "is_seller_account", nullable = false)
-    private boolean isSellerAccount;
-
-    @Embedded
-    @Column(name = "balance", nullable = false)
-    private Balance balance;
+    @Builder
+    private Account(
+            Long userId,
+            String accountNo
+    ) {
+        this.userId = userId;
+        this.accountNo = accountNo;
+    }
 }

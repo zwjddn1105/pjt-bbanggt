@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 
+
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -13,9 +14,12 @@ import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountReq
 import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountSsafyApiRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.request.FindProductSsafyApiRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.request.FindUserAccountRequest;
+import com.breadbolletguys.breadbread.ssafybank.account.request.SingleAccountRequest;
+import com.breadbolletguys.breadbread.ssafybank.account.request.SingleAccountSsafyApiRequest;
 import com.breadbolletguys.breadbread.ssafybank.account.response.CreateAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.response.FindAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.account.response.FindUserAccountResponse;
+import com.breadbolletguys.breadbread.ssafybank.account.response.FindUserSingleAccountResponse;
 import com.breadbolletguys.breadbread.ssafybank.common.domain.ApiName;
 import com.breadbolletguys.breadbread.ssafybank.common.request.SsafyBankRequestHeader;
 import com.breadbolletguys.breadbread.ssafybank.common.response.SsafyBankErrorResponse;
@@ -97,5 +101,27 @@ public class SsafyAccountService {
                 throw new SsafyApiException(errorResponse.responseCode(), errorResponse.responseMessage());
             })
             .body(FindUserAccountResponse.class);
+    }
+
+    public FindUserSingleAccountResponse findUserSingleAccount(SingleAccountRequest req) {
+        String apiKey = ssafyBankUtil.userApiKey;
+        RestClient restClient = RestClient.create();
+        var header = SsafyBankRequestHeader.of(ApiName.INQUIRE_ACCOUNT, apiKey, req.userKey());
+        var singleAccountSsafyApiRequest = new SingleAccountSsafyApiRequest(header, req.accountNo());
+
+        return restClient.post()
+                .uri("https://finopenapi.ssafy.io/ssafy/api/v1/edu/demandDeposit/inquireDemandDepositAccount")
+                .body(singleAccountSsafyApiRequest)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, (reqSpec, res) -> {
+                    String errorBody = new BufferedReader(new InputStreamReader(res.getBody()))
+                            .lines()
+                            .collect(Collectors.joining("\n"));
+                    ObjectMapper mapper = new ObjectMapper();
+
+                    SsafyBankErrorResponse errorResponse = mapper.readValue(errorBody, SsafyBankErrorResponse.class);
+                    throw new SsafyApiException(errorResponse.responseCode(), errorResponse.responseMessage());
+                })
+                .body(FindUserSingleAccountResponse.class);
     }
 }

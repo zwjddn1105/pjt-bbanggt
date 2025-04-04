@@ -3,10 +3,15 @@ package com.breadbolletguys.breadbread.order.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.order.domain.Order;
+import com.breadbolletguys.breadbread.order.domain.ProductState;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +33,14 @@ public class OrderRepository {
         return orderQueryRepository.findByIdAndVendingMachineId(id, vendingMachineId);
     }
 
+    public Page<OrderStackResponse> findStocksBySellerId(Long userId, Pageable pageable) {
+        return orderQueryRepository.findStocksBySellerId(userId, pageable);
+    }
+
+    public Page<OrderStackResponse> findSoldoutBySellerId(Long userId, Pageable pageable) {
+        return orderQueryRepository.findSoldoutBySellerId(userId, pageable);
+    }
+
     public void saveAll(List<Order> orders) {
         orderJpaRepository.saveAll(orders);
     }
@@ -46,5 +59,25 @@ public class OrderRepository {
 
     public List<Order> findAvailableOrdersBySpaceIds(List<Long> spaceIds) {
         return orderQueryRepository.findAvailableOrdersBySpaceIds(spaceIds);
+    }
+
+    public int countAvailableOrderByVendingMachineId(Long vendingMachineId) {
+        return orderQueryRepository.countAvailableOrderByVendingMachineId(vendingMachineId);
+    }
+
+    public List<OrderCountQueryResponse> findAvailableCountsByVendingMachineIds(List<Long> vendingMachineIds) {
+        return orderQueryRepository.findAvailableCountsByVendingMachineIds(vendingMachineIds);
+    }
+
+    public List<Order> findAllById(List<Long> ids) {
+        return orderJpaRepository.findAllByIdIn(ids);
+    }
+
+    public List<Long> findSpaceIdsByBakeryIds(List<Long> bakeryIds) {
+        return orderJpaRepository.findSpaceIdsByBakeryIds(bakeryIds);
+    }
+
+    public Optional<Order> findBySpaceIdAndProductState(Long spaceId, ProductState productState) {
+        return orderJpaRepository.findBySpaceIdAndProductState(spaceId, productState);
     }
 }

@@ -1,19 +1,31 @@
 package com.breadbolletguys.breadbread.order.domain.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.breadbolletguys.breadbread.order.domain.Order;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
+import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 
 public interface OrderQueryRepository {
     List<OrderResponse> findByVendingMachineId(Long vendingMachineId);
 
     List<OrderResponse> findByBuyerId(Long userId);
 
+    Page<OrderStackResponse> findStocksBySellerId(Long userId, Pageable pageable);
+
+    Page<OrderStackResponse> findSoldoutBySellerId(Long userId, Pageable pageable);
+
     OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId);
 
     List<Order> findAllByExpirationDateBefore();
 
     List<Order> findAvailableOrdersBySpaceIds(List<Long> spaceIds);
+
+    Integer countAvailableOrderByVendingMachineId(Long vendingMachineId);
+
+    List<OrderCountQueryResponse> findAvailableCountsByVendingMachineIds(List<Long> vendingMachineIds);
 }

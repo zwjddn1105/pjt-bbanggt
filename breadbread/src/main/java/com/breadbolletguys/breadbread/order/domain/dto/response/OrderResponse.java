@@ -1,6 +1,7 @@
 package com.breadbolletguys.breadbread.order.domain.dto.response;
 
-import java.time.LocalDateTime;
+import com.breadbolletguys.breadbread.order.domain.BreadType;
+import com.breadbolletguys.breadbread.order.domain.ProductState;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,10 +13,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderResponse {
     private Long id;
-    private String memo;
+    private String address;
     private String bakeryName;
-    private String name;
     private int price;
+    private int salePrice;
     private int count;
     private String image;
+    private ProductState productState;
+    private BreadType breadType;
 }

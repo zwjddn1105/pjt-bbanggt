@@ -39,4 +39,9 @@ public class BakeryRepository {
     public void updateAverageScore(Long bakeryId, Integer score) {
         bakeryQueryRepository.updateAverageScore(bakeryId, score);
     }
+
+    public Optional<Bakery> findByUserId(Long userId) {
+        return bakeryJpaRepository.findByUserId(userId);
+    }
+
 }

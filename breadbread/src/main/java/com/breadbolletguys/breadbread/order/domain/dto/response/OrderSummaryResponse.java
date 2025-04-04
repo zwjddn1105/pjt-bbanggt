@@ -1,8 +1,7 @@
 package com.breadbolletguys.breadbread.order.domain.dto.response;
 
-import java.util.List;
-
 import com.breadbolletguys.breadbread.order.domain.BreadType;
+import com.breadbolletguys.breadbread.order.domain.ProductState;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderSummaryResponse {
-    private Long id;
-    private int slotNumber;
-    private List<BreadType> breadTypes;
+    private Long orderId;
+    private BreadType breadType;
+    private boolean isMark;
+    private ProductState productState;
 }

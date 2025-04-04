@@ -33,7 +33,8 @@ public class ReviewController {
     public ResponseEntity<Void> createReview(
             @AuthUser User user,
             @PathVariable("bakeryId") Long bakeryId,
-            @RequestBody ReviewRequest reviewRequest) {
+            @RequestBody ReviewRequest reviewRequest
+    ) {
         reviewService.save(user, bakeryId, reviewRequest);
         return ResponseEntity.ok().build();
     }
@@ -50,9 +51,11 @@ public class ReviewController {
 
     @DeleteMapping("/deleteReview/{bakeryId}/{reviewId}")
     @Operation(description = "리뷰 id를 pathVariable로 받아서 삭제한다.")
-    public ResponseEntity<Void> deleteReview(@AuthUser User user,
-                                             @PathVariable("bakeryId") Long bakeryId,
-                                             @PathVariable("reviewId") Long reviewId) {
+    public ResponseEntity<Void> deleteReview(
+            @AuthUser User user,
+            @PathVariable("bakeryId") Long bakeryId,
+            @PathVariable("reviewId") Long reviewId
+    ) {
         reviewService.delete(user, bakeryId, reviewId);
         return ResponseEntity.ok().build();
     }
