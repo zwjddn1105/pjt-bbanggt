@@ -117,33 +117,4 @@ public class SsafyTransferService {
             })
             .body(AccountTransferSsafyApiResponse.class);
     }
-
-    public AccountHistorySsafyApiResponse accountHistory(AccountHistoryRequest req) {
-        String apiKey = ssafyBankUtil.userApiKey;
-
-        RestClient restClient = RestClient.create();
-        var header = SsafyBankRequestHeader.of(ApiName.HISTORY_ACCOUNT, apiKey, req.userKey());
-        var accountTransferReq = new AccountHistorySsafyApiRequest(
-            header,
-            req.accountNo(),
-            req.startDate(),
-            req.endDate(),
-            req.transactionType(),
-            req.orderByType());
-
-        return restClient.post()
-            .uri("https://finopenapi.ssafy.io/ssafy/api/v1/edu/demandDeposit/inquireTransactionHistoryList")
-            .body(accountTransferReq)
-            .retrieve()
-            .onStatus(HttpStatusCode::is4xxClientError, (reqSpec, res) -> {
-                String errorBody = new BufferedReader(new InputStreamReader(res.getBody()))
-                    .lines()
-                    .collect(Collectors.joining("\n"));
-                ObjectMapper mapper = new ObjectMapper();
-
-                SsafyBankErrorResponse errorResponse = mapper.readValue(errorBody, SsafyBankErrorResponse.class);
-                throw new SsafyApiException(errorResponse.responseCode(), errorResponse.responseMessage());
-            })
-            .body(AccountHistorySsafyApiResponse.class);
-    }
 }
