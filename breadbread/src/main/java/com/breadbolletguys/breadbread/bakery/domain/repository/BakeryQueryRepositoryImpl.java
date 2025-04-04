@@ -1,5 +1,6 @@
 package com.breadbolletguys.breadbread.bakery.domain.repository;
 
+import com.querydsl.core.types.dsl.Expressions;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.bakery.domain.QBakery;
@@ -34,7 +35,7 @@ public class BakeryQueryRepositoryImpl implements BakeryQueryRepository {
     }
 
     @Override
-    public BakeryResponse findByBakeryId(Long bakeryId) {
+    public BakeryResponse findBakeryBaseInfo(Long bakeryId) {
         QBakery qBakery = QBakery.bakery;
         return jpaQueryFactory
                 .select(Projections.constructor(
@@ -43,7 +44,8 @@ public class BakeryQueryRepositoryImpl implements BakeryQueryRepository {
                         qBakery.name,
                         qBakery.homepageUrl,
                         qBakery.address,
-                        qBakery.phone
+                        qBakery.phone,
+                        Expressions.constant(false)
                 ))
                 .from(qBakery)
                 .where(qBakery.id.eq(bakeryId))

@@ -45,12 +45,15 @@ public class BakeryService {
     }
 
     @Transactional(readOnly = true)
-    public BakeryResponse findByBakeryId(Long bakeryId) {
-        return bakeryRepository.findByBakeryId(bakeryId);
+    public BakeryResponse findByBakeryId(User user, Long bakeryId) {
+        BakeryResponse response = bakeryRepository.findBakeryBaseInfo(bakeryId);
+        boolean isMark = bookmarkRepository.existsByUserIdAndBakeryId(user.getId(), bakeryId);
+        response.updateMark(isMark);
+        return response;
     }
 
     @Transactional
-    public BakeryResponse updateBakery(User user, Long bakeryId, BakeryRequest bakeryRequest) {
+    public void updateBakery(User user, Long bakeryId, BakeryRequest bakeryRequest) {
         Bakery bakery = bakeryRepository.findById(bakeryId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BAKERY_NOT_FOUND));
 
@@ -63,13 +66,6 @@ public class BakeryService {
                 bakeryRequest.getHomepageUrl(),
                 bakeryRequest.getAddress(),
                 bakeryRequest.getPhone()
-        );
-        return new BakeryResponse(
-                bakery.getId(),
-                bakery.getName(),
-                bakery.getHomepageUrl(),
-                bakery.getAddress(),
-                bakery.getPhone()
         );
     }
 
