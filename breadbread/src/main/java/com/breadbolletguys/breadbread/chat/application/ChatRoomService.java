@@ -97,7 +97,7 @@ public class ChatRoomService {
         return summaries.stream()
                 .collect(Collectors.toMap(
                         ChatSummary::id,
-                        chatSummary -> ChatInfo.from(chatSummary.content(), chatSummary.id())
+                        chatSummary -> ChatInfo.from(chatSummary.content(), chatSummary.userId())
                 ));
     }
 
