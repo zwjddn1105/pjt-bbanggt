@@ -23,8 +23,11 @@ import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
 import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachine;
 import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachineRedisEntity;
 import com.breadbolletguys.breadbread.vendingmachine.domain.dto.request.VendingMachineCreateJsonRequest;
-import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SlotResponse;
-import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.VendingMachineSlotResponse;
+import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SlotBuyerResponse;
+import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.SlotSellerResponse;
+import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.StackSummaryResponse;
+import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.VendingMachineBuyerResponse;
+import com.breadbolletguys.breadbread.vendingmachine.domain.dto.response.VendingMachineSellerResponse;
 import com.breadbolletguys.breadbread.vendingmachine.domain.repository.SpaceRepository;
 import com.breadbolletguys.breadbread.vendingmachine.domain.repository.VendingMachineRepository;
 
@@ -95,12 +98,12 @@ public class VendingMachineService {
                 .build();
     }
 
-    public VendingMachineSlotResponse findVendingMachineById(User user, Long id) {
+    public VendingMachineBuyerResponse findVendingMachineForBuyer(User user, Long id) {
         VendingMachine vendingMachine = vendingMachineRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_VENDING_MACHINE));
         List<Space> spaces = spaceRepository.findByVendingMachineId(id);
 
-        List<SlotResponse> slotResponses = new ArrayList<>();
+        List<SlotBuyerResponse> slotResponses = new ArrayList<>();
 
         for (int i = 0; i < spaces.size(); i++) {
             Space space = spaces.get(i);
@@ -120,16 +123,47 @@ public class VendingMachineService {
                 );
             }).orElse(null);
 
-            slotResponses.add(new SlotResponse(i + 1, orderSummaryResponse));
+            slotResponses.add(new SlotBuyerResponse(i + 1, orderSummaryResponse));
         }
 
-        return new VendingMachineSlotResponse(
+        return new VendingMachineBuyerResponse(
                 vendingMachine.getName(),
                 vendingMachine.getHeight(),
                 vendingMachine.getWidth(),
                 slotResponses
         );
 
+    }
+
+    public VendingMachineSellerResponse findVendingMachineForSeller(User user, Long id) {
+        VendingMachine vendingMachine = vendingMachineRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_VENDING_MACHINE));
+        List<Space> spaces = spaceRepository.findByVendingMachineId(id);
+
+        List<SlotSellerResponse> slotSellerResponses = new ArrayList<>();
+        for (int i = 0; i < spaces.size(); i++) {
+            Space space = spaces.get(i);
+            Optional<Order> orderOpt =
+                    orderRepository.findBySpaceIdAndProductState(space.getId(), ProductState.AVAILABLE);
+
+            StackSummaryResponse stackSummaryResponse = orderOpt.map(order -> {
+                boolean isMine = false;
+
+                if (order.getSellerId().equals(user.getId())) {
+                    isMine = true;
+                }
+
+                return new StackSummaryResponse(order.getId(), isMine);
+            }).orElse(null);
+            slotSellerResponses.add(new SlotSellerResponse(i + 1, stackSummaryResponse));
+        }
+
+        return new VendingMachineSellerResponse(
+                vendingMachine.getName(),
+                vendingMachine.getHeight(),
+                vendingMachine.getWidth(),
+                slotSellerResponses
+        );
     }
 
     private List<Long> convertToSpaceIds(List<Space> spaces) {
