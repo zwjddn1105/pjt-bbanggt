@@ -88,4 +88,15 @@ public class User extends BaseTimeEntity {
         }
         this.userRole = UserRole.SELLER;
     }
+
+    public void purchaseTicket() {
+        this.tickets++;
+    }
+
+    public void useTickets() {
+        if (this.tickets == 0) {
+            throw new BadRequestException(ErrorCode.UNABLE_TO_USE_TICKET);
+        }
+        this.tickets--;
+    }
 }

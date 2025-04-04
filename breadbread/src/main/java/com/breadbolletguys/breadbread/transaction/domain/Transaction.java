@@ -25,7 +25,7 @@ public class Transaction {
     @Column(name = "transaction_id")
     private Long id;
 
-    @Column(name = "order_id", nullable = false)
+    @Column(name = "order_id")
     private Long orderId;
 
     @Column(name = "sender_account", length = 32, nullable = false)
