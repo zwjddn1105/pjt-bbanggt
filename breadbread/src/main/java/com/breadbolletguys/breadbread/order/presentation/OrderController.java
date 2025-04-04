@@ -2,6 +2,10 @@ package com.breadbolletguys.breadbread.order.presentation;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,13 +13,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
-import com.breadbolletguys.breadbread.common.model.PageInfo;
 import com.breadbolletguys.breadbread.image.application.S3Service;
 import com.breadbolletguys.breadbread.order.application.OrderService;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
@@ -85,19 +87,19 @@ public class OrderController {
     }
 
     @GetMapping("/myStocks")
-    public ResponseEntity<PageInfo<OrderStackResponse>> getMyOrderStocks(
+    public ResponseEntity<Page<OrderStackResponse>> getMyOrderStocks(
             @AuthUser User user,
-            @RequestParam(required = false, name = "pageToken") String pageToken
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(orderService.getMyOrderStocks(user, pageToken));
+        return ResponseEntity.ok(orderService.getMyOrderStocks(user, pageable));
     }
 
     @GetMapping("/mySoldout")
-    public ResponseEntity<PageInfo<OrderStackResponse>> getMyOrderSoldout(
+    public ResponseEntity<Page<OrderStackResponse>> getMyOrderSoldout(
             @AuthUser User user,
-            @RequestParam(required = false, name = "pageToken") String pageToken
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(orderService.getMyOrderSoldout(user, pageToken));
+        return ResponseEntity.ok(orderService.getMyOrderSoldout(user, pageable));
     }
 
 

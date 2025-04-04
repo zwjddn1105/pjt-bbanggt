@@ -7,6 +7,9 @@ import static com.breadbolletguys.breadbread.vendingmachine.domain.QVendingMachi
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.bakery.domain.QBakery;
@@ -97,12 +100,12 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     }
 
     @Override
-    public List<OrderStackResponse> findStocksBySellerId(Long userId, String pageToken, int size) {
+    public Page<OrderStackResponse> findStocksBySellerId(Long userId, Pageable pageable) {
         QSpace qSpace = space;
         QOrder qOrder = order;
         QVendingMachine qVendingMachine = vendingMachine;
 
-        return queryFactory
+        var data = queryFactory
                 .select(Projections.constructor(
                         OrderStackResponse.class,
                         qOrder.id,
@@ -116,17 +119,26 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .where(qOrder.sellerId.eq(userId)
                         .and(qOrder.productState.eq(ProductState.AVAILABLE)))
                 .orderBy(qOrder.id.desc())
-                .limit(size + 1)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        long total = queryFactory
+                .select(qOrder)
+                .from(qOrder)
+                .where(qOrder.sellerId.eq(userId))
+                .fetchCount();
+
+        return new PageImpl<>(data, pageable, total);
     }
 
     @Override
-    public List<OrderStackResponse> findSoldoutBySellerId(Long userId, String pageToken, int size) {
+    public Page<OrderStackResponse> findSoldoutBySellerId(Long userId, Pageable pageable) {
         QSpace qSpace = space;
         QOrder qOrder = order;
         QVendingMachine qVendingMachine = vendingMachine;
 
-        return queryFactory
+        var data = queryFactory
                 .select(Projections.constructor(
                         OrderStackResponse.class,
                         qOrder.id,
@@ -140,8 +152,17 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .where(qOrder.sellerId.eq(userId)
                         .and(qOrder.productState.eq(ProductState.SOLD_OUT)))
                 .orderBy(qOrder.id.desc())
-                .limit(size + 1)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        long total = queryFactory
+                .select(qOrder)
+                .from(qOrder)
+                .where(qOrder.sellerId.eq(userId))
+                .fetchCount();
+
+        return new PageImpl<>(data, pageable, total);
     }
 
     @Override

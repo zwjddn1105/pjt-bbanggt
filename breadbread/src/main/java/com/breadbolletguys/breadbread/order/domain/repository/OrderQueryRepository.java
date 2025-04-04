@@ -1,9 +1,10 @@
 package com.breadbolletguys.breadbread.order.domain.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import com.breadbolletguys.breadbread.common.model.PageInfo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
@@ -14,9 +15,9 @@ public interface OrderQueryRepository {
 
     List<OrderResponse> findByBuyerId(Long userId);
 
-    List<OrderStackResponse> findStocksBySellerId(Long userId, String pageToken, int size);
+    Page<OrderStackResponse> findStocksBySellerId(Long userId, Pageable pageable);
 
-    List<OrderStackResponse> findSoldoutBySellerId(Long userId, String pageToken, int size);
+    Page<OrderStackResponse> findSoldoutBySellerId(Long userId, Pageable pageable);
 
     OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId);
 

@@ -3,9 +3,10 @@ package com.breadbolletguys.breadbread.order.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.breadbolletguys.breadbread.common.model.PageInfo;
 import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.ProductState;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
@@ -17,8 +18,6 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class OrderRepository {
-
-    private static final int DEFAULT_PAGE_SIZE = 10;
     private final OrderJpaRepository orderJpaRepository;
     private final OrderQueryRepository orderQueryRepository;
 
@@ -34,14 +33,12 @@ public class OrderRepository {
         return orderQueryRepository.findByIdAndVendingMachineId(id, vendingMachineId);
     }
 
-    public PageInfo<OrderStackResponse> findStocksBySellerId(Long userId, String pageToken) {
-        var data = orderQueryRepository.findStocksBySellerId(userId, pageToken, DEFAULT_PAGE_SIZE);
-        return PageInfo.of(data, DEFAULT_PAGE_SIZE, OrderStackResponse::getId);
+    public Page<OrderStackResponse> findStocksBySellerId(Long userId, Pageable pageable) {
+        return orderQueryRepository.findStocksBySellerId(userId, pageable);
     }
 
-    public PageInfo<OrderStackResponse> findSoldoutBySellerId(Long userId, String pageToken) {
-        var data = orderQueryRepository.findSoldoutBySellerId(userId, pageToken, DEFAULT_PAGE_SIZE);
-        return PageInfo.of(data, DEFAULT_PAGE_SIZE, OrderStackResponse::getId);
+    public Page<OrderStackResponse> findSoldoutBySellerId(Long userId, Pageable pageable) {
+        return orderQueryRepository.findSoldoutBySellerId(userId, pageable);
     }
 
     public void saveAll(List<Order> orders) {
