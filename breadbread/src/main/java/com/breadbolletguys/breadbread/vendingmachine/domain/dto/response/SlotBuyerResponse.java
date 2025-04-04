@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SlotResponse {
+public class SlotBuyerResponse {
     private int slotNumber;
     private OrderSummaryResponse orderSummaryResponse;
 }
