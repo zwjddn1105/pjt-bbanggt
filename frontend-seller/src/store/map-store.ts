@@ -43,7 +43,7 @@ interface MapState {
   setShowLegend: (show: boolean) => void;
 }
 
-export const useMapStore = create<MapState>((set) => ({
+export const useMapStore = create<MapState>((set, get) => ({
   // 지도 관련 상태
   map: null,
   setMap: (map) => set({ map }),
@@ -56,9 +56,37 @@ export const useMapStore = create<MapState>((set) => ({
   selectedLocation: null,
   setSelectedLocation: (location) => set({ selectedLocation: location }),
 
-  // 검색 거리 상태 (기본값 3km로 변경)
+  // 검색 거리 상태 (기본값 3km로 설정)
   searchDistance: 3,
-  setSearchDistance: (distance) => set({ searchDistance: distance }),
+  setSearchDistance: (distance) => {
+    set({ searchDistance: distance });
+
+    // 검색 거리 변경 시 이벤트 발생
+    if (typeof window !== "undefined") {
+      const { userLocation, selectedLocation, map } = get();
+
+      // 현재 선택된 위치 또는 사용자 위치 기준으로 원 업데이트
+      if (map) {
+        let lat, lng;
+
+        if (selectedLocation) {
+          lat = selectedLocation.getLat();
+          lng = selectedLocation.getLng();
+        } else if (userLocation) {
+          lat = userLocation.lat;
+          lng = userLocation.lng;
+        } else {
+          return; // 위치 정보가 없으면 종료
+        }
+
+        // 원 업데이트 이벤트 발생
+        const event = new CustomEvent("updateSearchRadius", {
+          detail: { lat, lng, distance },
+        });
+        window.dispatchEvent(event);
+      }
+    }
+  },
 
   // 빵긋 자판기 상태
   vendingMachines: [],

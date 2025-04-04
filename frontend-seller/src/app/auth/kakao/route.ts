@@ -35,6 +35,9 @@ export async function GET(request: Request) {
     // 응답 데이터에서 accessToken 가져오기
     const accessToken = response.data.accessToken;
 
+    // 응답 데이터에서 userId 가져오기 (추가된 부분)
+    const userId = response.data.userId;
+
     // 응답 헤더에서 refresh-token 쿠키 가져오기
     const setCookieHeader = response.headers["set-cookie"];
     console.log("Set-Cookie 헤더:", setCookieHeader);
@@ -73,6 +76,19 @@ export async function GET(request: Request) {
       });
     } else {
       console.error("accessToken이 응답에 없습니다.");
+    }
+
+    // userId를 쿠키에 저장 (추가된 부분)
+    if (userId) {
+      console.log("userId 쿠키 설정:", userId);
+      nextResponse.cookies.set("userId", userId.toString(), {
+        httpOnly: false, // 자바스크립트에서 접근 가능하도록
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24 * 7, // 1주일
+        path: "/",
+      });
+    } else {
+      console.error("userId가 응답에 없습니다.");
     }
 
     // refresh-token도 필요하다면 저장

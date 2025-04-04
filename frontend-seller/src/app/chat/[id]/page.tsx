@@ -5,10 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import { fetchChatMessages, sendChatMessage } from "../../../api/chat-messages";
 import { useChatStore } from "../../../store/chat-store";
 import type { ChatMessage } from "../../../types/chat-message";
-import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ArrowLeft, Send, Loader2 } from "lucide-react";
-import { useLoading } from "../../../components/loading-provider";
+import { useLoading } from "@/components/loading-provider";
 
 export default function ChatRoomPage() {
   const params = useParams();
@@ -28,12 +28,29 @@ export default function ChatRoomPage() {
   const [newMessage, setNewMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   // 스크롤 관련 ref
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // 쿠키에서 userId 가져오는 useEffect 추가 (초기 메시지 로드 useEffect 위에 추가)
+  // 스크롤 관련 ref 아래에 추가
+  useEffect(() => {
+    const getCookie = (name: string): string | null => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+      return null;
+    };
+
+    const userIdFromCookie = getCookie("userId");
+    if (userIdFromCookie) {
+      setCurrentUserId(Number(userIdFromCookie));
+    }
+  }, []);
 
   // 초기 메시지 로드
   useEffect(() => {
@@ -205,14 +222,18 @@ export default function ChatRoomPage() {
   };
 
   // 메시지 발신자 확인 함수 (수정된 부분)
-  const isSellerMessage = (message: ChatMessage): boolean => {
-    // 메시지 내용에 "테스트메세지_김정우"가 포함되어 있으면 판매자 메시지로 처리
-    // 또는 메시지 내용에 특정 키워드가 있으면 판매자 메시지로 처리
+  const isCurrentUserMessage = (message: ChatMessage): boolean => {
+    // 쿠키에서 가져온 userId와 메시지의 senderId 비교
+    if (currentUserId !== null && message.senderId === currentUserId) {
+      return true;
+    }
+
+    // 백업 로직: 테스트 메시지 확인 (개발 중에만 사용)
     if (message.content.includes("테스트메세지_김정우")) {
       return true;
     }
 
-    // 기존 로직: senderId가 0이면 판매자 메시지
+    // 백업 로직: senderId가 0인 경우 (기존 로직)
     return message.senderId === 0;
   };
 
@@ -281,8 +302,8 @@ export default function ChatRoomPage() {
           ) : (
             <div className="space-y-4">
               {messages.map((message, index) => {
-                // 수정된 부분: 판매자 메시지 여부 확인
-                const isCurrentUser = isSellerMessage(message);
+                // 수정된 부분: 현재 사용자 메시지 여부 확인
+                const isCurrentUser = isCurrentUserMessage(message);
                 const prevMessage = index > 0 ? messages[index - 1] : null;
                 const showDateDivider =
                   !prevMessage ||
@@ -292,7 +313,7 @@ export default function ChatRoomPage() {
                 // 연속된 메시지인지 확인 (같은 사용자의 연속 메시지)
                 const isContinuous =
                   prevMessage &&
-                  isSellerMessage(prevMessage) === isCurrentUser &&
+                  isCurrentUserMessage(prevMessage) === isCurrentUser &&
                   formatDateForDivider(message.createdAt) ===
                     formatDateForDivider(prevMessage.createdAt);
 

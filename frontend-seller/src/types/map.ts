@@ -235,3 +235,38 @@ export interface VendingMachineApiResponse {
   remainSpaceCount?: number; // 남은 공간 수
   availableCount?: number; // 사용 가능한 수 (다른 앱에서 사용)
 }
+
+// 벤딩머신 상세 정보 API 응답 타입
+export interface VendingMachineDetailResponse {
+  vendingMachineName: string;
+  height: number;
+  width: number;
+  sellerResponseList: SlotResponse[]; // slotResponseList에서 sellerResponseList로 변경
+}
+
+// 슬롯 정보 타입
+export interface SlotResponse {
+  slotNumber: number;
+  stackSummaryResponse: StackSummaryResponse | null; // orderSummaryResponse에서 stackSummaryResponse로 변경
+}
+
+// 주문 요약 정보 타입 (이름 변경)
+export interface StackSummaryResponse {
+  orderId: number;
+  mine: boolean; // isMine에서 mine으로 변경
+}
+
+// 슬롯 상태 타입 (UI 표시용)
+export enum SlotStatus {
+  AVAILABLE = "AVAILABLE", // 이용 가능 (흰색)
+  SELECTED = "SELECTED", // 선택됨 (초록색)
+  MINE = "MINE", // 내가 사용 중 (노란색)
+  OCCUPIED = "OCCUPIED", // 타인이 사용 중 (회색)
+}
+
+// 슬롯 UI 표시용 타입
+export interface SlotUI {
+  slotNumber: number;
+  status: SlotStatus;
+  orderId?: number;
+}

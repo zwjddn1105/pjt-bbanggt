@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Product } from "../types/products";
+import type { ProductsResponse, FetchProductsParams } from "../types/products";
 
 // 쿠키에서 auth_token 가져오는 함수
 const getAuthToken = (): string | null => {
@@ -16,7 +16,9 @@ const getAuthToken = (): string | null => {
 };
 
 // 내 상품 재고 목록 가져오기 함수
-export const fetchMyStocks = async (): Promise<Product[]> => {
+export const fetchMyStocks = async (
+  params: FetchProductsParams = {}
+): Promise<ProductsResponse> => {
   const authToken = getAuthToken();
 
   if (!authToken) {
@@ -24,9 +26,10 @@ export const fetchMyStocks = async (): Promise<Product[]> => {
   }
 
   try {
-    const response = await axios.get<Product[]>(
+    const response = await axios.get<ProductsResponse>(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/order/myStocks`,
       {
+        params,
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -38,4 +41,45 @@ export const fetchMyStocks = async (): Promise<Product[]> => {
     console.error("상품 재고 목록을 가져오는 중 오류가 발생했습니다:", error);
     throw error;
   }
+};
+
+// 내 판매 완료 상품 목록 가져오기 함수
+export const fetchMySoldout = async (
+  params: FetchProductsParams = {}
+): Promise<ProductsResponse> => {
+  const authToken = getAuthToken();
+
+  if (!authToken) {
+    throw new Error("인증 토큰이 없습니다. 로그인이 필요합니다.");
+  }
+
+  try {
+    const response = await axios.get<ProductsResponse>(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/order/mySoldout`,
+      {
+        params,
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "판매 완료 상품 목록을 가져오는 중 오류가 발생했습니다:",
+      error
+    );
+    throw error;
+  }
+};
+
+// 다음 페이지 상품 목록 가져오기 함수
+export const fetchNextProducts = async (
+  type: "stocks" | "soldout",
+  currentPage: number
+): Promise<ProductsResponse> => {
+  return type === "stocks"
+    ? fetchMyStocks({ page: currentPage + 1 })
+    : fetchMySoldout({ page: currentPage + 1 });
 };

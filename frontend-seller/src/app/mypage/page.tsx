@@ -2,9 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isLoggedIn, logout } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { isLoggedIn, logout } from "../../lib/auth";
+import { Button } from "../../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import {
   LogOut,
   Ticket,
@@ -16,8 +21,8 @@ import {
   Settings,
   Star,
 } from "lucide-react";
-import { useLoading } from "@/components/loading-provider";
-import { BreadIcon } from "@/components/icons";
+import { useLoading } from "../../components/loading-provider";
+import { BreadIcon } from "../../components/icons";
 
 export default function MyPage() {
   const router = useRouter();

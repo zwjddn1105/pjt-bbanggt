@@ -9,12 +9,44 @@ export interface Product {
   productState: ProductState;
 }
 
-// API 응답 타입
+// 페이징 정보 타입
+export interface PageInfo {
+  offset: number;
+  sort: {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+  };
+  unpaged: boolean;
+  paged: boolean;
+  pageNumber: number;
+  pageSize: number;
+}
+
+// 상품 목록 응답 타입
 export interface ProductsResponse {
-  data: Product[];
-  pageToken?: string;
-  hasNext?: boolean;
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  content: Product[];
+  number: number;
+  sort: {
+    empty: boolean;
+    unsorted: boolean;
+    sorted: boolean;
+  };
+  numberOfElements: number;
+  pageable: PageInfo;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
 }
 
 // 상품 필터 타입
 export type ProductFilter = "전체" | "재고있음" | "품절";
+
+// 상품 목록 조회 파라미터
+export interface FetchProductsParams {
+  page?: number;
+  size?: number;
+}
