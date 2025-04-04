@@ -5,17 +5,7 @@ export interface VendingMachine {
   longitude: number
   latitude: number
   distance: number
-  availableCount: number
-  isBookmarked?: boolean
-}
-
-export interface VendingMachineResponse {
-  id: string
-  name: string
-  address: string
-  longitude: number
-  latitude: number
-  distance: number
+  remainSpaceCount: number
   availableCount: number
   isBookmarked?: boolean
 }

@@ -101,17 +101,7 @@ export function PickupItem({
   productState,
 }: PickupItemProps) {
   const handlePickupComplete = async () => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/order/${id}/complete`, // 예시
-        { method: "POST", credentials: "include" }
-      )
-      if (!res.ok) throw new Error("픽업 처리 실패")
-      alert("픽업이 완료되었습니다!")
-    } catch (err) {
-      console.error(err)
-      alert("픽업 처리 중 오류가 발생했습니다.")
-    }
+    alert("빵긋이 열렸습니다")
   }
 
   return (
@@ -135,7 +125,7 @@ export function PickupItem({
             className="mt-2 bg-primary-custom text-white text-sm px-4 py-1 rounded-full"
             onClick={handlePickupComplete}
           >
-            픽업 완료
+            빵긋열기
           </button>
         </div>
       </div>

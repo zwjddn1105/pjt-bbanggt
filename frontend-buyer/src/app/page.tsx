@@ -33,7 +33,7 @@ export default function Home() {
     if (!mapRef.current || !window.kakao?.maps) return
 
     const options = {
-      center: new window.kakao.maps.LatLng(37.4979, 126.0375),
+      center: new window.kakao.maps.LatLng(37.5013925, 127.03958),
       level: 3,
     }
 
@@ -44,6 +44,7 @@ export default function Home() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords
+          console.log("📍 현재 위치", latitude, longitude)
           const moveLatLng = new window.kakao.maps.LatLng(latitude, longitude)
 
           kakaoMap.setCenter(moveLatLng)
@@ -58,13 +59,18 @@ export default function Home() {
         },
         (error) => {
           console.error("현재 위치를 가져오는데 실패했습니다:", error)
-          setCurrentLocation({ lat: 37.4979, lng: 127.0375 })
-          fetchData(37.4979, 126.0375, showBookmarkedOnly)
+          setCurrentLocation({ lat: 37.5013925, lng: 127.03958 })
+          fetchData(37.5013925, 127.03958, showBookmarkedOnly)
         },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        }
       )
     } else {
-      setCurrentLocation({ lat: 37.4979, lng: 126.0375 })
-      fetchData(37.4979, 126.0375, showBookmarkedOnly)
+      setCurrentLocation({ lat: 37.5013925, lng: 127.03958 })
+      fetchData(37.5013925, 127.03958, showBookmarkedOnly)
     }
   }
 
@@ -132,8 +138,8 @@ export default function Home() {
   }
 
   const handleBookmarkClick = () => {
-    const lat = currentLocation?.lat ?? 37.4979
-    const lng = currentLocation?.lng ?? 126.0375
+    const lat = currentLocation?.lat ?? 37.5013925
+    const lng = currentLocation?.lng ?? 127.03958
 
     setShowBookmarkedOnly(true)
 
