@@ -1,12 +1,13 @@
 package com.breadbolletguys.breadbread.bakery.domain.repository;
 
-import com.querydsl.core.types.dsl.Expressions;
+
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.bakery.domain.QBakery;
 import com.breadbolletguys.breadbread.bakery.domain.dto.response.BakeryResponse;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
