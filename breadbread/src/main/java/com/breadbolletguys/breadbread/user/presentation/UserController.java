@@ -1,6 +1,5 @@
 package com.breadbolletguys.breadbread.user.presentation;
 
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.breadbolletguys.breadbread.account.domain.dto.request.AccountRequest;
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
-import com.breadbolletguys.breadbread.order.application.OrderService;
+import com.breadbolletguys.breadbread.user.application.UserService;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.user.domain.dto.response.UserResponse;
 
@@ -21,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final OrderService orderService;
+    private final UserService userService;
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> findById(@AuthUser User user) {
@@ -34,7 +33,7 @@ public class UserController {
             @AuthUser User user,
             @RequestBody AccountRequest accountRequest
     ) {
-        orderService.payForTicket(user, accountRequest.getAccountNo());
+        userService.payForTicket(user, accountRequest.getAccountNo());
         return ResponseEntity.ok().build();
     }
 }
