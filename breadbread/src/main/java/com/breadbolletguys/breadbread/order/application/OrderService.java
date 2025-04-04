@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +17,6 @@ import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 import com.breadbolletguys.breadbread.common.exception.NotFoundException;
-import com.breadbolletguys.breadbread.common.model.PageInfo;
 import com.breadbolletguys.breadbread.order.domain.BreadType;
 import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.ProductState;
@@ -69,13 +70,13 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public PageInfo<OrderStackResponse> getMyOrderStocks(User user, String pageToken) {
-        return orderRepository.findStocksBySellerId(user.getId(), pageToken);
+    public Page<OrderStackResponse> getMyOrderStocks(User user, Pageable pageable) {
+        return orderRepository.findStocksBySellerId(user.getId(), pageable);
     }
 
     @Transactional(readOnly = true)
-    public PageInfo<OrderStackResponse> getMyOrderSoldout(User user, String pageToken) {
-        return orderRepository.findSoldoutBySellerId(user.getId(), pageToken);
+    public Page<OrderStackResponse> getMyOrderSoldout(User user, Pageable pageable) {
+        return orderRepository.findSoldoutBySellerId(user.getId(), pageable);
     }
 
     @Transactional
