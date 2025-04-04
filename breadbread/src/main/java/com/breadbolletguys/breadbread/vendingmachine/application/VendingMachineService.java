@@ -2,7 +2,6 @@ package com.breadbolletguys.breadbread.vendingmachine.application;
 
 import static com.breadbolletguys.breadbread.common.exception.ErrorCode.*;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +9,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.breadbolletguys.breadbread.bakery.domain.Bakery;
+import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.NotFoundException;
 import com.breadbolletguys.breadbread.order.domain.Order;
@@ -37,6 +38,7 @@ public class VendingMachineService {
     private final SpaceRepository spaceRepository;
     private final OrderRepository orderRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final BakeryRepository bakeryRepository;
 
     @Transactional
     public VendingMachine save(
@@ -106,8 +108,16 @@ public class VendingMachineService {
                     orderRepository.findBySpaceIdAndProductState(space.getId(), ProductState.AVAILABLE);
 
             OrderSummaryResponse orderSummaryResponse = orderOpt.map(order -> {
+                Bakery bakery = bakeryRepository.findById(order.getBakeryId())
+                        .orElseThrow(() -> new NotFoundException(BAKERY_NOT_FOUND));
                 boolean isMark = bookmarkRepository.existsByUserIdAndBakeryId(user.getId(), order.getBakeryId());
-                return new OrderSummaryResponse(order.getId(), order.getBreadType(), isMark, order.getProductState());
+                return new OrderSummaryResponse(
+                        order.getId(),
+                        bakery.getName(),
+                        order.getBreadType(),
+                        isMark,
+                        order.getProductState()
+                );
             }).orElse(null);
 
             slotResponses.add(new SlotResponse(i + 1, orderSummaryResponse));
