@@ -38,7 +38,7 @@ public class BakeryController {
     @Operation(description = "빵집 id를 PathVariable 로 받아서 조회한다.")
     public ResponseEntity<BakeryResponse> getBakeryById(@AuthUser User user,
                                                         @PathVariable("bakeryId") Long bakeryId) {
-        return ResponseEntity.ok(bakeryService.findByBakeryId(bakeryId));
+        return ResponseEntity.ok(bakeryService.findByBakeryId(user, bakeryId));
     }
 
     @PatchMapping("/{bakeryId}")
@@ -47,14 +47,8 @@ public class BakeryController {
                                                        @PathVariable("bakeryId") Long bakeryId,
                                                        @RequestBody BakeryRequest bakeryRequest
     ) {
-        return ResponseEntity.ok(bakeryService.updateBakery(user, bakeryId, bakeryRequest));
-    }
-
-    @GetMapping("/{bakeryId}/bookmark")
-    @Operation(description = "빵집 id를 PathVariable 로 북마크 등록했는지 확인한다. (등록 존재 : true, 등록 존재하지 않음 : false)")
-    public ResponseEntity<Boolean> getBookMark(@AuthUser User user,
-                                               @PathVariable("bakeryId") Long bakeryId) {
-        return ResponseEntity.ok(bakeryService.hasBookmark(user, bakeryId));
+        bakeryService.updateBakery(user, bakeryId, bakeryRequest);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{bakeryId}/bookmark")

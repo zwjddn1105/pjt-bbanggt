@@ -24,8 +24,8 @@ public class BakeryRepository {
         bakeryJpaRepository.save(bakery);
     }
 
-    public BakeryResponse findByBakeryId(Long bakeryId) {
-        return bakeryQueryRepository.findByBakeryId(bakeryId);
+    public BakeryResponse findBakeryBaseInfo(Long bakeryId) {
+        return bakeryQueryRepository.findBakeryBaseInfo(bakeryId);
     }
 
     public void increaseReview(Long bakeryid) {
@@ -43,5 +43,4 @@ public class BakeryRepository {
     public Optional<Bakery> findByUserId(Long userId) {
         return bakeryJpaRepository.findByUserId(userId);
     }
-
 }

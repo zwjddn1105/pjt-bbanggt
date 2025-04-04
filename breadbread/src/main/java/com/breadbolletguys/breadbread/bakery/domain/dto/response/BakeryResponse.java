@@ -13,4 +13,9 @@ public class BakeryResponse {
     private String homepageUrl;
     private String address;
     private String phone;
+    private boolean isMark;
+
+    public void updateMark(boolean isMark) {
+        this.isMark = isMark;
+    }
 }
