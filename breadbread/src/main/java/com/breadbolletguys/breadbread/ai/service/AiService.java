@@ -1,6 +1,7 @@
 package com.breadbolletguys.breadbread.ai.service;
 
-import lombok.NoArgsConstructor;
+import java.io.IOException;
+
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -9,13 +10,13 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import lombok.NoArgsConstructor;
 
 @Service
 @NoArgsConstructor
 public class AiService {
 
-    public String AiClient(MultipartFile file) throws IOException {
+    public String aiClient(MultipartFile file) throws IOException {
         RestClient restClient = RestClient.create();
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
