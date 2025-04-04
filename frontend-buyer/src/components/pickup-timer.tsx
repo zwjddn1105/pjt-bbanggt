@@ -14,59 +14,54 @@ export default function PickupTimer() {
       // 한국 시간으로 변환 (실제 배포 시에는 서버 시간이나 사용자 로컬 시간 사용 가능)
       const koreaTime = new Date(now.getTime())
 
-      // 오늘 오전 9시 30분 설정
-      const todayPickupTime = new Date(koreaTime)
-      todayPickupTime.setHours(9, 30, 0, 0)
+      // 오늘 오전 9시 30분 설정 (픽업 불가능 시작 시간)
+      const todayPickupStartTime = new Date(koreaTime)
+      todayPickupStartTime.setHours(9, 30, 0, 0)
+
+      // 오늘 오후 8시 설정 (픽업 불가능 종료 시간)
+      const todayPickupEndTime = new Date(koreaTime)
+      todayPickupEndTime.setHours(20, 0, 0, 0)
 
       // 내일 오전 9시 30분 설정
-      const tomorrowPickupTime = new Date(koreaTime)
-      tomorrowPickupTime.setDate(koreaTime.getDate() + 1)
-      tomorrowPickupTime.setHours(9, 30, 0, 0)
-
-      // 오후 7시 30분 설정 (픽업 마감 시간)
-      const todayCloseTime = new Date(koreaTime)
-      todayCloseTime.setHours(19, 30, 0, 0)
+      const tomorrowPickupStartTime = new Date(koreaTime)
+      tomorrowPickupStartTime.setDate(koreaTime.getDate() + 1)
+      tomorrowPickupStartTime.setHours(9, 30, 0, 0)
 
       let targetTime: Date
       let timeAvailable = false
 
-      // 현재 시간이 오전 9시 30분 ~ 오후 7시 30분 사이인 경우
-      if (koreaTime >= todayPickupTime && koreaTime <= todayCloseTime) {
-        targetTime = todayPickupTime // 이미 지난 시간이지만 형식상 설정
-        timeAvailable = true // 픽업 가능 시간
+      // 현재 시간이 오전 9시 30분 ~ 오후 8시 사이인 경우 (픽업 불가능 시간)
+      if (koreaTime >= todayPickupStartTime && koreaTime <= todayPickupEndTime) {
+        targetTime = todayPickupEndTime // 픽업 불가능 종료 시간까지 남은 시간 계산
+        timeAvailable = false // 픽업 불가능 시간
       }
       // 현재 시간이 오전 9시 30분 이전인 경우
-      else if (koreaTime < todayPickupTime) {
-        targetTime = todayPickupTime
-        timeAvailable = false // 픽업 불가능 시간 (대기 중)
+      else if (koreaTime < todayPickupStartTime) {
+        targetTime = todayPickupStartTime // 픽업 불가능 시작 시간까지 남은 시간 계산
+        timeAvailable = true // 픽업 가능 시간
       }
-      // 현재 시간이 오후 7시 30분 이후인 경우
+      // 현재 시간이 오후 8시 이후인 경우
       else {
-        targetTime = tomorrowPickupTime
-        timeAvailable = false // 픽업 불가능 시간 (대기 중)
+        targetTime = tomorrowPickupStartTime // 내일 픽업 불가능 시작 시간까지 남은 시간 계산
+        timeAvailable = true // 픽업 가능 시간
       }
 
       // 남은 시간 계산
       let diff = targetTime.getTime() - koreaTime.getTime()
 
-      // 픽업 가능 시간이면 00:00:00 표시
-      if (timeAvailable) {
-        setRemainingTime("00:00:00")
-      } else {
-        // 시, 분, 초 계산
-        const hours = Math.floor(diff / (1000 * 60 * 60))
-        diff -= hours * (1000 * 60 * 60)
+      // 시, 분, 초 계산
+      const hours = Math.floor(diff / (1000 * 60 * 60))
+      diff -= hours * (1000 * 60 * 60)
 
-        const mins = Math.floor(diff / (1000 * 60))
-        diff -= mins * (1000 * 60)
+      const mins = Math.floor(diff / (1000 * 60))
+      diff -= mins * (1000 * 60)
 
-        const secs = Math.floor(diff / 1000)
+      const secs = Math.floor(diff / 1000)
 
-        // 형식에 맞게 표시 (HH:MM:SS)
-        setRemainingTime(
-          `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`,
-        )
-      }
+      // 형식에 맞게 표시 (HH:MM:SS)
+      setRemainingTime(
+        `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`,
+      )
 
       setIsAvailable(timeAvailable)
     }
@@ -82,18 +77,14 @@ export default function PickupTimer() {
   }, [])
 
   return (
-    <div className="mb-4">
-      <div className="bg-orange-100 p-3 rounded-md mb-2">
-        <div className="font-bold text-lg text-orange-600">남은 시간: {remainingTime}</div>
-      </div>
-      <div className="text-sm text-gray-600 leading-relaxed">
-          {/* {isAvailable ? "빵긋빵 매장에서 픽업 가능합니다." : "픽업 시간은 오전 9시 30분부터 오후 7시 30분까지입니다."}
-          */}
-          <p>빵긋빵긋에서 찾아가세요</p>
-          <p>픽업 시간은 오전 9시 30분부터 오후 7시 30분까지입니다.</p> 
-
-      </div>
-     </div>
+    <div className="bg-orange-100 p-3 rounded-md mb-4">
+      <div className="font-bold text-lg text-orange-600">남은 시간: {remainingTime}</div>
+      <p className="text-sm text-gray-600">
+        {isAvailable
+          ? "빵긋빵긋에서 픽업 가능합니다."
+          : "픽업 불가능 시간입니다. 오후 8시 이후에 다시 시도해주세요."}
+      </p>
+    </div>
   )
 }
 

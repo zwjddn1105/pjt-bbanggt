@@ -1,69 +1,265 @@
-import { ShoppingCart, Star } from "lucide-react"
-import Image from "next/image"
+"use client"
 
-export default function Page() {
+import type React from "react"
+
+import { useEffect, useRef, useState } from "react"
+import BottomNavTab from "@/components/bottom-navtab"
+import CurrentLocationButton from "@/components/map/current-location-button"
+import FilterButtons from "@/components/map/filter-buttons"
+import MarkerDetail from "@/components/map/marker-detail"
+import CustomMarker from "@/components/map/custom-marker"
+import { fetchVendingMachines, fetchBookmarkedVendingMachines } from "@/services/breadgut-api"
+import type { VendingMachine } from "@/types/vending-machine"
+
+declare global {
+  interface Window {
+    kakao: any
+  }
+}
+
+export default function Home() {
+  const mapRef = useRef<HTMLDivElement>(null)
+  const [map, setMap] = useState<any>(null)
+  const [isKakaoMapLoaded, setIsKakaoMapLoaded] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [vendingMachines, setVendingMachines] = useState<VendingMachine[]>([])
+  const [markers, setMarkers] = useState<any[]>([])
+  const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false)
+  const [selectedVendingMachine, setSelectedVendingMachine] = useState<VendingMachine | null>(null)
+  const scriptLoadedRef = useRef(false)
+  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null)
+
+  const initializeMap = () => {
+    if (!mapRef.current || !window.kakao?.maps) return
+
+    const options = {
+      center: new window.kakao.maps.LatLng(37.4979, 126.0375),
+      level: 3,
+    }
+
+    const kakaoMap = new window.kakao.maps.Map(mapRef.current, options)
+    setMap(kakaoMap)
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          const moveLatLng = new window.kakao.maps.LatLng(latitude, longitude)
+
+          kakaoMap.setCenter(moveLatLng)
+          setCurrentLocation({ lat: latitude, lng: longitude })
+
+          new window.kakao.maps.Marker({
+            position: moveLatLng,
+            map: kakaoMap,
+          })
+
+          fetchData(latitude, longitude, showBookmarkedOnly)
+        },
+        (error) => {
+          console.error("현재 위치를 가져오는데 실패했습니다:", error)
+          setCurrentLocation({ lat: 37.4979, lng: 127.0375 })
+          fetchData(37.4979, 126.0375, showBookmarkedOnly)
+        },
+      )
+    } else {
+      setCurrentLocation({ lat: 37.4979, lng: 126.0375 })
+      fetchData(37.4979, 126.0375, showBookmarkedOnly)
+    }
+  }
+
+  // ✅ showBookmarkedOnly를 인자로 받음
+  const fetchData = async (lat: number, lng: number, useBookmark: boolean) => {
+    try {
+      if (useBookmark) {
+        const bookmarkedVendingMachines = await fetchBookmarkedVendingMachines(lat, lng)
+        const uniqueVendingMachines = removeDuplicateById(bookmarkedVendingMachines)
+        setVendingMachines(uniqueVendingMachines)
+      } else {
+        const vendingData = await fetchVendingMachines(lat, lng, 20)
+        const uniqueVendingMachines = removeDuplicateById(vendingData)
+        setVendingMachines(uniqueVendingMachines)
+      }
+    } catch (error) {
+      console.error("데이터를 가져오는데 실패했습니다:", error)
+    }
+  }
+
+  const removeDuplicateById = (items: VendingMachine[]): VendingMachine[] => {
+    const uniqueIds = new Set<string>()
+    return items.filter((item) => {
+      if (uniqueIds.has(item.id)) return false
+      uniqueIds.add(item.id)
+      return true
+    })
+  }
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!searchQuery.trim() || !map) return
+
+    const ps = new window.kakao.maps.services.Places()
+
+    const placesSearchCB = (data: any, status: any) => {
+      if (status === window.kakao.maps.services.Status.OK) {
+        const bounds = new window.kakao.maps.LatLngBounds()
+        data.forEach((place: any) => {
+          bounds.extend(new window.kakao.maps.LatLng(place.y, place.x))
+        })
+        map.setBounds(bounds)
+
+        if (data.length > 0) {
+          const lat = parseFloat(data[0].y)
+          const lng = parseFloat(data[0].x)
+          setCurrentLocation({ lat, lng })
+          fetchData(lat, lng, showBookmarkedOnly)
+        }
+      } else {
+        alert("검색 결과가 없습니다.")
+      }
+    }
+
+    ps.keywordSearch(searchQuery, placesSearchCB)
+  }
+
+  const handleFilterChange = (isBookmarkedOnly: boolean) => {
+    setShowBookmarkedOnly(isBookmarkedOnly)
+
+    if (currentLocation) {
+      fetchData(currentLocation.lat, currentLocation.lng, isBookmarkedOnly)
+    }
+  }
+
+  const handleBookmarkClick = () => {
+    const lat = currentLocation?.lat ?? 37.4979
+    const lng = currentLocation?.lng ?? 126.0375
+
+    setShowBookmarkedOnly(true)
+
+    fetchBookmarkedVendingMachines(lat, lng)
+      .then((data) => {
+        const uniqueVendingMachines = removeDuplicateById(data)
+        setVendingMachines(uniqueVendingMachines)
+      })
+      .catch((error) => {
+        console.error("북마크된 빵긋 데이터를 가져오는데 실패했습니다:", error)
+      })
+  }
+
+  const handleVendingMachineBookmarkChange = (isBookmarked: boolean) => {
+    if (selectedVendingMachine) {
+      const updatedVendingMachine = { ...selectedVendingMachine, isBookmarked }
+      setSelectedVendingMachine(updatedVendingMachine)
+
+      const updatedList = vendingMachines.map((vm) =>
+        vm.id === selectedVendingMachine.id ? { ...vm, isBookmarked } : vm,
+      )
+      setVendingMachines(updatedList)
+
+      if (showBookmarkedOnly && !isBookmarked) {
+        const filtered = updatedList.filter((vm) => vm.isBookmarked)
+        setVendingMachines(filtered)
+        setSelectedVendingMachine(null)
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (window.kakao?.maps) {
+      setIsKakaoMapLoaded(true)
+      return
+    }
+
+    if (!scriptLoadedRef.current && !document.getElementById("kakao-maps-sdk")) {
+      scriptLoadedRef.current = true
+
+      const script = document.createElement("script")
+      script.id = "kakao-maps-sdk"
+      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY}&libraries=services&autoload=false`
+      script.async = true
+      script.onload = () => {
+        window.kakao.maps.load(() => {
+          setIsKakaoMapLoaded(true)
+        })
+      }
+      document.head.appendChild(script)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isKakaoMapLoaded && mapRef.current && !map) {
+      initializeMap()
+    }
+  }, [isKakaoMapLoaded, map])
+
+  useEffect(() => {
+    return () => {
+      if (map) {
+        setMap(null)
+      }
+    }
+  }, [map])
+
   return (
-    <main className="pb-20 hide-scrollbar overflow-auto">
-      {/* 상단 헤더 */}
-      <header className="p-4 border-b">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <Image src="/mascot.png" alt="빵긋 마스코트" width={40} height={40} className="mr-2" />
-            <h1 className="text-2xl font-bold">빵긋 홈</h1>
-          </div>
-          {/* 장바구니 api와 연동 해야 됨 */}
-          <div className="relative">
-            <ShoppingCart className="h-6 w-6" />
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              3     
-            </span>   
-          </div>
-        </div>
-      </header>
+    <main className="flex flex-col h-screen relative">
+      <div className="relative flex-1 w-full h-full" style={{ marginBottom: "72px" }}>
+        <div ref={mapRef} className="w-full h-full" />
 
-      {/* 메인 콘텐츠 */}
-      <div className="p-4">
-        <h2 className="text-xl font-semibold mb-4">오늘의 추천 빵집</h2>
+        <CurrentLocationButton map={map} />
 
-        {/* 추천 빵집 카드 */}
-        <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-          <div className="flex items-center mb-3">
-            <div className="w-12 h-12 bg-bread-brown rounded-full flex items-center justify-center text-white mr-3">
-              <Image src="/mascot.png" alt="빵긋 마스코트" width={36} height={36} />
-            </div>
-            <div>
-              <h3 className="font-bold">빵긋빵긋 역삼점</h3>
-              <div className="flex text-primary-custom">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} fill="#FF9671" className="w-4 h-4" />
-                ))}
-              </div>
-            </div>
-          </div>
-          <p className="text-sm text-gray-600 mb-3">
-            역삼역 3번 출구에서 도보 5분 거리에 위치한 프리미엄 베이커리입니다. 매일 아침 신선한 빵을 구워 판매합니다.
-          </p>
-          <button className="w-full bg-primary-custom text-white py-2 rounded-md">주문하기</button>
-        </div>
-
-        {/* 인기 메뉴 섹션 */}
-        <h2 className="text-xl font-semibold mb-4">인기 메뉴</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="bg-white rounded-lg shadow p-3">
-              <div className="w-full h-32 bg-gray-200 rounded-md mb-2"></div>
-              <h3 className="font-medium">소보로 빵</h3>
-              <p className="text-sm text-gray-500">3,200원</p>
-              <div className="flex text-primary-custom mt-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} fill="#FF9671" className="w-3 h-3" />
-                ))}
-              </div>
-            </div>
+        {map &&
+          vendingMachines.map((vm) => (
+            <CustomMarker
+              key={`marker-${vm.id}-${vm.latitude}-${vm.longitude}`}
+              map={map}
+              position={{ lat: vm.latitude, lng: vm.longitude }}
+              title={vm.name}
+              isBookmarked={vm.isBookmarked}
+              availableCount={vm.availableCount}
+              onClick={() => setSelectedVendingMachine(vm)}
+            />
           ))}
+      </div>
+
+      <div className="absolute top-0 left-0 right-0 z-10 p-4 bg-transparent flex justify-center">
+        <div className="w-full max-w-[800px]">
+          <form onSubmit={handleSearch}>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="주소를 입력해주세요. 예) 역삼동"
+                className="w-full p-2 pl-10 border rounded-full bg-white bg-opacity-90 shadow-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <svg
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </form>
+
+          <div className="flex justify-between mt-2">
+            <FilterButtons onFilterChange={handleFilterChange} onBookmarkClick={handleBookmarkClick} />
+          </div>
         </div>
       </div>
+
+      {selectedVendingMachine && (
+        <MarkerDetail
+          vendingMachine={selectedVendingMachine}
+          onClose={() => setSelectedVendingMachine(null)}
+          onBookmarkChange={handleVendingMachineBookmarkChange}
+        />
+      )}
+
+      <BottomNavTab />
     </main>
   )
 }
-
