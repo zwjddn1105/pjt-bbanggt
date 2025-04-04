@@ -60,7 +60,8 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository {
                 Projections.constructor(
                         ChatSummary.class,
                         chat.id,
-                        chat.content
+                        chat.content,
+                        chat.senderId
                 )).from(chat)
                 .where(chat.id.in(lastChatIds))
                 .fetch();
