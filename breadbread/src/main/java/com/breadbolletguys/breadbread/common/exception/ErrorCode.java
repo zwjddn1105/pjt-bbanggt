@@ -29,6 +29,7 @@ public enum ErrorCode {
     NOT_SOCIAL_USER(2003, "소셜 로그인 유저가 아닙니다."),
     NOT_NONE_SOCIAL_USER(2004, "일반 로그인 유저가 아닙니다."),
     NOT_ADMIN_USER(2005, "관리자 권한이 없습니다."),
+    UNABLE_TO_USE_TICKET(2006, "티켓 잔고가 없어 사용이 불가합니다"),
 
     UNAUTHORIZED_ACCESS(3000, "접근할 수 없는 리소스입니다."),
     INVALID_REFRESH_TOKEN(3001, "유효하지 않은 Refresh Token입니다."),
@@ -43,6 +44,7 @@ public enum ErrorCode {
     MINUS_REVIEW_ERROR(5001, "리뷰에 음수가 들어올 수 없습니다."),
     CURRENCY_CODE_NOT_EXIST_ERROR(5002, "해당 유형의 통화는 사용할 수 없습니다."),
     BANK_CODE_NOT_EXIST_ERROR(5003, "해당 유형의 은행은 존재하지 않습니다."),
+    NOT_OWNED_ACCOUNT_ERROR(5004, "요청한 계좌는 사용자 소유가 아닙니다."),
 
     SCORE_RANGE_ERROR(6000, "리뷰 점수의 범위는 1-5점입니다."),
 

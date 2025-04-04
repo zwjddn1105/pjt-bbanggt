@@ -35,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderController {
     private final OrderService orderService;
-    private final S3Service s3Service;
 
     @PostMapping(value = "/createOrder/{spaceId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -45,8 +44,7 @@ public class OrderController {
             @RequestPart("orderRequests") List<OrderRequest> orderRequests,
             @RequestPart("image") MultipartFile image
     ) {
-        String imageUrl = s3Service.uploadFile(image);
-        orderService.save(user, spaceId, orderRequests, imageUrl);
+        orderService.save(user, spaceId, orderRequests, image);
         return ResponseEntity.ok().build();
     }
 

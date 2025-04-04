@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.breadbolletguys.breadbread.account.domain.Account;
 import com.breadbolletguys.breadbread.account.domain.repository.AccountRepository;
@@ -17,6 +18,7 @@ import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 import com.breadbolletguys.breadbread.common.exception.NotFoundException;
+import com.breadbolletguys.breadbread.image.application.S3Service;
 import com.breadbolletguys.breadbread.order.domain.BreadType;
 import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.ProductState;
@@ -58,6 +60,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final SsafyTransferService ssafyTransferService;
     private final TransactionService transactionService;
+    private final S3Service s3Service;
 
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersByBuyerId(User user) {
@@ -80,11 +83,12 @@ public class OrderService {
     }
 
     @Transactional
-    public void save(User user, Long spaceId, List<OrderRequest> orderRequests, String imageUrl) {
+    public void save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
         Long bakeryId = bakeryRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.BAKERY_NOT_FOUND))
                 .getId();
-
+        user.useTickets();
+        String imageUrl = s3Service.uploadFile(image);
         if (orderRequests.size() == 1) {
             saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), imageUrl);
         } else {
@@ -112,7 +116,8 @@ public class OrderService {
         );
         ssafyTransferService.accountTransfer(accountTransferRequest);
         String sellerAccount = sellerAccount(orderId);
-        transactionService.recordTransaction(orderId,
+        transactionService.recordTransaction(
+                orderId,
                 accountNo,
                 adminAccount,
                 (long) discountPrice,
@@ -198,6 +203,35 @@ public class OrderService {
                     TransactionType.BREAD_PURCHASE,
                     TransactionStatus.SETTLED);
         }
+    }
+
+    public void payForTicket(User user, String accountNo) {
+        Account account = accountRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+        if (!accountNo.equals(account.getAccountNo())) {
+            throw new BadRequestException(ErrorCode.NOT_OWNED_ACCOUNT_ERROR);
+        }
+
+        log.info("Account : {}", account.getAccountNo());
+        AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
+                user.getUserKey(),
+                adminAccount,
+                "입금",
+                1L,
+                account.getAccountNo(),
+                "송금"
+        );
+        ssafyTransferService.accountTransfer(accountTransferRequest);
+        user.purchaseTicket();
+        transactionService.recordTransaction(
+                null,
+                account.getAccountNo(),
+                adminAccount,
+                100L,
+                TransactionType.TICKET_PURCHASE,
+                TransactionStatus.PURCHASE
+        );
     }
 
     private int getWidth(List<Space> spaces) {
