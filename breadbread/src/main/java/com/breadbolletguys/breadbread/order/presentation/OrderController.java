@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
-import com.breadbolletguys.breadbread.image.application.S3Service;
 import com.breadbolletguys.breadbread.order.application.OrderService;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.request.PayRequest;
@@ -74,6 +73,15 @@ public class OrderController {
             @PathVariable("orderId") Long orderId
     ) {
         orderService.refundOrder(user, orderId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderId}/pickup")
+    public ResponseEntity<Void> pickupOrder(
+            @AuthUser User user,
+            @PathVariable("orderId") Long orderId
+    ) {
+        orderService.pickupOrder(user, orderId);
         return ResponseEntity.ok().build();
     }
 

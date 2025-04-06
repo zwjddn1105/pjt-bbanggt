@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderResponse {
-    private Long id;
+    private Long orderId;
     private String address;
     private String bakeryName;
     private int price;
@@ -21,4 +21,10 @@ public class OrderResponse {
     private String image;
     private ProductState productState;
     private BreadType breadType;
+    private Long bakeryId;
+    private Long vendingMachineId;
+    private Double latitude;
+    private Double longitude;
+    private String vendingMachineName;
+    private int slotNumber;
 }
