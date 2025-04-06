@@ -1,5 +1,7 @@
 package com.breadbolletguys.breadbread.bakery.presentation;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +43,12 @@ public class BakeryController {
         return ResponseEntity.ok(bakeryService.findByBakeryId(user, bakeryId));
     }
 
+    @GetMapping("/bookmark")
+    @Operation(description = "사용자가 좋아요를 누른 빵집 리스트 반환합니다.")
+    public ResponseEntity<List<BakeryResponse>> getBookMarkBakery(@AuthUser User user) {
+        return ResponseEntity.ok(bakeryService.getBookMarkBakery(user));
+    }
+
     @PatchMapping("/{bakeryId}")
     @Operation(description = "빵집 id를 PathVariable 로 받아서 수정한다.")
     public ResponseEntity<BakeryResponse> modifyBakery(@AuthUser User user,
@@ -64,6 +72,6 @@ public class BakeryController {
     public ResponseEntity<Void> deleteBookmark(@AuthUser User user,
                                                @PathVariable("bakeryId") Long bakeryId) {
         bakeryService.removeBookmark(user, bakeryId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

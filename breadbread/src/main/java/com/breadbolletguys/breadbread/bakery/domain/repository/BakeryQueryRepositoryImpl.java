@@ -1,5 +1,7 @@
 package com.breadbolletguys.breadbread.bakery.domain.repository;
 
+import java.util.Collections;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
@@ -79,4 +81,28 @@ public class BakeryQueryRepositoryImpl implements BakeryQueryRepository {
                 .where(qBakery.id.eq(bakeryId))
                 .execute();
     }
+
+    @Override
+    public List<BakeryResponse> findBakeryBaseInfos(List<Long> bakeryIds) {
+        if (bakeryIds == null || bakeryIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        QBakery qBakery = QBakery.bakery;
+
+        return jpaQueryFactory
+                .select(Projections.constructor(
+                        BakeryResponse.class,
+                        qBakery.id,
+                        qBakery.name,
+                        qBakery.homepageUrl,
+                        qBakery.address,
+                        qBakery.phone,
+                        Expressions.constant(true)  // 북마크된 항목이므로 true 고정
+                ))
+                .from(qBakery)
+                .where(qBakery.id.in(bakeryIds))  // <--- 여기서 IN 사용
+                .fetch();
+    }
+
 }

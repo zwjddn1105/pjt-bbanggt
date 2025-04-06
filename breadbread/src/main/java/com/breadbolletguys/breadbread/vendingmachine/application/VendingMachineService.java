@@ -116,6 +116,7 @@ public class VendingMachineService {
                 boolean isMark = bookmarkRepository.existsByUserIdAndBakeryId(user.getId(), order.getBakeryId());
                 return new OrderSummaryResponse(
                         order.getId(),
+                        bakery.getId(),
                         bakery.getName(),
                         order.getBreadType(),
                         isMark,

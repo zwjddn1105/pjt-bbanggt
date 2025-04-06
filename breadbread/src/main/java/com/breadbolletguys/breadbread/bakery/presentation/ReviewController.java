@@ -57,6 +57,6 @@ public class ReviewController {
             @PathVariable("reviewId") Long reviewId
     ) {
         reviewService.delete(user, bakeryId, reviewId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

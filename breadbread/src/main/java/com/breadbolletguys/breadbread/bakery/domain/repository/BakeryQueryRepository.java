@@ -1,5 +1,7 @@
 package com.breadbolletguys.breadbread.bakery.domain.repository;
 
+import java.util.List;
+
 import com.breadbolletguys.breadbread.bakery.domain.dto.response.BakeryResponse;
 
 public interface BakeryQueryRepository {
@@ -10,4 +12,6 @@ public interface BakeryQueryRepository {
     BakeryResponse findBakeryBaseInfo(Long bakeryId);
 
     void updateAverageScore(Long bakeryId, Integer score);
+
+    List<BakeryResponse> findBakeryBaseInfos(List<Long> bakeryIds);
 }
