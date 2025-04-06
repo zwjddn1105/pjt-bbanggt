@@ -64,7 +64,9 @@ public enum ErrorCode {
     ACCOUNT_NOT_FOUND(11000, "요청 UserID에 해당하는 계좌가 존재하지 않습니다."),
 
     Transaction_NOT_FOUND(12000, "요청 OrderID에 해당하는 거래 내역이 존재하지 않습니다."),
-    REFUND_TIME_EXCEEDED(12001, "환불 시간이 불가능한 상품입니다.");
+    REFUND_TIME_EXCEEDED(12001, "환불 시간이 불가능한 상품입니다."),
+    UNABLE_TO_PICKUP_ORDER(12002, "상품 픽업이 불가합니다."),
+    ALREADY_PICKUP_ORDER(12003, "이미 픽업한 상품입니다.");
 
     private final int code;
     private final String message;

@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.breadbolletguys.breadbread.bakery.domain.QBakery;
-import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.ProductState;
 import com.breadbolletguys.breadbread.order.domain.QOrder;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
@@ -23,6 +22,7 @@ import com.breadbolletguys.breadbread.vendingmachine.domain.QSpace;
 import com.breadbolletguys.breadbread.vendingmachine.domain.QVendingMachine;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -33,44 +33,17 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<OrderResponse> findByVendingMachineId(Long vendingMachineId) {
-        QSpace qSpace = space;
-        QOrder qOrder = order;
-        QBakery qBakery = QBakery.bakery;
-        QVendingMachine qVendingMachine = vendingMachine;
-        return queryFactory
-                .select(Projections.constructor(
-                        OrderResponse.class,
-                        qOrder.id,
-                        qVendingMachine.address,
-                        qBakery.name,
-                        qOrder.price,
-                        Expressions.numberTemplate(
-                                Integer.class,
-                                "CAST({0} * (1 - {1}) AS INTEGER)",
-                                order.price,
-                                order.discount
-                        ),
-                        qOrder.count,
-                        qOrder.image,
-                        qOrder.productState,
-                        qOrder.breadType
-                ))
-                .from(qOrder)
-                .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
-                .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
-                .where(qSpace.vendingMachineId.eq(vendingMachineId)
-                        .and(qOrder.productState.eq(ProductState.AVAILABLE)))
-                .fetch();
-    }
-
-    @Override
     public List<OrderResponse> findByBuyerId(Long userId) {
         QSpace qSpace = space;
         QOrder qOrder = order;
         QBakery qBakery = QBakery.bakery;
         QVendingMachine qVendingMachine = vendingMachine;
         LocalDateTime now = LocalDateTime.now();
+        NumberTemplate<Integer> slotNumberExpr = Expressions.numberTemplate(
+                Integer.class,
+                "({0} * {1}) + {2} + 1",
+                qSpace.height, qVendingMachine.width, qSpace.width
+        );
         return queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
@@ -87,7 +60,13 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.count,
                         qOrder.image,
                         qOrder.productState,
-                        qOrder.breadType
+                        qOrder.breadType,
+                        qBakery.id,
+                        qVendingMachine.id,
+                        qVendingMachine.latitude,
+                        qVendingMachine.longitude,
+                        qVendingMachine.name,
+                        slotNumberExpr
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
@@ -171,6 +150,11 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         QOrder qOrder = order;
         QBakery qBakery = QBakery.bakery;
         QVendingMachine qVendingMachine = vendingMachine;
+        NumberTemplate<Integer> slotNumberExpr = Expressions.numberTemplate(
+                Integer.class,
+                "({0} * {1}) + {2} + 1",
+                qSpace.height, qVendingMachine.width, qSpace.width
+        );
         return queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
@@ -187,7 +171,13 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.count,
                         qOrder.image,
                         qOrder.productState,
-                        qOrder.breadType
+                        qOrder.breadType,
+                        qBakery.id,
+                        qVendingMachine.id,
+                        qVendingMachine.latitude,
+                        qVendingMachine.longitude,
+                        qVendingMachine.name,
+                        slotNumberExpr
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
@@ -197,27 +187,6 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         .and(qOrder.id.eq(id))
                         .and(qOrder.productState.eq(ProductState.AVAILABLE)))
                 .fetchOne();
-    }
-
-    @Override
-    public List<Order> findAllByExpirationDateBefore() {
-        QOrder qOrder = order;
-        LocalDateTime endOfToday = LocalDateTime.now();
-        return queryFactory
-                .selectFrom(qOrder)
-                .where(qOrder.expirationDate.loe(endOfToday)
-                        .and(qOrder.productState.eq(ProductState.AVAILABLE)))
-                .fetch();
-    }
-
-    @Override
-    public List<Order> findAvailableOrdersBySpaceIds(List<Long> spaceIds) {
-        QOrder qOrder = order;
-        return queryFactory
-                .selectFrom(qOrder)
-                .where(qOrder.spaceId.in(spaceIds)
-                        .and(qOrder.productState.eq(ProductState.AVAILABLE)))
-                .fetch();
     }
 
     @Override
@@ -234,11 +203,11 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     @Override
     public List<OrderCountQueryResponse> findAvailableCountsByVendingMachineIds(List<Long> vendingMachineIds) {
         return queryFactory.select(
-                Projections.constructor(
-                        OrderCountQueryResponse.class,
-                        order.count().intValue(),
-                        vendingMachine.id
-                )).from(order)
+                        Projections.constructor(
+                                OrderCountQueryResponse.class,
+                                order.count().intValue(),
+                                vendingMachine.id
+                        )).from(order)
                 .leftJoin(space).on(order.spaceId.eq(space.id))
                 .leftJoin(vendingMachine).on(space.vendingMachineId.eq(space.vendingMachineId))
                 .where(vendingMachine.id.in(vendingMachineIds))

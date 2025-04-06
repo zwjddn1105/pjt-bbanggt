@@ -60,4 +60,9 @@ public class Space {
         this.sellerId = sellerId;
         this.occupied = true;
     }
+
+    public void releaseOccupied() {
+        this.sellerId = null;
+        this.occupied = false;
+    }
 }

@@ -145,7 +145,7 @@ public class OrderService {
             throw new BadRequestException(ErrorCode.UNABLE_TO_REFUND_PRODUCT);
         }
 
-        if (transaction.getTransactionDate().plusHours(1).isBefore(LocalDateTime.now())) {
+        if (order.getProductState().equals(ProductState.FINISHED)) {
             throw new BadRequestException(ErrorCode.REFUND_TIME_EXCEEDED);
         }
 
@@ -167,6 +167,25 @@ public class OrderService {
                 TransactionType.BREAD_PURCHASE,
                 TransactionStatus.REFUND
         );
+    }
+
+    public void pickupOrder(User user, Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
+        Account account = accountRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
+        Transaction transaction = transactionService.findByOrderId(orderId);
+        if (!transaction.getSenderAccount().equals(account.getAccountNo())
+                || order.getProductState().equals(ProductState.AVAILABLE)) {
+            throw new BadRequestException(ErrorCode.UNABLE_TO_PICKUP_ORDER);
+        }
+        if (order.getProductState().equals(ProductState.FINISHED)) {
+            throw new BadRequestException(ErrorCode.ALREADY_PICKUP_ORDER);
+        }
+        order.completePickUp();
+        Space space = spaceRepository.findById(order.getSpaceId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_SPACE));
+        space.releaseOccupied();
     }
 
     public void settleOrder() {

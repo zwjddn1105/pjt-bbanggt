@@ -102,4 +102,8 @@ public class Order extends BaseTimeEntity {
         this.productState = ProductState.AVAILABLE;
     }
 
+    public void completePickUp() {
+        this.productState = ProductState.FINISHED;
+    }
+
 }
