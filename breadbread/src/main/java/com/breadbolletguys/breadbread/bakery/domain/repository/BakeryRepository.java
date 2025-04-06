@@ -1,5 +1,6 @@
 package com.breadbolletguys.breadbread.bakery.domain.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -42,5 +43,9 @@ public class BakeryRepository {
 
     public Optional<Bakery> findByUserId(Long userId) {
         return bakeryJpaRepository.findByUserId(userId);
+    }
+
+    public List<BakeryResponse> findBakeryBaseInfos(List<Long> bakeryIds) {
+        return bakeryQueryRepository.findBakeryBaseInfos(bakeryIds);
     }
 }

@@ -1,6 +1,7 @@
 package com.breadbolletguys.breadbread.bakery.application;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,7 +91,8 @@ public class BakeryService {
     }
 
     @Transactional(readOnly = true)
-    public boolean hasBookmark(User user, Long bakeryId) {
-        return bookmarkRepository.existsByUserIdAndBakeryId(user.getId(), bakeryId);
+    public List<BakeryResponse> getBookMarkBakery(User user) {
+        List<Long> bakeryIds = bookmarkRepository.findBakeryIdsByUserId(user.getId());
+        return bakeryRepository.findBakeryBaseInfos(bakeryIds);
     }
 }
