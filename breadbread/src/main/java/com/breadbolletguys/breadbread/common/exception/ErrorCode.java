@@ -54,6 +54,7 @@ public enum ErrorCode {
     NOT_FOUND_VENDING_MACHINE(8001, "해당 자판기를 찾을 수 없습니다."),
     NOT_FOUND_SPACE(8002, "해당 칸을 찾을 수 없습니다."),
     ALREADY_PURCHASED_SPACE(8003, "이미 구매된 칸입니다."),
+    UNABLE_TO_USE_SPACE(8004, "해당 칸을 이용할 권한이 없습니다."),
 
     FILE_UPLOAD_FAILED(9000, "파일 업로드에 실패했습니다. 다시 시도해 주세요."),
 
