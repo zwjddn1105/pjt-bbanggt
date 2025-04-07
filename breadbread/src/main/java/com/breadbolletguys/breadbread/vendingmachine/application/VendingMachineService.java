@@ -144,14 +144,12 @@ public class VendingMachineService {
         List<SlotSellerResponse> slotSellerResponses = new ArrayList<>();
         for (int i = 0; i < spaces.size(); i++) {
             Space space = spaces.get(i);
+            boolean isMine = space.getSellerId() != null && space.getSellerId().equals(user.getId());
             Optional<Order> orderOpt =
                     orderRepository.findFirstBySpaceIdAndProductStateIn(
                             space.getId(),
                             List.of(ProductState.AVAILABLE, ProductState.SOLD_OUT)
                     );
-            boolean isMine = orderOpt
-                    .map(order -> order.getSellerId().equals(user.getId()))
-                    .orElse(false);
             StackSummaryResponse stackSummaryResponse = orderOpt
                     .map(order -> new StackSummaryResponse(order.getId()))
                     .orElse(null);
