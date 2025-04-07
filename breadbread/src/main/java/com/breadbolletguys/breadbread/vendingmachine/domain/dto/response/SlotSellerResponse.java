@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SlotSellerResponse {
+    private Long spaceId;
     private int slotNumber;
     private StackSummaryResponse stackSummaryResponse;
 }
