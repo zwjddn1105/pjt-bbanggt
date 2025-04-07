@@ -64,4 +64,11 @@ public class OrderRepository {
     public Optional<Order> findBySpaceIdAndProductState(Long spaceId, ProductState productState) {
         return orderJpaRepository.findBySpaceIdAndProductState(spaceId, productState);
     }
+
+    public Optional<Order> findFirstBySpaceIdAndProductStateIn(
+            Long spaceId,
+            List<ProductState> productStates
+    ) {
+        return orderJpaRepository.findFirstBySpaceIdAndProductStateIn(spaceId, productStates);
+    }
 }
