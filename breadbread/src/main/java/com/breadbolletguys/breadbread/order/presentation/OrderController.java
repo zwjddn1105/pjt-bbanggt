@@ -108,6 +108,14 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getMyOrderSoldout(user, pageable));
     }
 
+    @GetMapping("/{vendingMachineId}/seller")
+    public ResponseEntity<List<OrderResponse>> getOrdersBySellerId(
+            @AuthUser User user,
+            @PathVariable("vendingMachineId") Long vendingMachineId
+    ) {
+        return ResponseEntity.ok(orderService.getOrdersBySellerId(user, vendingMachineId));
+    }
+
 
     @PostMapping("/{orderId}/test/pay")
     public ResponseEntity<Void> testOrder(
