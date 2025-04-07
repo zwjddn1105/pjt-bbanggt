@@ -51,6 +51,7 @@ public class SpaceService {
                 .availableCount(availableCount)
                 .build();
 
+        user.useTickets();
         space.buy(user.getId());
         spaceRepository.save(space);
 
