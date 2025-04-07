@@ -31,4 +31,8 @@ public class VendingMachineRepository {
     public List<VendingMachine> findAll() {
         return vendingMachineJpaRepository.findAll();
     }
+
+    public Optional<VendingMachine> findByOrderId(Long orderId) {
+        return vendingMachineJpaRepository.findByOrderId(orderId);
+    }
 }

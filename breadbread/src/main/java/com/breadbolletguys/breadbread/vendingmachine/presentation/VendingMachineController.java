@@ -53,11 +53,7 @@ public class VendingMachineController {
     ) {
         var imageUrls = s3Service.uploadFiles(files);
         var vendingMachine = vendingMachineService.save(jsonRequest, imageUrls);
-        vendingMachineCacheService.save(
-                jsonRequest.latitude(),
-                jsonRequest.longitude(),
-                vendingMachine
-        );
+        vendingMachineCacheService.save(vendingMachine);
 
         return ResponseEntity.created(URI.create("/api/v1/vending-machines/" + vendingMachine.getId())).build();
     }

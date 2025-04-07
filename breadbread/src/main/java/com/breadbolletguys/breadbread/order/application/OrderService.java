@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +37,7 @@ import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.user.domain.repository.UserRepository;
 import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
 import com.breadbolletguys.breadbread.vendingmachine.domain.repository.SpaceRepository;
+import com.breadbolletguys.breadbread.vendingmachine.domain.repository.VendingMachineRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +64,7 @@ public class OrderService {
     private final TransactionService transactionService;
     private final S3Service s3Service;
     private final IpfsService ipfsService;
+    private final VendingMachineRepository vendingMachineRepository;
 
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersByBuyerId(User user) {
@@ -192,6 +193,7 @@ public class OrderService {
         if (order.getProductState().equals(ProductState.FINISHED)) {
             throw new BadRequestException(ErrorCode.ALREADY_PICKUP_ORDER);
         }
+
         order.completePickUp();
         Space space = spaceRepository.findById(order.getSpaceId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_SPACE));
