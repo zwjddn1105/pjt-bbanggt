@@ -18,4 +18,6 @@ public interface OrderJpaRepository extends JpaRepository<Order, Long> {
     List<Order> findAllByIdIn(List<Long> ids);
 
     Optional<Order> findBySpaceIdAndProductState(Long spaceId, ProductState productState);
+
+    Optional<Order> findFirstBySpaceIdAndProductStateIn(Long spaceId, List<ProductState> productStates);
 }

@@ -145,7 +145,10 @@ public class VendingMachineService {
         for (int i = 0; i < spaces.size(); i++) {
             Space space = spaces.get(i);
             Optional<Order> orderOpt =
-                    orderRepository.findBySpaceIdAndProductState(space.getId(), ProductState.AVAILABLE);
+                    orderRepository.findFirstBySpaceIdAndProductStateIn(
+                            space.getId(),
+                            List.of(ProductState.AVAILABLE, ProductState.SOLD_OUT)
+                    );
 
             StackSummaryResponse stackSummaryResponse = orderOpt.map(order -> {
                 boolean isMine = false;
