@@ -76,6 +76,24 @@ public class VendingMachineCacheService {
         geoOperations.add(VENDING_MACHINE_KEY, point, jsonUtil.convertToJson(vendingMachineRedisEntity));
     }
 
+    public void deleteBySpaceId(Long spaceId) {
+        VendingMachine vendingMachine = vendingMachineRepository.findBySpaceId(spaceId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.NOT_FOUND_VENDING_MACHINE));
+
+        int remainSpaceCount = spaceRepository.countNotOccupiedSpaceByVendingMachineId(vendingMachine.getId());
+        int availableCount = orderRepository.countAvailableOrderByVendingMachineId(vendingMachine.getId());
+
+        var vendingMachineDeleteRedisEntity = VendingMachineRedisEntity.builder()
+                .id(vendingMachine.getId().toString())
+                .address(vendingMachine.getAddress())
+                .name(vendingMachine.getName())
+                .remainSpaceCount(remainSpaceCount)
+                .availableCount(availableCount)
+                .build();
+
+        geoOperations.remove(VENDING_MACHINE_KEY, jsonUtil.convertToJson(vendingMachineDeleteRedisEntity));
+    }
+
     public void delete(VendingMachineRedisEntity vendingMachineRedisEntity) {
         geoOperations.remove(VENDING_MACHINE_KEY, jsonUtil.convertToJson(vendingMachineRedisEntity));
     }
