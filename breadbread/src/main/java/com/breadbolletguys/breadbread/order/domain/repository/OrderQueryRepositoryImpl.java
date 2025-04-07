@@ -22,7 +22,9 @@ import com.breadbolletguys.breadbread.transaction.domain.QTransaction;
 import com.breadbolletguys.breadbread.transaction.domain.TransactionStatus;
 import com.breadbolletguys.breadbread.vendingmachine.domain.QSpace;
 import com.breadbolletguys.breadbread.vendingmachine.domain.QVendingMachine;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -92,12 +94,17 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         QOrder qOrder = order;
         QBakery qBakery = QBakery.bakery;
         QVendingMachine qVendingMachine = vendingMachine;
+        QTransaction qTransaction = QTransaction.transaction;
         LocalDateTime now = LocalDateTime.now();
         NumberTemplate<Integer> slotNumberExpr = Expressions.numberTemplate(
                 Integer.class,
                 "({0} * {1}) + {2} + 1",
                 qSpace.height, qVendingMachine.width, qSpace.width
         );
+        Expression<LocalDateTime> paymentDateExpr = new CaseBuilder()
+                .when(qOrder.productState.eq(ProductState.SOLD_OUT))
+                .then(qTransaction.transactionDate)
+                .otherwise((LocalDateTime) null);
         return queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
@@ -120,19 +127,17 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qVendingMachine.latitude,
                         qVendingMachine.longitude,
                         qVendingMachine.name,
-                        slotNumberExpr
+                        slotNumberExpr,
+                        paymentDateExpr
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
                 .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
                 .where(qVendingMachine.id.eq(vendingMachineId)
-                                .and(
-                                        qOrder.sellerId.eq(userId)
-                                                .and(qOrder.productState.eq(ProductState.AVAILABLE)
-                                                        .or(qOrder.productState.eq(ProductState.SOLD_OUT)))
-                                )
-                        )
+                        .and(qOrder.sellerId.eq(userId))
+                        .and(qOrder.productState.in(ProductState.AVAILABLE, ProductState.SOLD_OUT))
+                )
                 .fetch();
     }
 
