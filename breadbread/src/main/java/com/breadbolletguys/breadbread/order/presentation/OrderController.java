@@ -48,12 +48,12 @@ public class OrderController {
     }
 
 
-    @GetMapping("/vendor/{vendingMachineId}/{id}")
+    @GetMapping("/vendor/{vendingMachineId}/{orderId}")
     public ResponseEntity<OrderResponse> getOrdersByIdAndVendingMachineId(
-            @PathVariable("id") Long id,
+            @PathVariable("orderId") Long orderId,
             @PathVariable("vendingMachineId") Long vendingMachineId
     ) {
-        return ResponseEntity.ok(orderService.getOrdersByIdAndVendingMachineId(id, vendingMachineId));
+        return ResponseEntity.ok(orderService.getOrdersByIdAndVendingMachineId(orderId, vendingMachineId));
     }
 
 

@@ -29,8 +29,8 @@ public class OrderRepository {
         return orderQueryRepository.findBySellerId(userId, vendingMachineId);
     }
 
-    public OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId) {
-        return orderQueryRepository.findByIdAndVendingMachineId(id, vendingMachineId);
+    public OrderResponse findByIdAndVendingMachineId(Long orderId, Long vendingMachineId) {
+        return orderQueryRepository.findByIdAndVendingMachineId(orderId, vendingMachineId);
     }
 
     public Page<OrderStackResponse> findStocksBySellerId(Long userId, Pageable pageable) {

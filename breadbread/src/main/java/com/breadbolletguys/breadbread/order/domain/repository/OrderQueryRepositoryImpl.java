@@ -203,16 +203,18 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     }
 
     @Override
-    public OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId) {
-        QSpace qSpace = space;
-        QOrder qOrder = order;
+    public OrderResponse findByIdAndVendingMachineId(Long orderId, Long vendingMachineId) {
+        QSpace qSpace = QSpace.space;
+        QOrder qOrder = QOrder.order;
         QBakery qBakery = QBakery.bakery;
-        QVendingMachine qVendingMachine = vendingMachine;
+        QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
+
         NumberTemplate<Integer> slotNumberExpr = Expressions.numberTemplate(
                 Integer.class,
                 "({0} * {1}) + {2} + 1",
                 qSpace.height, qVendingMachine.width, qSpace.width
         );
+
         return queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
@@ -223,8 +225,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         Expressions.numberTemplate(
                                 Integer.class,
                                 "CAST({0} * (1 - {1}) AS INTEGER)",
-                                order.price,
-                                order.discount
+                                qOrder.price,
+                                qOrder.discount
                         ),
                         qOrder.count,
                         qOrder.image,
@@ -239,11 +241,13 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
-                .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
-                .where(qSpace.vendingMachineId.eq(vendingMachineId)
-                        .and(qOrder.id.eq(id))
-                        .and(qOrder.productState.eq(ProductState.AVAILABLE)))
+                .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
+                .where(
+                        qOrder.id.eq(orderId),
+                        qVendingMachine.id.eq(vendingMachineId),
+                        qOrder.productState.eq(ProductState.AVAILABLE)
+                )
                 .fetchOne();
     }
 

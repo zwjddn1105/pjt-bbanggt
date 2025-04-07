@@ -20,7 +20,7 @@ public interface OrderQueryRepository {
 
     Page<OrderStackResponse> findSoldoutBySellerId(Long userId, Pageable pageable);
 
-    OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId);
+    OrderResponse findByIdAndVendingMachineId(Long orderId, Long vendingMachineId);
 
     Integer countAvailableOrderByVendingMachineId(Long vendingMachineId);
 
