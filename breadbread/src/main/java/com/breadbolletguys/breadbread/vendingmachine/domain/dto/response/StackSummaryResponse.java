@@ -9,5 +9,4 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class StackSummaryResponse {
     private Long orderId;
-    private boolean isMine;
 }
