@@ -23,10 +23,12 @@ import com.breadbolletguys.breadbread.image.application.S3Service;
 import com.breadbolletguys.breadbread.order.domain.BreadType;
 import com.breadbolletguys.breadbread.order.domain.Order;
 import com.breadbolletguys.breadbread.order.domain.ProductState;
+import com.breadbolletguys.breadbread.order.domain.dto.request.IamportPayRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.order.domain.repository.OrderRepository;
+import com.breadbolletguys.breadbread.order.infrasture.PaymentValidator;
 import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountTransferRequest;
 import com.breadbolletguys.breadbread.ssafybank.transfer.service.SsafyTransferService;
 import com.breadbolletguys.breadbread.transaction.application.TransactionService;
@@ -65,6 +67,7 @@ public class OrderService {
     private final S3Service s3Service;
     private final IpfsService ipfsService;
     private final VendingMachineRepository vendingMachineRepository;
+    private final PaymentValidator paymentValidator;
 
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersByBuyerId(User user) {
@@ -110,6 +113,7 @@ public class OrderService {
         }
     }
 
+
     public void payForOrder(User user, Long orderId, String accountNo) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
@@ -133,6 +137,37 @@ public class OrderService {
         transactionService.recordTransaction(
                 orderId,
                 accountNo,
+                adminAccount,
+                (long) discountPrice,
+                TransactionType.BREAD_PURCHASE,
+                TransactionStatus.PURCHASE
+        );
+    }
+
+    public void payOrderWithIamport(User user, Long orderId, IamportPayRequest iamportPayRequest) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (!order.getProductState().equals(ProductState.AVAILABLE)) {
+            throw new BadRequestException(ErrorCode.FORBIDDEN_ORDER_ACCESS);
+        }
+        paymentValidator.validatePayment(orderId, iamportPayRequest.getImpUid());
+        order.completePurchase(user.getId());
+        int discountPrice = (int) (order.getPrice() * (1.0 - order.getDiscount()));
+
+        AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
+                user.getUserKey(),
+                adminAccount,
+                "입금",
+                discountPrice / 100L,
+                iamportPayRequest.getAccount(),
+                "송금"
+        );
+        ssafyTransferService.accountTransfer(accountTransferRequest);
+        String sellerAccount = sellerAccount(orderId);
+        transactionService.recordTransaction(
+                orderId,
+                iamportPayRequest.getAccount(),
                 adminAccount,
                 (long) discountPrice,
                 TransactionType.BREAD_PURCHASE,
@@ -331,79 +366,6 @@ public class OrderService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
         return account.getAccountNo();
     }
-
-
-    public void testOrder(Long orderId, String accountNo) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
-
-        if (!order.getProductState().equals(ProductState.AVAILABLE)) {
-            throw new BadRequestException(ErrorCode.FORBIDDEN_ORDER_ACCESS);
-        }
-
-        User user = userRepository.findById(1L)
-                        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-        order.completePurchase(user.getId());
-        int discountPrice = (int) (order.getPrice() * (1.0 - order.getDiscount()));
-        AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
-                user.getUserKey(),
-                adminAccount,
-                "입금",
-                discountPrice / 100L,
-                accountNo,
-                "송금"
-        );
-        ssafyTransferService.accountTransfer(accountTransferRequest);
-       // String sellerAccount = sellerAccount(orderId);
-        transactionService.recordTransaction(orderId,
-                accountNo,
-                adminAccount,
-                (long) discountPrice,
-                TransactionType.BREAD_PURCHASE,
-                TransactionStatus.PURCHASE
-        );
-    }
-
-    public void testRefund(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-        Transaction transaction = transactionService.findByOrderId(orderId);
-        Account account = accountRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
-        //String sellerAccount = sellerAccount(orderId);
-        if (!account.getAccountNo().equals(transaction.getSenderAccount())
-            //    || !sellerAccount.equals(transaction.getReceiverAccount())
-        ) {
-            throw new BadRequestException(ErrorCode.UNABLE_TO_REFUND_PRODUCT);
-        }
-
-        if (transaction.getTransactionDate().plusHours(1).isBefore(LocalDateTime.now())) {
-            throw new BadRequestException(ErrorCode.REFUND_TIME_EXCEEDED);
-        }
-
-        AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
-                adminKey,
-                transaction.getSenderAccount(),
-                "환불 입금",
-                transaction.getTransactionBalance() / 100,
-                transaction.getReceiverAccount(),
-                "환불 송금"
-        );
-        ssafyTransferService.accountTransfer(accountTransferRequest);
-        order.cancelPurchase();
-        transactionService.recordTransaction(
-                orderId,
-                transaction.getSenderAccount(),
-                adminAccount,
-                transaction.getTransactionBalance(),
-                TransactionType.BREAD_PURCHASE,
-                TransactionStatus.REFUND
-        );
-    }
-
-
 //    @Scheduled(cron = "0 10 10 * * *")
 //    @Transactional
 //    public void expireOutdatedOrders() {

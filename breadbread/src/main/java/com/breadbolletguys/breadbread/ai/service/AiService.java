@@ -2,8 +2,7 @@ package com.breadbolletguys.breadbread.ai.service;
 
 import java.io.IOException;
 
-import com.breadbolletguys.breadbread.ai.controller.response.BadBreadResponse;
-import com.breadbolletguys.breadbread.ai.controller.response.BreadClassificationResponse;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -12,6 +11,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.breadbolletguys.breadbread.ai.controller.response.BadBreadResponse;
+import com.breadbolletguys.breadbread.ai.controller.response.BreadClassificationResponse;
 
 import lombok.NoArgsConstructor;
 

@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
 import com.breadbolletguys.breadbread.order.application.OrderService;
+import com.breadbolletguys.breadbread.order.domain.dto.request.IamportPayRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.request.PayRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
@@ -66,6 +67,16 @@ public class OrderController {
             @RequestBody PayRequest payRequest
     ) {
         orderService.payForOrder(user, orderId, payRequest.getAccountNo());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{order}/pay/iamport")
+    public ResponseEntity<Void> payOrderWithIamport(
+            @AuthUser User user,
+            @PathVariable("orderId") Long orderId,
+            @RequestBody IamportPayRequest iamportPayRequest
+    ) {
+        orderService.payOrderWithIamport(user, orderId, iamportPayRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -120,21 +131,4 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersBySellerId(user, vendingMachineId));
     }
 
-
-    @PostMapping("/{orderId}/test/pay")
-    public ResponseEntity<Void> testOrder(
-            @PathVariable("orderId") Long orderId,
-            @RequestBody PayRequest payRequest
-    ) {
-        orderService.testOrder(orderId, payRequest.getAccountNo());
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/{orderId}/test/refund")
-    public ResponseEntity<Void> testRefund(
-            @PathVariable("orderId") Long orderId
-    ) {
-        orderService.testRefund(orderId);
-        return ResponseEntity.ok().build();
-    }
 }
