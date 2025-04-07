@@ -55,11 +55,7 @@ public class SpaceService {
         spaceRepository.save(space);
 
         vendingMachineCacheService.delete(vendingMachineDeleteRedisEntity);
-        vendingMachineCacheService.save(
-                vendingMachine.getLatitude(),
-                vendingMachine.getLongitude(),
-                vendingMachine
-        );
+        vendingMachineCacheService.save(vendingMachine);
 
         // TODO: 계좌 이체 Seller -> Admin 계좌로
     }

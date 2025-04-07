@@ -24,6 +24,7 @@ import com.breadbolletguys.breadbread.order.domain.dto.request.PayRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.user.domain.User;
+import com.breadbolletguys.breadbread.vendingmachine.application.VendingMachineCacheService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OrderController {
     private final OrderService orderService;
+    private final VendingMachineCacheService vendingMachineCacheService;
 
     @PostMapping(value = "/createOrder/{spaceId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -81,7 +83,9 @@ public class OrderController {
             @AuthUser User user,
             @PathVariable("orderId") Long orderId
     ) {
+        vendingMachineCacheService.deleteByOrderId(orderId);
         orderService.pickupOrder(user, orderId);
+        vendingMachineCacheService.save(orderId);
         return ResponseEntity.ok().build();
     }
 

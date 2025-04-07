@@ -14,6 +14,8 @@ import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.GeoOperations;
 import org.springframework.stereotype.Service;
 
+import com.breadbolletguys.breadbread.common.exception.BadRequestException;
+import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 import com.breadbolletguys.breadbread.common.util.JsonUtil;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.repository.OrderRepository;
@@ -41,12 +43,25 @@ public class VendingMachineCacheService {
     private final OrderRepository orderRepository;
     private final JsonUtil jsonUtil;
 
-    public void save(
-            Double latitude,
-            Double longitude,
-            VendingMachine vendingMachine
-    ) {
-        Point point = new Point(longitude, latitude);
+    public void deleteByOrderId(Long orderId) {
+        VendingMachine vendingMachine = vendingMachineRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.NOT_FOUND_VENDING_MACHINE));
+        int remainSpaceCount = spaceRepository.countNotOccupiedSpaceByVendingMachineId(vendingMachine.getId());
+        int availableCount = orderRepository.countAvailableOrderByVendingMachineId(vendingMachine.getId());
+
+        var vendingMachineDeleteRedisEntity = VendingMachineRedisEntity.builder()
+                .id(vendingMachine.getId().toString())
+                .address(vendingMachine.getAddress())
+                .name(vendingMachine.getName())
+                .remainSpaceCount(remainSpaceCount)
+                .availableCount(availableCount)
+                .build();
+
+        geoOperations.remove(VENDING_MACHINE_KEY, jsonUtil.convertToJson(vendingMachineDeleteRedisEntity));
+    }
+
+    public void save(VendingMachine vendingMachine) {
+        Point point = new Point(vendingMachine.getLongitude(), vendingMachine.getLatitude());
         int remainSpaceCount = spaceRepository.countNotOccupiedSpaceByVendingMachineId(vendingMachine.getId());
         int availableCount = orderRepository.countAvailableOrderByVendingMachineId(vendingMachine.getId());
 
@@ -63,6 +78,25 @@ public class VendingMachineCacheService {
 
     public void delete(VendingMachineRedisEntity vendingMachineRedisEntity) {
         geoOperations.remove(VENDING_MACHINE_KEY, jsonUtil.convertToJson(vendingMachineRedisEntity));
+    }
+
+    public void save(Long orderId) {
+        VendingMachine vendingMachine = vendingMachineRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.NOT_FOUND_VENDING_MACHINE));
+
+        Point point = new Point(vendingMachine.getLongitude(), vendingMachine.getLatitude());
+        int remainSpaceCount = spaceRepository.countNotOccupiedSpaceByVendingMachineId(vendingMachine.getId());
+        int availableCount = orderRepository.countAvailableOrderByVendingMachineId(vendingMachine.getId());
+
+        var vendingMachineRedisEntity = VendingMachineRedisEntity.builder()
+                .id(vendingMachine.getId().toString())
+                .address(vendingMachine.getAddress())
+                .name(vendingMachine.getName())
+                .remainSpaceCount(remainSpaceCount)
+                .availableCount(availableCount)
+                .build();
+
+        geoOperations.add(VENDING_MACHINE_KEY, point, jsonUtil.convertToJson(vendingMachineRedisEntity));
     }
 
     public List<VendingMachineResponse> findNearByVendingMachine(
