@@ -98,11 +98,9 @@ public class OrderService {
                 .getId();
         Space space = spaceRepository.findById(spaceId)
                         .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_SPACE));
-        if (space.isOccupied()) {
-            throw new BadRequestException(ErrorCode.ALREADY_PURCHASED_SPACE);
+        if (space.getSellerId() == null || !space.getSellerId().equals(user.getId())) {
+            throw new BadRequestException(ErrorCode.UNABLE_TO_USE_SPACE);
         }
-        space.buy(user.getId());
-        user.useTickets();
         String imageUrl = s3Service.uploadFile(image);
         //String imageUrl = ipfsService.uploadFile(image);
         if (orderRequests.size() == 1) {
