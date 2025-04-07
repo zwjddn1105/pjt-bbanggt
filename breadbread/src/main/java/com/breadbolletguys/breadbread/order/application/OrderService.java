@@ -173,6 +173,7 @@ public class OrderService {
         );
     }
 
+    @Transactional
     public void pickupOrder(User user, Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
