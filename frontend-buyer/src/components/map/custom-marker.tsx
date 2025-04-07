@@ -90,9 +90,13 @@ export default function CustomMarker({
     container.appendChild(bubble)
     container.appendChild(tail)
     container.appendChild(markerImg)
-
+    
     // 클릭 이벤트 추가
-    container.addEventListener("click", () => {
+    container.addEventListener("click", (e) => {
+      // 이벤트 버블링 방지
+      e.stopPropagation()
+
+      // 원래 클릭 핸들러 호출
       if (onClick) onClick()
     })
 

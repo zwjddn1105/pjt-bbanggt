@@ -69,7 +69,9 @@ export default function Home() {
       fetchData(37.5013925, 127.03958, showBookmarkedOnly)
     }
 
-    // 지도 클릭 이벤트 추가
+    // 지도 클릭 이벤트 리스너 제거
+    // 아래 코드를 완전히 제거했습니다
+    /*
     window.kakao.maps.event.addListener(kakaoMap, "click", (mouseEvent: any) => {
       // 클릭한 위치의 좌표를 얻어옵니다
       const latlng = mouseEvent.latLng
@@ -77,12 +79,12 @@ export default function Home() {
       // 지도 중심을 클릭한 위치로 이동
       kakaoMap.setCenter(latlng)
 
-      // 클릭한 위치 기준으로 자판기 데이터 가져오기
+      // 클릭한 위치 좌표 저장 (API 호출 없이)
       const lat = latlng.getLat()
       const lng = latlng.getLng()
       setCurrentLocation({ lat, lng })
-      fetchData(lat, lng, showBookmarkedOnly)
     })
+    */
   }
 
   // ✅ showBookmarkedOnly를 인자로 받음
@@ -295,6 +297,11 @@ export default function Home() {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
+              {isLoading && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
             </div>
           </form>
 
