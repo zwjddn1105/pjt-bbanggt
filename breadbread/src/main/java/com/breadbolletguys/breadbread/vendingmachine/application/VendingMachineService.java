@@ -149,17 +149,18 @@ public class VendingMachineService {
                             space.getId(),
                             List.of(ProductState.AVAILABLE, ProductState.SOLD_OUT)
                     );
-
-            StackSummaryResponse stackSummaryResponse = orderOpt.map(order -> {
-                boolean isMine = false;
-
-                if (order.getSellerId().equals(user.getId())) {
-                    isMine = true;
-                }
-
-                return new StackSummaryResponse(order.getId(), isMine);
-            }).orElse(null);
-            slotSellerResponses.add(new SlotSellerResponse(space.getId(), i + 1, stackSummaryResponse));
+            boolean isMine = orderOpt
+                    .map(order -> order.getSellerId().equals(user.getId()))
+                    .orElse(false);
+            StackSummaryResponse stackSummaryResponse = orderOpt
+                    .map(order -> new StackSummaryResponse(order.getId()))
+                    .orElse(null);
+            slotSellerResponses.add(
+                    new SlotSellerResponse(space.getId(),
+                            i + 1,
+                            stackSummaryResponse,
+                            isMine)
+            );
         }
 
         return new VendingMachineSellerResponse(
