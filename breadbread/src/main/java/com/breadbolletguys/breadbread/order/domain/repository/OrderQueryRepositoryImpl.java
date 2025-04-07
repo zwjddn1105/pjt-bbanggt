@@ -79,6 +79,56 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     }
 
     @Override
+    public List<OrderResponse> findBySellerId(Long userId, Long vendingMachineId) {
+        QSpace qSpace = space;
+        QOrder qOrder = order;
+        QBakery qBakery = QBakery.bakery;
+        QVendingMachine qVendingMachine = vendingMachine;
+        LocalDateTime now = LocalDateTime.now();
+        NumberTemplate<Integer> slotNumberExpr = Expressions.numberTemplate(
+                Integer.class,
+                "({0} * {1}) + {2} + 1",
+                qSpace.height, qVendingMachine.width, qSpace.width
+        );
+        return queryFactory
+                .select(Projections.constructor(
+                        OrderResponse.class,
+                        qOrder.id,
+                        qVendingMachine.address,
+                        qBakery.name,
+                        qOrder.price,
+                        Expressions.numberTemplate(
+                                Integer.class,
+                                "CAST({0} * (1 - {1}) AS INTEGER)",
+                                order.price,
+                                order.discount
+                        ),
+                        qOrder.count,
+                        qOrder.image,
+                        qOrder.productState,
+                        qOrder.breadType,
+                        qBakery.id,
+                        qVendingMachine.id,
+                        qVendingMachine.latitude,
+                        qVendingMachine.longitude,
+                        qVendingMachine.name,
+                        slotNumberExpr
+                ))
+                .from(qOrder)
+                .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
+                .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
+                .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
+                .where(qVendingMachine.id.eq(vendingMachineId)
+                                .and(
+                                        qOrder.sellerId.eq(userId)
+                                                .and(qOrder.productState.eq(ProductState.AVAILABLE)
+                                                        .or(qOrder.productState.eq(ProductState.SOLD_OUT)))
+                                )
+                        )
+                .fetch();
+    }
+
+    @Override
     public Page<OrderStackResponse> findStocksBySellerId(Long userId, Pageable pageable) {
         QSpace qSpace = space;
         QOrder qOrder = order;

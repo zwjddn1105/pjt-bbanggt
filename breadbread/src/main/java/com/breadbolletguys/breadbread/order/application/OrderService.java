@@ -71,6 +71,11 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
+    public List<OrderResponse> getOrdersBySellerId(User user, Long vendingMachineId) {
+        return orderRepository.findBySellerId(user.getId(), vendingMachineId);
+    }
+
+    @Transactional(readOnly = true)
     public OrderResponse getOrdersByIdAndVendingMachineId(Long id, Long vendingMachineId) {
         return orderRepository.findByIdAndVendingMachineId(id, vendingMachineId);
     }
@@ -397,6 +402,7 @@ public class OrderService {
                 TransactionStatus.REFUND
         );
     }
+
 
 //    @Scheduled(cron = "0 10 10 * * *")
 //    @Transactional

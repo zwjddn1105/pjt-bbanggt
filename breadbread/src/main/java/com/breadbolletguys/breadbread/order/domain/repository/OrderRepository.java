@@ -25,6 +25,10 @@ public class OrderRepository {
         return orderQueryRepository.findByBuyerId(userId);
     }
 
+    public List<OrderResponse> findBySellerId(Long userId, Long vendingMachineId) {
+        return orderQueryRepository.findBySellerId(userId, vendingMachineId);
+    }
+
     public OrderResponse findByIdAndVendingMachineId(Long id, Long vendingMachineId) {
         return orderQueryRepository.findByIdAndVendingMachineId(id, vendingMachineId);
     }

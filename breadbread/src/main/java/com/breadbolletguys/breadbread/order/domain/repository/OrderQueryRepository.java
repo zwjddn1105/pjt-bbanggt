@@ -14,6 +14,8 @@ public interface OrderQueryRepository {
 
     List<OrderResponse> findByBuyerId(Long userId);
 
+    List<OrderResponse> findBySellerId(Long userId, Long vendingMachineId);
+
     Page<OrderStackResponse> findStocksBySellerId(Long userId, Pageable pageable);
 
     Page<OrderStackResponse> findSoldoutBySellerId(Long userId, Pageable pageable);
