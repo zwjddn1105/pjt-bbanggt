@@ -4,6 +4,8 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 import java.io.IOException;
 
+import com.breadbolletguys.breadbread.ai.controller.response.BadBreadResponse;
+import com.breadbolletguys.breadbread.ai.controller.response.BreadClassificationResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,9 +24,16 @@ public class AiController {
     private final AiService aiService;
 
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> getObjects(
+    public ResponseEntity<BreadClassificationResponse> getObjects(
         @RequestParam MultipartFile multipartFile
     ) throws IOException {
         return ResponseEntity.ok(aiService.aiClient(multipartFile));
+    }
+
+    @PostMapping(path = "/2", consumes = MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<BadBreadResponse> badObjects(
+        @RequestParam MultipartFile multipartFile
+    ) throws IOException {
+        return ResponseEntity.ok(aiService.aiClient2(multipartFile));
     }
 }
