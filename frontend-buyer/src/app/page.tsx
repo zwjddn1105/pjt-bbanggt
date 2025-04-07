@@ -71,27 +71,13 @@ export default function Home() {
 
     // 지도 클릭 이벤트 리스너 제거
     // 아래 코드를 완전히 제거했습니다
-    /*
-    window.kakao.maps.event.addListener(kakaoMap, "click", (mouseEvent: any) => {
-      // 클릭한 위치의 좌표를 얻어옵니다
-      const latlng = mouseEvent.latLng
-
-      // 지도 중심을 클릭한 위치로 이동
-      kakaoMap.setCenter(latlng)
-
-      // 클릭한 위치 좌표 저장 (API 호출 없이)
-      const lat = latlng.getLat()
-      const lng = latlng.getLng()
-      setCurrentLocation({ lat, lng })
-    })
-    */
   }
 
   // ✅ showBookmarkedOnly를 인자로 받음
   const fetchData = async (lat: number, lng: number, useBookmark: boolean) => {
     try {
       if (useBookmark) {
-        const bookmarkedVendingMachines = await fetchBookmarkedVendingMachines(lat, lng)
+        const bookmarkedVendingMachines = await fetchBookmarkedVendingMachines(lat, lng, 20) // 명시적으로 20 전달
         const uniqueVendingMachines = removeDuplicateById(bookmarkedVendingMachines)
         setVendingMachines(uniqueVendingMachines)
       } else {
@@ -116,14 +102,20 @@ export default function Home() {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!searchQuery.trim() || !map) return
-
+    if (!map) return
     setIsLoading(true)
+
     try {
       // 현재 지도의 중심 좌표 가져오기
       const center = map.getCenter()
       const lat = center.getLat()
       const lng = center.getLng()
+
+      // 검색어가 비어있는 경우 전체 빵긋 가져오기
+      if (!searchQuery.trim()) {
+        fetchData(lat, lng, showBookmarkedOnly)
+        return
+      }
 
       // 검색어가 있는 경우 해당 검색어를 포함하는 자판기 필터링
       const vendingData = await fetchVendingMachines(lat, lng, 20)
@@ -306,7 +298,9 @@ export default function Home() {
           </form>
 
           <div className="flex justify-between mt-2">
-            <FilterButtons onFilterChange={handleFilterChange} onBookmarkClick={handleBookmarkClick} />
+            <div className="flex gap-2 overflow-x-auto py-2 no-scrollbar">
+              <FilterButtons onFilterChange={handleFilterChange} onBookmarkClick={handleBookmarkClick} />
+            </div>
           </div>
         </div>
       </div>
