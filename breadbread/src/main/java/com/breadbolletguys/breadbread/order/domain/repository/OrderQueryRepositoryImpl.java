@@ -214,7 +214,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 qSpace.height, qVendingMachine.width, qSpace.width
         );
 
-        return queryFactory
+        OrderResponse response = queryFactory
                 .select(Projections.constructor(
                         OrderResponse.class,
                         qOrder.id,
@@ -236,8 +236,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qVendingMachine.latitude,
                         qVendingMachine.longitude,
                         qVendingMachine.name,
-                        slotNumberExpr,
-                        null
+                        slotNumberExpr
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
@@ -249,6 +248,13 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.productState.eq(ProductState.AVAILABLE)
                 )
                 .fetchOne();
+
+        if (response != null) {
+            response.setPaymentDate(null);
+        }
+
+        return response;
+
     }
 
     @Override
