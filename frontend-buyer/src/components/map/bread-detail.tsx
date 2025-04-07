@@ -1,9 +1,16 @@
 "use client"
-import { ArrowLeft, MapPin, CreditCard } from "lucide-react"
+import { ArrowLeft, MapPin, CreditCard, Bookmark } from "lucide-react"
 import type { VendingMachine } from "@/types/vending-machine"
 import type { OrderResponse, BreadType, AccountResponse } from "@/types/api-types"
 import { useEffect, useState } from "react"
-import { fetchOrderDetail, fetchAccountInfo } from "@/services/breadgut-api"
+import {
+  fetchOrderDetail,
+  fetchAccountInfo,
+  addBakeryBookmark,
+  removeBakeryBookmark,
+  fetchBakeryById,
+} from "@/services/breadgut-api"
+import { useRouter } from "next/navigation"
 
 // 빵 타입별 한글 이름 매핑
 const breadTypeNames: Record<BreadType, string> = {
@@ -39,11 +46,18 @@ export default function BreadDetail({
   onClose,
   onBackToVendingMachine,
 }: BreadDetailProps) {
+  // 상태 관리 부분에 동의 체크박스 상태 추가
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [breadDetail, setBreadDetail] = useState<OrderResponse | null>(null)
   const [accountInfo, setAccountInfo] = useState<AccountResponse[]>([])
   const [accountLoading, setAccountLoading] = useState(true)
+  const [agreeToTerms, setAgreeToTerms] = useState(false) // 구매 동의 상태 추가
+  const [paymentLoading, setPaymentLoading] = useState(false) // 결제 로딩 상태 추가
+  const [isBookmarked, setIsBookmarked] = useState(false) // 북마크 상태 추가
+  const [bookmarkLoading, setBookmarkLoading] = useState(false) // 북마크 로딩 상태 추가
+  const [bakeryId, setBakeryId] = useState<number | null>(null) // 빵집 ID 상태 추가
+  const router = useRouter() // Next.js 라우터 사용
 
   // API에서 빵 상세 정보 가져오기
   useEffect(() => {
@@ -52,6 +66,23 @@ export default function BreadDetail({
         setLoading(true)
         const data = await fetchOrderDetail(vendingMachine.id, orderId)
         setBreadDetail(data)
+
+        // 빵집 ID가 breadDetail 객체에 있으면 사용
+        if (data && data.bakeryId) {
+          setBakeryId(data.bakeryId)
+
+          // 빵집 정보 가져오기
+          try {
+            const bakeryData = await fetchBakeryById(data.bakeryId)
+            console.log("빵집 정보:", bakeryData) // 디버깅용 로그
+
+            // 스웨거 문서에 따라 mark 속성 사용
+            setIsBookmarked(bakeryData.mark ?? false)
+          } catch (bakeryErr) {
+            console.error("빵집 정보를 가져오는데 실패했습니다:", bakeryErr)
+          }
+        }
+
         setLoading(false)
       } catch (err) {
         console.error("빵 상세 정보를 가져오는데 실패했습니다:", err)
@@ -204,6 +235,93 @@ export default function BreadDetail({
     }
   }
 
+  // 북마크 토글 함수
+  const handleBookmarkToggle = async () => {
+    if (!bakeryId || bookmarkLoading) return
+
+    try {
+      setBookmarkLoading(true)
+
+      if (isBookmarked) {
+        // 북마크 삭제
+        await removeBakeryBookmark(bakeryId)
+      } else {
+        // 북마크 추가
+        await addBakeryBookmark(bakeryId)
+      }
+
+      // 북마크 상태 토글
+      setIsBookmarked(!isBookmarked)
+      setBookmarkLoading(false)
+    } catch (err) {
+      console.error("북마크 처리 중 오류가 발생했습니다:", err)
+      alert("북마크 처리에 실패했습니다. 다시 시도해주세요.")
+      setBookmarkLoading(false)
+    }
+  }
+
+  // 결제 처리 함수 수정 - 디버깅 로그 추가 및 오류 처리 개선
+  const handlePayment = async () => {
+    if (!agreeToTerms || !breadDetail || accountInfo.length === 0) {
+      console.log("결제 조건 미충족:", { agreeToTerms, breadDetail, accountInfo })
+      return
+    }
+
+    try {
+      setPaymentLoading(true)
+      console.log("결제 시작 - breadDetail:", breadDetail)
+      console.log("결제 시작 - orderId:", breadDetail.orderId)
+
+      // 결제 요청 객체 생성
+      const payRequest = {
+        accountNo: accountInfo[0].accountNo, // 첫 번째 계좌 사용
+      }
+
+      // 토큰 가져오기
+      const token = localStorage.getItem("access_token")
+      if (!token) {
+        throw new Error("로그인이 필요합니다. 토큰이 없습니다.")
+      }
+
+      console.log(`결제 요청 준비: orderId=${breadDetail.orderId}, payRequest=`, payRequest)
+
+      // 환경 변수 이름 수정 (NEXT_PUBLIC_API_BASE_URL -> NEXT_PUBLIC_API_URL)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/order/${breadDetail.orderId}/pay`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Bearer 접두사 확인
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payRequest),
+      })
+
+      console.log("결제 응답 상태:", response.status)
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error("결제 오류 응답:", errorData)
+
+        // 토큰 오류인 경우 특별 처리
+        if (errorData.code === 3002) {
+          throw new Error("인증이 만료되었습니다. 다시 로그인해주세요.")
+        }
+
+        throw new Error(errorData.message || "결제에 실패했습니다")
+      }
+
+      console.log("결제 성공")
+
+      // 결제 성공 시 pickup 페이지로 이동
+      router.push("/pickup")
+    } catch (err) {
+      console.error("결제 처리 중 오류가 발생했습니다:", err)
+      alert(err instanceof Error ? err.message : "결제에 실패했습니다. 다시 시도해주세요.")
+    } finally {
+      setPaymentLoading(false)
+    }
+  }
+
   // 로딩 중 표시
   if (loading) {
     return (
@@ -224,10 +342,6 @@ export default function BreadDetail({
         </button>
       </div>
     )
-  }
-
-  const handlePayment = () => {
-    alert("결제 페이지로 이동합니다.")
   }
 
   return (
@@ -267,7 +381,25 @@ export default function BreadDetail({
 
           {/* 빵 정보 */}
           <div className="p-6 text-center">
-            <h2 className="text-xl font-bold mb-2">{breadData.bakery}</h2>
+            {/* 빵집 이름과 북마크 버튼 */}
+            <div className="flex items-center justify-center mb-2">
+              <h2 className="text-xl font-bold">{breadData.bakery}</h2>
+              <button
+                onClick={handleBookmarkToggle}
+                disabled={bookmarkLoading || !bakeryId}
+                className="ml-2 p-1 focus:outline-none"
+                aria-label={isBookmarked ? "북마크 제거" : "북마크 추가"}
+              >
+                {bookmarkLoading ? (
+                  <div className="w-5 h-5 border-2 border-gray-300 border-t-orange-500 rounded-full animate-spin"></div>
+                ) : (
+                  <Bookmark
+                    className={`w-5 h-5 ${isBookmarked ? "fill-orange-500 text-orange-500" : "text-gray-400"}`}
+                  />
+                )}
+              </button>
+            </div>
+
             <p className="text-gray-700 mb-2">{breadData.name}</p>
             <p className="text-sm text-gray-500 mb-4">
               {breadDetail?.count ? `${breadDetail.count}개 구성` : "1개 구성"}
@@ -314,19 +446,45 @@ export default function BreadDetail({
               </div>
             </div>
 
+            {/* 구매 동의 체크박스 */}
+            <div className="flex items-center mb-6">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreeToTerms}
+                  onChange={(e) => setAgreeToTerms(e.target.checked)}
+                  className="w-5 h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                />
+                <span className="ml-2 text-gray-700">구매하는데 동의합니다</span>
+              </label>
+            </div>
+
             {/* 버튼 영역 - 취소하기와 결제하기 버튼 */}
             <div className="flex gap-3">
               <button
                 onClick={handleBack}
                 className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-lg font-medium"
+                disabled={paymentLoading}
               >
                 취소하기
               </button>
               <button
                 onClick={handlePayment}
-                className="flex-1 py-3 px-4 bg-orange-500 text-white rounded-lg font-medium"
+                disabled={!agreeToTerms || paymentLoading || accountInfo.length === 0}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium ${
+                  agreeToTerms && !paymentLoading && accountInfo.length > 0
+                    ? "bg-orange-500 text-white"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
               >
-                결제하기
+                {paymentLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    <span>결제 중...</span>
+                  </div>
+                ) : (
+                  "결제하기"
+                )}
               </button>
             </div>
           </div>
@@ -335,11 +493,30 @@ export default function BreadDetail({
 
       {/* 하단 버튼 */}
       <div className="sticky bottom-0 bg-white border-t flex justify-between p-4">
-        <button onClick={handleBack} className="px-8 py-3 border border-gray-300 rounded-full text-gray-700">
+        <button
+          onClick={handleBack}
+          className="px-8 py-3 border border-gray-300 rounded-full text-gray-700"
+          disabled={paymentLoading}
+        >
           취소
         </button>
-        <button onClick={handlePayment} className="px-8 py-3 bg-orange-500 text-white rounded-full">
-          결제하기
+        <button
+          onClick={handlePayment}
+          disabled={!agreeToTerms || paymentLoading || accountInfo.length === 0}
+          className={`px-8 py-3 rounded-full ${
+            agreeToTerms && !paymentLoading && accountInfo.length > 0
+              ? "bg-orange-500 text-white"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
+        >
+          {paymentLoading ? (
+            <div className="flex items-center justify-center">
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              <span>결제 중...</span>
+            </div>
+          ) : (
+            "결제하기"
+          )}
         </button>
       </div>
     </div>

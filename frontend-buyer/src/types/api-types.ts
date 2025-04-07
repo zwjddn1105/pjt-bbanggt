@@ -113,6 +113,7 @@ export interface BakeryResponse {
   homepageUrl?: string // 홈페이지 URL(선택)
   address: string // 주소
   phone: string // 전화번호
+  mark?: boolean // 북마크 여부 (스웨거 문서에 따라 mark로 수정)
 }
 
 // ===== 리뷰 관련 타입 =====
@@ -201,6 +202,29 @@ export interface PageReviewResponse {
 // ===== 주문 관련 타입 =====
 
 /**
+ * 주문 응답 인터페이스
+ * 주문 조회 시 반환되는 주문 정보를 포함합니다.
+ */
+export interface OrderResponse {
+  // id 속성은 스웨거에 없으므로 제거합니다
+  orderId: number // 주문 ID
+  address: string // 주소
+  bakeryName: string // 빵집 이름
+  price: number // 원가
+  salePrice: number // 판매가
+  count: number // 수량
+  image: string // 이미지 URL
+  productState: ProductState // 상품 상태
+  breadType: BreadType // 빵 종류
+  bakeryId: number // 빵집 ID (추가됨)
+  vendingMachineId: number // 자판기 ID (추가됨)
+  latitude: number // 위도 (추가됨)
+  longitude: number // 경도 (추가됨)
+  vendingMachineName: string // 자판기 이름 (추가됨)
+  slotNumber: number // 슬롯 번호 (추가됨)
+}
+
+/**
  * 주문 요청 인터페이스
  * 주문 생성 시 필요한 정보를 포함합니다.
  */
@@ -212,19 +236,11 @@ export interface OrderRequest {
 }
 
 /**
- * 주문 응답 인터페이스
- * 주문 조회 시 반환되는 주문 정보를 포함합니다.
+ * 결제 요청 인터페이스
+ * 결제 시 필요한 정보를 포함합니다.
  */
-export interface OrderResponse {
-  id: number // 주문 ID
-  address: string // 주소
-  bakeryName: string // 빵집 이름
-  price: number // 원가
-  salePrice: number // 판매가
-  count: number // 수량
-  image: string // 이미지 URL
-  productState: ProductState // 상품 상태
-  breadType: BreadType // 빵 종류
+export interface PayRequest {
+  accountNo: string // 계좌 번호
 }
 
 /**
@@ -354,10 +370,10 @@ export interface AccountResponse {
  */
 export interface OrderSummaryResponse {
   orderId: number // 주문 ID
-  bakeryName: string // 빵집 이름
+  bakeryName: string // 빵집 이름 (추가됨)
   breadType: BreadType // 빵 종류
   productState: ProductState // 상품 상태
-  mark: boolean // 북마크 여부
+  mark: boolean // 마크 여부
 }
 
 /**

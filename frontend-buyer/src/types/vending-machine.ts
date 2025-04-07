@@ -8,5 +8,6 @@ export interface VendingMachine {
   remainSpaceCount: number
   availableCount: number
   isBookmarked?: boolean
+  bakeryId?: number
 }
 

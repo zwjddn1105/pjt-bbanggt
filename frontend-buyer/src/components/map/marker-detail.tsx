@@ -28,12 +28,21 @@ export default function MarkerDetail({ vendingMachine, onClose, onBookmarkChange
   const handleBookmarkToggle = async () => {
     if (isLoading) return
 
+    // 빵집 ID가 없는 경우 처리
+    if (!vendingMachine.bakeryId) {
+      console.error("빵집 ID가 없습니다.")
+      alert("북마크 처리에 필요한 정보가 없습니다.")
+      return
+    }
+
     setIsLoading(true)
     try {
       if (isBookmarked) {
-        await removeBakeryBookmark(Number(vendingMachine.id))
+        // 북마크 삭제 - 빵집 ID 사용
+        await removeBakeryBookmark(vendingMachine.bakeryId)
       } else {
-        await addBakeryBookmark(Number(vendingMachine.id))
+        // 북마크 추가 - 빵집 ID 사용
+        await addBakeryBookmark(vendingMachine.bakeryId)
       }
 
       const newBookmarkState = !isBookmarked
