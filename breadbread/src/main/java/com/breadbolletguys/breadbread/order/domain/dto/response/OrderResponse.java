@@ -1,12 +1,13 @@
 package com.breadbolletguys.breadbread.order.domain.dto.response;
 
+import java.time.LocalDateTime;
+
 import com.breadbolletguys.breadbread.order.domain.BreadType;
 import com.breadbolletguys.breadbread.order.domain.ProductState;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 
 @Getter
 @AllArgsConstructor
@@ -27,4 +28,5 @@ public class OrderResponse {
     private Double longitude;
     private String vendingMachineName;
     private int slotNumber;
+    private LocalDateTime paymentDate;
 }

@@ -18,6 +18,8 @@ import com.breadbolletguys.breadbread.order.domain.QOrder;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderCountQueryResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
+import com.breadbolletguys.breadbread.transaction.domain.QTransaction;
+import com.breadbolletguys.breadbread.transaction.domain.TransactionStatus;
 import com.breadbolletguys.breadbread.vendingmachine.domain.QSpace;
 import com.breadbolletguys.breadbread.vendingmachine.domain.QVendingMachine;
 import com.querydsl.core.types.Projections;
@@ -38,6 +40,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         QOrder qOrder = order;
         QBakery qBakery = QBakery.bakery;
         QVendingMachine qVendingMachine = vendingMachine;
+        QTransaction qTransaction = QTransaction.transaction;
         LocalDateTime now = LocalDateTime.now();
         NumberTemplate<Integer> slotNumberExpr = Expressions.numberTemplate(
                 Integer.class,
@@ -66,12 +69,17 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qVendingMachine.latitude,
                         qVendingMachine.longitude,
                         qVendingMachine.name,
-                        slotNumberExpr
+                        slotNumberExpr,
+                        qTransaction.transactionDate
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
                 .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
+                .leftJoin(qTransaction).on(
+                        qTransaction.orderId.eq(qOrder.id)
+                                .and(qTransaction.transactionStatus.eq(TransactionStatus.PURCHASE))
+                )
                 .where(qOrder.buyerId.eq(userId)
                         .and(qOrder.productState.eq(ProductState.SOLD_OUT)
                                 .or(qOrder.productState.eq(ProductState.FINISHED))))
