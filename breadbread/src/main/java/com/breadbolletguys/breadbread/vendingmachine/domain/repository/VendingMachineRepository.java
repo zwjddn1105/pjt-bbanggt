@@ -35,4 +35,8 @@ public class VendingMachineRepository {
     public Optional<VendingMachine> findByOrderId(Long orderId) {
         return vendingMachineJpaRepository.findByOrderId(orderId);
     }
+
+    public Optional<VendingMachine> findBySpaceId(Long spaceId) {
+        return vendingMachineJpaRepository.findBySpaceId(spaceId);
+    }
 }

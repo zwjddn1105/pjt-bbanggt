@@ -18,4 +18,14 @@ public interface VendingMachineJpaRepository
         WHERE o.id = :orderId
         """)
     Optional<VendingMachine> findByOrderId(Long orderId);
+
+    @Query("""
+        SELECT vm
+        FROM VendingMachine vm
+        LEFT JOIN Space sp ON vm.id = sp.vendingMachineId
+        WHERE sp.id = :spaceId
+        ORDER BY vm.id
+        LIMIT 1
+        """)
+    Optional<VendingMachine> findBySpaceId(Long spaceId);
 }

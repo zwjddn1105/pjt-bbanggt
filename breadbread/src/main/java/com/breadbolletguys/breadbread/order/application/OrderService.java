@@ -92,7 +92,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
+    public Long save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
         Long bakeryId = bakeryRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.BAKERY_NOT_FOUND))
                 .getId();
@@ -104,9 +104,9 @@ public class OrderService {
         String imageUrl = s3Service.uploadFile(image);
         //String imageUrl = ipfsService.uploadFile(image);
         if (orderRequests.size() == 1) {
-            saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), imageUrl);
+            return saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), imageUrl).getId();
         } else {
-            saveMixedBreadOrder(user, spaceId, bakeryId, orderRequests, imageUrl);
+            return saveMixedBreadOrder(user, spaceId, bakeryId, orderRequests, imageUrl).getId();
         }
     }
 
@@ -247,7 +247,7 @@ public class OrderService {
                 .orElse(0);
     }
 
-    private void saveSingleBreadOrder(
+    private Order saveSingleBreadOrder(
             User user,
             Long spaceId,
             Long bakeryId,
@@ -269,10 +269,10 @@ public class OrderService {
                 .productState(ProductState.AVAILABLE)
                 .breadType(request.getBreadType())
                 .build();
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
 
-    private void saveMixedBreadOrder(
+    private Order saveMixedBreadOrder(
             User user,
             Long spaceId,
             Long bakeryId,
@@ -310,7 +310,7 @@ public class OrderService {
                 .breadType(BreadType.MIXED_BREAD)
                 .build();
 
-        orderRepository.save(mixedOrder);
+        return orderRepository.save(mixedOrder);
     }
 
     private LocalDateTime getExpirationDate() {
