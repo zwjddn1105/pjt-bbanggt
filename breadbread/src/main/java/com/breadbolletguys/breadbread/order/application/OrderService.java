@@ -124,7 +124,7 @@ public class OrderService {
                 user.getUserKey(),
                 adminAccount,
                 "입금",
-                discountPrice * 1L,
+                discountPrice / 100L,
                 accountNo,
                 "송금"
         );
@@ -161,7 +161,7 @@ public class OrderService {
                 adminKey,
                 transaction.getSenderAccount(),
                 "환불 입금",
-                transaction.getTransactionBalance(),
+                transaction.getTransactionBalance() / 100,
                 transaction.getSenderAccount(),
                 "환불 송금"
         );
@@ -221,7 +221,7 @@ public class OrderService {
                     adminKey,
                     sellerAccount,
                     "정산 입금",
-                    transaction.getTransactionBalance(),
+                    transaction.getTransactionBalance() / 100,
                     adminAccount,
                     "정산 송금"
             );
@@ -286,7 +286,7 @@ public class OrderService {
         int totalCount = 0;
 
         for (OrderRequest req : requests) {
-            double rate = req.getDiscount() * 1.0;
+            double rate = req.getDiscount() * 1.0 / 100;
             int originalPrice = req.getPrice();
             int discountPrice = (int) (req.getPrice() * (1 - rate));
             totalOriginalPrice += originalPrice;
@@ -349,7 +349,7 @@ public class OrderService {
                 user.getUserKey(),
                 adminAccount,
                 "입금",
-                discountPrice * 1L,
+                discountPrice / 100L,
                 accountNo,
                 "송금"
         );
@@ -397,7 +397,7 @@ public class OrderService {
                 orderId,
                 transaction.getSenderAccount(),
                 adminAccount,
-                transaction.getTransactionBalance(),
+                transaction.getTransactionBalance() / 100,
                 TransactionType.BREAD_PURCHASE,
                 TransactionStatus.REFUND
         );
