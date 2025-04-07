@@ -19,6 +19,7 @@ import com.breadbolletguys.breadbread.chat.domain.dto.request.ChatRoomCreateRequ
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatInfo;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatQueryResponse;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomBuyerOnlyResponse;
+import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomExistenceResponse;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomQueryResponse;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomSellerOnlyResponse;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatSummary;
@@ -138,5 +139,16 @@ public class ChatRoomService {
         return chatQueryResponse.stream()
                 .map(ChatQueryResponse::chatId)
                 .toList();
+    }
+
+    public ChatRoomExistenceResponse checkChatRoomExist(User user, Long bakeryId) {
+        Bakery bakery = bakeryRepository.findById(bakeryId)
+                .orElseThrow(() -> new BadRequestException(BAKERY_NOT_FOUND));
+
+        Long ownerId = bakery.getUserId();
+        var chatRoom = chatRoomRepository.findChatRoomByOwnerIdAndCustomerId(ownerId, user.getId());
+
+        return chatRoom.map(room -> ChatRoomExistenceResponse.of(true, room.getId()))
+                .orElseGet(() -> ChatRoomExistenceResponse.of(false, null));
     }
 }
