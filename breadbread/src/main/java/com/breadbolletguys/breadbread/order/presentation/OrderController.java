@@ -46,7 +46,9 @@ public class OrderController {
             @RequestPart("orderRequests") List<OrderRequest> orderRequests,
             @RequestPart("image") MultipartFile image
     ) {
-        orderService.save(user, spaceId, orderRequests, image);
+        vendingMachineCacheService.deleteBySpaceId(spaceId);
+        Long orderId = orderService.save(user, spaceId, orderRequests, image);
+        vendingMachineCacheService.save(orderId);
         return ResponseEntity.ok().build();
     }
 
@@ -59,14 +61,15 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByIdAndVendingMachineId(orderId, vendingMachineId));
     }
 
-
     @PostMapping("/{orderId}/pay")
     public ResponseEntity<Void> payForOrder(
             @AuthUser User user,
             @PathVariable("orderId") Long orderId,
             @RequestBody PayRequest payRequest
     ) {
+        vendingMachineCacheService.deleteByOrderId(orderId);
         orderService.payForOrder(user, orderId, payRequest.getAccountNo());
+        vendingMachineCacheService.save(orderId);
         return ResponseEntity.ok().build();
     }
 
@@ -85,7 +88,9 @@ public class OrderController {
             @AuthUser User user,
             @PathVariable("orderId") Long orderId
     ) {
+        vendingMachineCacheService.deleteByOrderId(orderId);
         orderService.refundOrder(user, orderId);
+        vendingMachineCacheService.save(orderId);
         return ResponseEntity.ok().build();
     }
 

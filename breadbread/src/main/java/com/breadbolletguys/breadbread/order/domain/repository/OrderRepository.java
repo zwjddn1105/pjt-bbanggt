@@ -41,8 +41,8 @@ public class OrderRepository {
         return orderQueryRepository.findSoldoutBySellerId(userId, pageable);
     }
 
-    public void save(Order order) {
-        orderJpaRepository.save(order);
+    public Order save(Order order) {
+        return orderJpaRepository.save(order);
     }
 
     public Optional<Order> findById(Long orderId) {

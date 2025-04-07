@@ -95,7 +95,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
+    public Long save(User user, Long spaceId, List<OrderRequest> orderRequests, MultipartFile image) {
         Long bakeryId = bakeryRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ErrorCode.BAKERY_NOT_FOUND))
                 .getId();
@@ -107,9 +107,9 @@ public class OrderService {
         String imageUrl = s3Service.uploadFile(image);
         //String imageUrl = ipfsService.uploadFile(image);
         if (orderRequests.size() == 1) {
-            saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), imageUrl);
+            return saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), imageUrl).getId();
         } else {
-            saveMixedBreadOrder(user, spaceId, bakeryId, orderRequests, imageUrl);
+            return saveMixedBreadOrder(user, spaceId, bakeryId, orderRequests, imageUrl).getId();
         }
     }
 
@@ -256,7 +256,7 @@ public class OrderService {
                     adminKey,
                     sellerAccount,
                     "정산 입금",
-                    transaction.getTransactionBalance() / 100L,
+                    transaction.getTransactionBalance() / 100,
                     adminAccount,
                     "정산 송금"
             );
@@ -282,7 +282,7 @@ public class OrderService {
                 .orElse(0);
     }
 
-    private void saveSingleBreadOrder(
+    private Order saveSingleBreadOrder(
             User user,
             Long spaceId,
             Long bakeryId,
@@ -297,17 +297,17 @@ public class OrderService {
                 .spaceId(spaceId)
                 .buyerId(null)
                 .price(request.getPrice())
-                .discount(request.getDiscount() * 1.0 / 100)
+                .discount(request.getDiscount() * 1.0)
                 .count(request.getCount())
                 .image(imageUrl) // 이미지 업로드 시 로직 필요
                 .expirationDate(expirationDate)
                 .productState(ProductState.AVAILABLE)
                 .breadType(request.getBreadType())
                 .build();
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
 
-    private void saveMixedBreadOrder(
+    private Order saveMixedBreadOrder(
             User user,
             Long spaceId,
             Long bakeryId,
@@ -345,7 +345,7 @@ public class OrderService {
                 .breadType(BreadType.MIXED_BREAD)
                 .build();
 
-        orderRepository.save(mixedOrder);
+        return orderRepository.save(mixedOrder);
     }
 
     private LocalDateTime getExpirationDate() {

@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 import java.io.IOException;
 
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,14 +26,14 @@ public class AiController {
 
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BreadClassificationResponse> getObjects(
-        @RequestParam MultipartFile multipartFile
+            @RequestParam MultipartFile multipartFile
     ) throws IOException {
         return ResponseEntity.ok(aiService.aiClient(multipartFile));
     }
 
     @PostMapping(path = "/2", consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BadBreadResponse> badObjects(
-        @RequestParam MultipartFile multipartFile
+            @RequestParam MultipartFile multipartFile
     ) throws IOException {
         return ResponseEntity.ok(aiService.aiClient2(multipartFile));
     }
