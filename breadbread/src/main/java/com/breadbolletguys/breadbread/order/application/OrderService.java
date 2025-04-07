@@ -173,7 +173,7 @@ public class OrderService {
         );
     }
 
-    @Transactional
+
     public void pickupOrder(User user, Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
@@ -188,6 +188,7 @@ public class OrderService {
             throw new BadRequestException(ErrorCode.ALREADY_PICKUP_ORDER);
         }
         order.completePickUp();
+        orderRepository.save(order);
         Space space = spaceRepository.findById(order.getSpaceId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_SPACE));
         space.releaseOccupied();
