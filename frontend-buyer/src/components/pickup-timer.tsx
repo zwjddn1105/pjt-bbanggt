@@ -29,7 +29,9 @@ export default function PickupTimer() {
 
       let targetTime: Date
       let timeAvailable = false
-
+      // 개발 중에는 항상 픽업 가능하도록 설정
+      targetTime = todayPickupEndTime; // 타이머는 계속 보이도록
+      timeAvailable = true; // 항상 픽업 가능 시간으로 설정
       // 현재 시간이 오전 9시 30분 ~ 오후 8시 사이인 경우 (픽업 불가능 시간)
       if (koreaTime >= todayPickupStartTime && koreaTime <= todayPickupEndTime) {
         targetTime = todayPickupEndTime // 픽업 불가능 종료 시간까지 남은 시간 계산

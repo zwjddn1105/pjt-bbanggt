@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Bookmark, MapPin, Clock, Navigation, X, Package, Info } from "lucide-react"
+import { MapPin, Clock, Navigation, X, Package, Info } from "lucide-react"
 import { addBakeryBookmark, removeBakeryBookmark } from "@/services/breadgut-api"
 import type { VendingMachine } from "@/types/vending-machine"
 import VendingMachineDetail from "./vending-machine-detail"
@@ -18,17 +18,31 @@ export default function MarkerDetail({ vendingMachine, onClose, onBookmarkChange
   const [isLoading, setIsLoading] = useState(false)
   const [showVendingMachineDetail, setShowVendingMachineDetail] = useState(false)
   const [showBreadDetail, setShowBreadDetail] = useState(false)
-  const [selectedBread, setSelectedBread] = useState<{ slotId: number; breadType: number } | null>(null)
+  const [selectedBread, setSelectedBread] = useState<{
+    slotId: number
+    breadType: string
+    bakeryName: string
+    orderId: number
+  } | null>(null)
 
   const handleBookmarkToggle = async () => {
     if (isLoading) return
 
+    // 빵집 ID가 없는 경우 처리
+    if (!vendingMachine.bakeryId) {
+      console.error("빵집 ID가 없습니다.")
+      alert("북마크 처리에 필요한 정보가 없습니다.")
+      return
+    }
+
     setIsLoading(true)
     try {
       if (isBookmarked) {
-        await removeBakeryBookmark(Number(vendingMachine.id))
+        // 북마크 삭제 - 빵집 ID 사용
+        await removeBakeryBookmark(vendingMachine.bakeryId)
       } else {
-        await addBakeryBookmark(Number(vendingMachine.id))
+        // 북마크 추가 - 빵집 ID 사용
+        await addBakeryBookmark(vendingMachine.bakeryId)
       }
 
       const newBookmarkState = !isBookmarked
@@ -55,14 +69,21 @@ export default function MarkerDetail({ vendingMachine, onClose, onBookmarkChange
     setShowVendingMachineDetail(true)
   }
 
-  const handleBreadDetailClick = (slotId: number, breadType: number) => {
-    setSelectedBread({ slotId, breadType })
+  const handleBreadDetailClick = (slotId: number, breadType: string, bakeryName: string, orderId: number) => {
+    setSelectedBread({ slotId, breadType, bakeryName, orderId })
     setShowVendingMachineDetail(false)
     setShowBreadDetail(true)
   }
 
+  // 빵 상세에서 자판기 상세로 돌아가는 함수
+  const handleBackToVendingMachine = () => {
+    setShowBreadDetail(false)
+    setShowVendingMachineDetail(true)
+  }
+
   return (
     <>
+      <div className="fixed inset-0 bg-black bg-opacity-10 z-10" onClick={onClose} />
       <div className="fixed bottom-16 left-0 right-0 max-h-[60vh] overflow-y-auto bg-white rounded-t-2xl shadow-lg p-4 z-20">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">{vendingMachine.name}</h2>
@@ -73,14 +94,14 @@ export default function MarkerDetail({ vendingMachine, onClose, onBookmarkChange
 
         <div className="flex items-center mb-2">
           <span className="text-gray-600">빵긋 자판기</span>
-          <button
+          {/* <button
             onClick={handleBookmarkToggle}
             disabled={isLoading}
             className="ml-auto p-1"
             aria-label={isBookmarked ? "북마크 제거" : "북마크 추가"}
           >
             <Bookmark className={`w-6 h-6 ${isBookmarked ? "fill-orange-500 text-orange-500" : "text-gray-400"}`} />
-          </button>
+          </button> */}
         </div>
 
         {vendingMachine.address && (
@@ -92,7 +113,7 @@ export default function MarkerDetail({ vendingMachine, onClose, onBookmarkChange
 
         <div className="flex items-start mb-2">
           <Clock className="w-5 h-5 mr-2 text-gray-500 mt-0.5 flex-shrink-0" />
-          <span className="text-gray-700">24시간 운영</span>
+          <span className="text-gray-700">오후 8시부터 오전 9시까지지</span>
         </div>
 
         <div className="flex items-start mb-2">
@@ -138,7 +159,10 @@ export default function MarkerDetail({ vendingMachine, onClose, onBookmarkChange
           vendingMachine={vendingMachine}
           slotId={selectedBread.slotId}
           breadType={selectedBread.breadType}
+          bakeryName={selectedBread.bakeryName}
+          orderId={selectedBread.orderId}
           onClose={() => setShowBreadDetail(false)}
+          onBackToVendingMachine={handleBackToVendingMachine} // 자판기 상세로 돌아가는 함수 전달
         />
       )}
     </>

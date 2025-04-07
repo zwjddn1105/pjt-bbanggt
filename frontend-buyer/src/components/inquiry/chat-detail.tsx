@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { fetchChatMessages, sendChatMessage, fetchChatRooms } from "@/lib/chat"
-import type { ChatResponse, ChatRoomBuyerOnlyResponse } from "@/types/chat"
+import type { ChatResponse } from "@/types/chat"
 
 interface ChatDetailProps {
   chatRoomId: number
@@ -23,6 +23,8 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
   const [userId, setUserId] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const [readMessages, setReadMessages] = useState<Record<number, { time: string; lastContent: string }>>({})
+  const [lastContent, setLastContent] = useState<string>("")
 
   // 사용자 ID 가져오기
   useEffect(() => {
@@ -31,7 +33,7 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
       if (typeof window !== "undefined") {
         const userIdFromStorage = localStorage.getItem("user_id")
         if (userIdFromStorage) {
-          return parseInt(userIdFromStorage, 10)
+          return Number.parseInt(userIdFromStorage, 10)
         }
       }
       return null
@@ -40,32 +42,32 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
     const fetchedUserId = getUserId()
     if (fetchedUserId) {
       setUserId(fetchedUserId)
-    } else {
-      // 로컬 스토리지에 사용자 ID가 없는 경우
-      // 첫 번째 메시지를 보낸 후 해당 메시지의 senderId를 사용자 ID로 설정
-      const firstMessage = messages[0]
-      if (firstMessage && messages.length > 0) {
-        setUserId(firstMessage.senderId)
-        // 로컬 스토리지에 저장 (선택 사항)
-        if (typeof window !== "undefined") {
-          localStorage.setItem("user_id", firstMessage.senderId.toString())
-        }
+    }
+  }, [])
+
+  // 읽은 메시지 정보 로드
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedReadMessages = localStorage.getItem("readMessages")
+      if (savedReadMessages) {
+        setReadMessages(JSON.parse(savedReadMessages))
       }
     }
-  }, [messages])
+  }, [])
 
   // 채팅방 정보 가져오기 (빵집 이름 포함)
   const fetchChatRoomInfo = useCallback(async () => {
     try {
       // 채팅방 목록 API를 호출하여 모든 채팅방 정보를 가져옵니다
       const response = await fetchChatRooms(null)
-      
+
       // 현재 채팅방 ID와 일치하는 채팅방 찾기
-      const chatRoom = response.data.find(room => room.chatRoomId === chatRoomId)
-      
+      const chatRoom = response.data.find((room) => room.chatRoomId === chatRoomId)
+
       // 채팅방을 찾았으면 빵집 이름 설정
       if (chatRoom) {
         setBakeryName(chatRoom.name)
+        setLastContent(chatRoom.lastContent)
       } else {
         // 채팅방을 찾지 못한 경우 기본값 설정
         setBakeryName("베이커리")
@@ -102,13 +104,29 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
 
         setPageToken(response.pageToken)
         setHasMore(response.hasNext)
+
+        // 메시지를 로드할 때마다 읽음 상태 업데이트
+        if (typeof window !== "undefined" && response.data.length > 0) {
+          // 채팅방 정보 다시 가져와서 최신 lastContent 확인
+          await fetchChatRoomInfo()
+
+          const updatedReadMessages = {
+            ...readMessages,
+            [chatRoomId]: {
+              time: new Date().toISOString(),
+              lastContent: lastContent,
+            },
+          }
+          setReadMessages(updatedReadMessages)
+          localStorage.setItem("readMessages", JSON.stringify(updatedReadMessages))
+        }
       } catch (error) {
         console.error("메시지를 불러오는 중 오류가 발생했습니다:", error)
       } finally {
         setLoading(false)
       }
     },
-    [chatRoomId, pageToken],
+    [chatRoomId, pageToken, readMessages, lastContent, fetchChatRoomInfo],
   )
 
   // 폴링 설정
@@ -186,20 +204,23 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
 
   // 메시지가 내 메시지인지 확인하는 함수
   const isMyMessage = (message: ChatResponse) => {
-    // 첫 번째 방법: 사용자 ID가 있는 경우 비교
+    // 사용자 ID가 있는 경우 비교
     if (userId !== null) {
       return message.senderId === userId
     }
-    
-    // 두 번째 방법: 메시지 패턴 분석 (예: 구매자가 보낸 메시지는 항상 짝수 ID)
-    // 이 부분은 실제 데이터 패턴에 맞게 수정해야 합니다
-    // return message.senderId % 2 === 0; // 예시: 짝수 ID는 구매자
-    
-    // 세 번째 방법: 메시지 내용이나 시간 패턴 분석
-    // 이 부분도 실제 데이터 패턴에 맞게 수정해야 합니다
-    
-    // 임시 해결책: 모든 메시지를 구매자 메시지로 처리 (오른쪽에 표시)
-    return true
+
+    // 사용자 ID를 알 수 없는 경우, 메시지 패턴을 분석
+    // 이 부분은 실제 API 응답 데이터를 분석하여 수정해야 합니다
+
+    // 예: 메시지 전송 시간을 기준으로 판단
+    // 현재 시간과 가까운 메시지는 사용자가 보낸 메시지일 가능성이 높음
+    const now = new Date().getTime()
+    const messageTime = new Date(message.createdAt).getTime()
+    const timeDiff = now - messageTime
+
+    // 최근 1시간 이내의 메시지는 사용자가 보낸 것으로 가정
+    // (이 로직은 실제 상황에 맞게 조정 필요)
+    return timeDiff < 3600000
   }
 
   return (
@@ -312,3 +333,4 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
     </div>
   )
 }
+
