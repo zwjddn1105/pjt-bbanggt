@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 import com.breadbolletguys.breadbread.common.exception.NotFoundException;
+import com.breadbolletguys.breadbread.image.application.IpfsService;
 import com.breadbolletguys.breadbread.image.application.S3Service;
 import com.breadbolletguys.breadbread.order.domain.BreadType;
 import com.breadbolletguys.breadbread.order.domain.Order;
@@ -61,6 +63,7 @@ public class OrderService {
     private final SsafyTransferService ssafyTransferService;
     private final TransactionService transactionService;
     private final S3Service s3Service;
+    private final IpfsService ipfsService;
 
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersByBuyerId(User user) {
@@ -95,6 +98,7 @@ public class OrderService {
         space.buy(user.getId());
         user.useTickets();
         String imageUrl = s3Service.uploadFile(image);
+        //String imageUrl = ipfsService.uploadFile(image);
         if (orderRequests.size() == 1) {
             saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), imageUrl);
         } else {
