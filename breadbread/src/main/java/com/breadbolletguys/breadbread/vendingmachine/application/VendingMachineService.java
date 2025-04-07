@@ -156,7 +156,7 @@ public class VendingMachineService {
 
                 return new StackSummaryResponse(order.getId(), isMine);
             }).orElse(null);
-            slotSellerResponses.add(new SlotSellerResponse(i + 1, stackSummaryResponse));
+            slotSellerResponses.add(new SlotSellerResponse(space.getId(), i + 1, stackSummaryResponse));
         }
 
         return new VendingMachineSellerResponse(
