@@ -39,4 +39,8 @@ public class ChatRoomRepository {
     public Page<ChatRoomQueryResponse> findAllBySellerId(Long userId, Pageable pageable) {
         return chatRoomJpaRepository.findAllBySellerId(userId, pageable);
     }
+
+    public Optional<ChatRoom> findChatRoomByOwnerIdAndCustomerId(Long ownerId, Long customerId) {
+        return chatRoomJpaRepository.findCHatRoomByOwnerIdAndCustomerId(ownerId, customerId);
+    }
 }

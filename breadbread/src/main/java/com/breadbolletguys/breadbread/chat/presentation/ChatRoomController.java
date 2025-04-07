@@ -18,6 +18,7 @@ import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
 import com.breadbolletguys.breadbread.chat.application.ChatRoomService;
 import com.breadbolletguys.breadbread.chat.domain.dto.request.ChatRoomCreateRequest;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomBuyerOnlyResponse;
+import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomExistenceResponse;
 import com.breadbolletguys.breadbread.chat.domain.dto.response.ChatRoomSellerOnlyResponse;
 import com.breadbolletguys.breadbread.common.model.PageInfo;
 import com.breadbolletguys.breadbread.user.domain.User;
@@ -63,5 +64,13 @@ public class ChatRoomController {
             @RequestParam(required = false, name = "pageToken") String pageToken
     ) {
         return ResponseEntity.ok(chatRoomService.findAllBuyerOnly(user, pageToken));
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<ChatRoomExistenceResponse> checkChatRoomExist(
+            @AuthUser User user,
+            @RequestParam(name = "bakeryId") Long bakeryId
+    ) {
+        return ResponseEntity.ok(chatRoomService.checkChatRoomExist(user, bakeryId));
     }
 }

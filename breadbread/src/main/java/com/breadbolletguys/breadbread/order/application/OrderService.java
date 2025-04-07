@@ -124,7 +124,7 @@ public class OrderService {
                 user.getUserKey(),
                 adminAccount,
                 "입금",
-                discountPrice / 100L,
+                discountPrice * 1L,
                 accountNo,
                 "송금"
         );
@@ -161,7 +161,7 @@ public class OrderService {
                 adminKey,
                 transaction.getSenderAccount(),
                 "환불 입금",
-                transaction.getTransactionBalance() / 100,
+                transaction.getTransactionBalance(),
                 transaction.getSenderAccount(),
                 "환불 송금"
         );
@@ -221,7 +221,7 @@ public class OrderService {
                     adminKey,
                     sellerAccount,
                     "정산 입금",
-                    transaction.getTransactionBalance() / 100L,
+                    transaction.getTransactionBalance(),
                     adminAccount,
                     "정산 송금"
             );
@@ -262,7 +262,7 @@ public class OrderService {
                 .spaceId(spaceId)
                 .buyerId(null)
                 .price(request.getPrice())
-                .discount(request.getDiscount() * 1.0 / 100)
+                .discount(request.getDiscount() * 1.0)
                 .count(request.getCount())
                 .image(imageUrl) // 이미지 업로드 시 로직 필요
                 .expirationDate(expirationDate)
@@ -286,7 +286,7 @@ public class OrderService {
         int totalCount = 0;
 
         for (OrderRequest req : requests) {
-            double rate = req.getDiscount() * 1.0 / 100;
+            double rate = req.getDiscount() * 1.0;
             int originalPrice = req.getPrice();
             int discountPrice = (int) (req.getPrice() * (1 - rate));
             totalOriginalPrice += originalPrice;
@@ -349,7 +349,7 @@ public class OrderService {
                 user.getUserKey(),
                 adminAccount,
                 "입금",
-                discountPrice / 100L,
+                discountPrice * 1L,
                 accountNo,
                 "송금"
         );
@@ -387,7 +387,7 @@ public class OrderService {
                 adminKey,
                 transaction.getSenderAccount(),
                 "환불 입금",
-                transaction.getTransactionBalance() / 100,
+                transaction.getTransactionBalance(),
                 transaction.getReceiverAccount(),
                 "환불 송금"
         );
