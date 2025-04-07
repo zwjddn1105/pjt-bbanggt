@@ -26,14 +26,14 @@ public class AiController {
 
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BreadClassificationResponse> getObjects(
-        @RequestParam MultipartFile multipartFile
+            @RequestParam MultipartFile multipartFile
     ) throws IOException {
         return ResponseEntity.ok(aiService.aiClient(multipartFile));
     }
 
     @PostMapping(path = "/2", consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BadBreadResponse> badObjects(
-        @RequestParam MultipartFile multipartFile
+            @RequestParam MultipartFile multipartFile
     ) throws IOException {
         return ResponseEntity.ok(aiService.aiClient2(multipartFile));
     }

@@ -5,6 +5,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.breadbolletguys.breadbread.account.domain.Account;
+import com.breadbolletguys.breadbread.account.domain.repository.AccountRepository;
 import com.breadbolletguys.breadbread.auth.JwtUtil;
 import com.breadbolletguys.breadbread.auth.domain.RefreshToken;
 import com.breadbolletguys.breadbread.auth.domain.UserTokens;
@@ -15,12 +17,18 @@ import com.breadbolletguys.breadbread.auth.infrastructure.KakaoUserInfo;
 import com.breadbolletguys.breadbread.auth.repository.RefreshTokenRepository;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
+import com.breadbolletguys.breadbread.ssafybank.account.request.CreateAccountRequest;
+import com.breadbolletguys.breadbread.ssafybank.account.response.CreateAccountResponse;
+import com.breadbolletguys.breadbread.ssafybank.account.service.SsafyAccountService;
 import com.breadbolletguys.breadbread.ssafybank.login.request.UserCreateRequest;
 import com.breadbolletguys.breadbread.ssafybank.login.response.CreateUserSsafyApiResponse;
 import com.breadbolletguys.breadbread.ssafybank.login.service.SsafyLoginService;
+import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountDepositRequest;
+import com.breadbolletguys.breadbread.ssafybank.transfer.service.SsafyTransferService;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.user.domain.UserRole;
 import com.breadbolletguys.breadbread.user.domain.repository.UserRepository;
+
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +40,12 @@ import lombok.extern.slf4j.Slf4j;
 public class LoginService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final JwtUtil jwtUtil;
     private final KakaoOAuthProvider kakaoOAuthProvider;
     private final SsafyLoginService ssafyLoginService;
+    private final SsafyAccountService ssafyAccountService;
+    private final SsafyTransferService ssafyTransferService;
 
     public LoginResponse login(LoginRequest loginRequest) {
         String kakaoAccessToken = kakaoOAuthProvider.fetchKakaoAccessToken(loginRequest.getCode());
@@ -67,7 +78,10 @@ public class LoginService {
         String email = UUID.randomUUID() + "@ssafy.co.kr";
         CreateUserSsafyApiResponse createUserSsafyApiResponse = ssafyLoginService.createSsafyUser(
                 new UserCreateRequest(email));
-        return userRepository.save(
+        CreateAccountResponse createAccountResponse = ssafyAccountService.createAccount(
+                new CreateAccountRequest(createUserSsafyApiResponse.userKey())
+        );
+        User user = userRepository.save(
                 User.builder()
                         .socialId(socialLoginId)
                         .name(nickname)
@@ -78,6 +92,20 @@ public class LoginService {
                         .deleted(false)
                         .build()
         );
+        accountRepository.save(Account.builder()
+                .userId(user.getId())
+                .accountNo(createAccountResponse.REC().accountNo())
+                .build()
+        );
+        ssafyTransferService.accountDeposit(
+                new AccountDepositRequest(
+                        createUserSsafyApiResponse.userKey(),
+                        createAccountResponse.REC().accountNo(),
+                        1000000L,
+                        "초기 입금"
+                )
+        );
+        return user;
     }
 
     private String generateNewUserNickname(String socialLoginId, String nickname) {
