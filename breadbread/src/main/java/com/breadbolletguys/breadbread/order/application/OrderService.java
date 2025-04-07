@@ -76,8 +76,8 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public OrderResponse getOrdersByIdAndVendingMachineId(Long id, Long vendingMachineId) {
-        return orderRepository.findByIdAndVendingMachineId(id, vendingMachineId);
+    public OrderResponse getOrdersByIdAndVendingMachineId(Long orderId, Long vendingMachineId) {
+        return orderRepository.findByIdAndVendingMachineId(orderId, vendingMachineId);
     }
 
     @Transactional(readOnly = true)
