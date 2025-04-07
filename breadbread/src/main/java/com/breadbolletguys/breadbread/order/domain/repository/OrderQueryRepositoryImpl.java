@@ -208,7 +208,6 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         QOrder qOrder = QOrder.order;
         QBakery qBakery = QBakery.bakery;
         QVendingMachine qVendingMachine = QVendingMachine.vendingMachine;
-
         NumberTemplate<Integer> slotNumberExpr = Expressions.numberTemplate(
                 Integer.class,
                 "({0} * {1}) + {2} + 1",
@@ -237,7 +236,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qVendingMachine.latitude,
                         qVendingMachine.longitude,
                         qVendingMachine.name,
-                        slotNumberExpr
+                        slotNumberExpr,
+                        null
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
