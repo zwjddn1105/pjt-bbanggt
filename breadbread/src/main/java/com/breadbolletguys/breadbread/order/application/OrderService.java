@@ -297,7 +297,7 @@ public class OrderService {
                 .spaceId(spaceId)
                 .buyerId(null)
                 .price(request.getPrice())
-                .discount(request.getDiscount() * 1.0)
+                .discount(request.getDiscount() / 100)
                 .count(request.getCount())
                 .image(imageUrl) // 이미지 업로드 시 로직 필요
                 .expirationDate(expirationDate)
