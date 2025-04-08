@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,7 @@ import com.breadbolletguys.breadbread.transaction.application.TransactionService
 import com.breadbolletguys.breadbread.transaction.domain.Transaction;
 import com.breadbolletguys.breadbread.transaction.domain.TransactionStatus;
 import com.breadbolletguys.breadbread.transaction.domain.TransactionType;
+import com.breadbolletguys.breadbread.transaction.domain.repository.TransactionRepository;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.user.domain.repository.UserRepository;
 import com.breadbolletguys.breadbread.vendingmachine.domain.Space;
@@ -65,6 +67,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final SsafyTransferService ssafyTransferService;
     private final TransactionService transactionService;
+    private final TransactionRepository transactionRepository;
     private final S3Service s3Service;
     private final IpfsService ipfsService;
     private final PaymentValidator paymentValidator;
@@ -133,7 +136,6 @@ public class OrderService {
                 "송금"
         );
         ssafyTransferService.accountTransfer(accountTransferRequest);
-        String sellerAccount = sellerAccount(orderId);
         transactionService.recordTransaction(
                 orderId,
                 accountNo,
@@ -165,7 +167,6 @@ public class OrderService {
                 "송금"
         );
         ssafyTransferService.accountTransfer(accountTransferRequest);
-        String sellerAccount = sellerAccount(orderId);
         transactionService.recordTransaction(
                 orderId,
                 account.getAccountNo(),
@@ -179,27 +180,28 @@ public class OrderService {
     public void refundOrder(User user, Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
-        Transaction transaction = transactionService.findByOrderId(orderId);
+        Transaction transaction = transactionRepository.findLatestTransactionByOrderId(orderId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.Transaction_NOT_FOUND));
         Account account = accountRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
-        String sellerAccount = sellerAccount(orderId);
-        if (!account.getAccountNo().equals(transaction.getSenderAccount())
-                || !sellerAccount.equals(transaction.getReceiverAccount())
-        ) {
+        if (!transaction.getTransactionStatus().equals(TransactionStatus.PURCHASE)) {
+            throw new BadRequestException(ErrorCode.UNABLE_TO_REFUND_PRODUCT);
+        }
+        if (!account.getAccountNo().equals(transaction.getSenderAccount())) {
             throw new BadRequestException(ErrorCode.UNABLE_TO_REFUND_PRODUCT);
         }
 
         if (order.getProductState().equals(ProductState.FINISHED)) {
-            throw new BadRequestException(ErrorCode.REFUND_TIME_EXCEEDED);
+            throw new BadRequestException(ErrorCode.CANCEL_TIME_EXCEEDED);
         }
 
         AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
                 adminKey,
                 transaction.getSenderAccount(),
-                "환불 입금",
+                "주문 취소 입금",
                 transaction.getTransactionBalance() / 100,
                 adminAccount,
-                "환불 송금"
+                "주문 취소 송금"
         );
         ssafyTransferService.accountTransfer(accountTransferRequest);
         order.cancelPurchase();
@@ -209,7 +211,7 @@ public class OrderService {
                 adminAccount,
                 transaction.getTransactionBalance(),
                 TransactionType.BREAD_PURCHASE,
-                TransactionStatus.REFUND
+                TransactionStatus.CANCELED
         );
     }
 
@@ -219,15 +221,15 @@ public class OrderService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
         Account account = accountRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
-        Transaction transaction = transactionService.findByOrderId(orderId);
-        if (!transaction.getSenderAccount().equals(account.getAccountNo())
-                || order.getProductState().equals(ProductState.AVAILABLE)) {
+        Transaction transaction = transactionRepository.findLatestTransactionByOrderId(orderId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.Transaction_NOT_FOUND));
+        if (!transaction.getTransactionStatus().equals(TransactionStatus.PURCHASE)) {
             throw new BadRequestException(ErrorCode.UNABLE_TO_PICKUP_ORDER);
         }
-        if (order.getProductState().equals(ProductState.FINISHED)) {
-            throw new BadRequestException(ErrorCode.ALREADY_PICKUP_ORDER);
+        if (!transaction.getSenderAccount().equals(account.getAccountNo())
+                || !order.getProductState().equals(ProductState.SOLD_OUT)) {
+            throw new BadRequestException(ErrorCode.UNABLE_TO_PICKUP_ORDER);
         }
-
         order.completePickUp();
         Space space = spaceRepository.findById(order.getSpaceId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOT_FOUND_SPACE));
