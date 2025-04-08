@@ -86,7 +86,7 @@ public class LoginService {
                         .socialId(socialLoginId)
                         .name(nickname)
                         .userRole(UserRole.BUYER)
-                        .noticeCheck(true)
+                        .noticeCheck(false)
                         .email(email)
                         .userKey(createUserSsafyApiResponse.userKey())
                         .deleted(false)

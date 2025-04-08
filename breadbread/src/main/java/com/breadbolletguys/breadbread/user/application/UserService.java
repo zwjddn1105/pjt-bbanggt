@@ -2,6 +2,7 @@ package com.breadbolletguys.breadbread.user.application;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.breadbolletguys.breadbread.account.domain.Account;
 import com.breadbolletguys.breadbread.account.domain.repository.AccountRepository;
@@ -18,14 +19,17 @@ import com.breadbolletguys.breadbread.transaction.domain.TransactionType;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.user.domain.dto.request.TicketPurchaseRequest;
 import com.breadbolletguys.breadbread.user.domain.dto.response.UserResponse;
+import com.breadbolletguys.breadbread.user.domain.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
+    private final UserRepository userRepository;
     @Value("${app.admin.userId}")
     private String adminId;
 
@@ -77,5 +81,13 @@ public class UserService {
         if (count <= 0 || count > 100) {
             throw new BadRequestException(ErrorCode.INVALID_TICKET_PURCHASE_COUNT);
         }
+    }
+
+    @Transactional
+    public void toggle(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
+
+        user.toggleNotice();
     }
 }
