@@ -31,8 +31,8 @@ const breadTypeNames: Record<string, string> = {
   WHITE_BREAD: "식빵",
   BAGUETTE: "바게트",
   CROISSANT: "크루아상",
-  PIZZA_BREAD : "피자빵",
-  BAGEL : "베이글",
+  PIZZA_BREAD: "피자빵",
+  BAGEL: "베이글",
   GARLIC_BREAD: "마늘빵",
   OTHER: "기타",
   MIXED_BREAD: "모듬빵",
@@ -57,6 +57,7 @@ export function PickupItem({
 }: PickupItemProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isChatLoading, setIsChatLoading] = useState(false) // 채팅 로딩 상태 추가
+  const [isRefundLoading, setIsRefundLoading] = useState(false) // 환불 로딩 상태 추가
   const router = useRouter() // Next.js 라우터 사용
 
   // 빵 타입 한글 이름 가져오기
@@ -149,6 +150,67 @@ export function PickupItem({
       alert(error instanceof Error ? error.message : "주문 취소 중 오류가 발생했습니다")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  // 새로운 환불 API를 사용하는 함수 추가
+  const handleFinishedRefund = async () => {
+    // 확인 다이얼로그 표시
+    const confirmed = window.confirm("정말로 환불을 요청하시겠습니까?")
+    if (!confirmed) {
+      console.log("환불 요청이 취소되었습니다.")
+      return
+    }
+
+    setIsRefundLoading(true)
+    try {
+      // access_token 가져오기
+      const token = localStorage.getItem("access_token")
+      if (!token) {
+        throw new Error("로그인이 필요합니다")
+      }
+
+      // API URL 생성 및 로그 출력
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/refunds`
+      console.log(`[환불 API 호출] URL: ${apiUrl}`)
+      console.log(`[환불 API 호출] 주문 ID: ${orderId}`)
+
+      // 환불 API 호출
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderId }),
+      })
+
+      console.log(`[환불 API 응답] 상태 코드: ${response.status}`)
+
+      // 응답 데이터 로그 출력
+      let responseData
+      try {
+        responseData = await response.json()
+        console.log("[환불 API 응답] 데이터:", responseData)
+      } catch (e) {
+        console.log("[환불 API 응답] 데이터 없음 또는 JSON이 아님")
+      }
+
+      if (!response.ok) {
+        throw new Error(responseData?.message || "환불 처리 중 오류가 발생했습니다")
+      }
+
+      // 성공 메시지 표시
+      console.log("[환불 API] 성공적으로 처리됨")
+      alert("환불이 요청되었습니다")
+
+      // 페이지 새로고침 (목록 업데이트를 위해)
+      window.location.reload()
+    } catch (error) {
+      console.error("[환불 API 오류]", error)
+      alert(error instanceof Error ? error.message : "환불 처리 중 오류가 발생했습니다")
+    } finally {
+      setIsRefundLoading(false)
     }
   }
 
@@ -362,59 +424,91 @@ export function PickupItem({
           <p className="text-sm mt-1">빵긋번호: {slotNumber}번</p>
 
           <p className="text-sm mt-1">수량: {count}개</p>
-          <p className="text-sm">가격: {salePrice.toLocaleString()}원</p>
 
-          {/* 버튼 영역 */}
-          <div className="mt-2 flex gap-2">
-            {productState === "SOLD_OUT" && (
-              <button
-                className="flex-1 bg-red-500 text-white text-sm px-4 py-1 rounded-full"
-                onClick={handleRefund}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center">
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></span>
-                    처리 중...
-                  </span>
-                ) : (
-                  "주문 취소"
-                )}
-              </button>
-            )}
+          {/* 가격 정보와 환불 요청 버튼을 같은 줄에 배치 (FINISHED 상태일 때만) */}
+          <div className="flex justify-between items-center mt-1">
+            <p className="text-sm">가격: {salePrice.toLocaleString()}원</p>
 
-            {/* FINISHED 상태일 때 채팅 문의 버튼 추가 */}
+            {/* FINISHED 상태일 때만 환불 요청 버튼 표시 */}
             {productState === "FINISHED" && (
               <button
-                className="flex-1 bg-blue-500 text-white text-sm px-4 py-1 rounded-full"
-                onClick={handleChatInquiry}
-                disabled={isChatLoading}
+                className="bg-red-500 text-white text-xs px-3 py-1 rounded-full"
+                onClick={handleFinishedRefund}
+                disabled={isRefundLoading}
               >
-                {isChatLoading ? (
+                {isRefundLoading ? (
                   <span className="flex items-center justify-center">
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></span>
-                    처리 중...
+                    <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></span>
+                    처리중
                   </span>
                 ) : (
-                  <span className="flex items-center justify-center">
-                    <MessageCircle className="w-4 h-4 mr-1" />
-                    문의하기
-                  </span>
+                  "환불 요청"
                 )}
               </button>
             )}
+          </div>
 
-            <button
-              className={`${productState === "SOLD_OUT" || productState === "FINISHED" ? "flex-1" : "w-full"} bg-orange-500 text-white text-sm px-4 py-1 rounded-full`}
-              onClick={handlePickupComplete}
-              disabled={isLoading}
-            >
-              {getButtonText()}
-            </button>
+          {/* 버튼 영역 */}
+          <div className="mt-2">
+            {/* SOLD_OUT 상태일 때 주문 취소와 빵긋 열기 버튼을 한 줄에 배치 */}
+            {productState === "SOLD_OUT" && (
+              <div className="flex gap-2">
+                <button
+                  className="flex-1 bg-red-500 text-white text-sm px-4 py-2 rounded-full"
+                  onClick={handleRefund}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center">
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></span>
+                      처리 중...
+                    </span>
+                  ) : (
+                    "주문 취소"
+                  )}
+                </button>
+                <button
+                  className="flex-1 bg-orange-500 text-white text-sm px-4 py-2 rounded-full"
+                  onClick={handlePickupComplete}
+                  disabled={isLoading}
+                >
+                  {getButtonText()}
+                </button>
+              </div>
+            )}
+
+            {/* FINISHED 상태일 때 문의하기와 빵긋 열기 버튼을 한 줄에 배치 */}
+            {productState === "FINISHED" && (
+              <div className="flex gap-2">
+                <button
+                  className="flex-1 bg-blue-500 text-white text-sm px-4 py-2 rounded-full"
+                  onClick={handleChatInquiry}
+                  disabled={isChatLoading}
+                >
+                  {isChatLoading ? (
+                    <span className="flex items-center justify-center">
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></span>
+                      처리 중...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <MessageCircle className="w-4 h-4 mr-1" />
+                      문의하기
+                    </span>
+                  )}
+                </button>
+                <button
+                  className="flex-1 bg-orange-500 text-white text-sm px-4 py-2 rounded-full"
+                  onClick={handlePickupComplete}
+                  disabled={isLoading}
+                >
+                  {getButtonText()}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </Card>
   )
 }
-
