@@ -1,6 +1,5 @@
 package com.breadbolletguys.breadbread.user.application;
 
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +7,7 @@ import com.breadbolletguys.breadbread.account.domain.Account;
 import com.breadbolletguys.breadbread.account.domain.repository.AccountRepository;
 import com.breadbolletguys.breadbread.bakery.domain.Bakery;
 import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
+import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 import com.breadbolletguys.breadbread.common.exception.NotFoundException;
 import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountTransferRequest;
@@ -16,6 +16,7 @@ import com.breadbolletguys.breadbread.transaction.application.TransactionService
 import com.breadbolletguys.breadbread.transaction.domain.TransactionStatus;
 import com.breadbolletguys.breadbread.transaction.domain.TransactionType;
 import com.breadbolletguys.breadbread.user.domain.User;
+import com.breadbolletguys.breadbread.user.domain.dto.request.TicketPurchaseRequest;
 import com.breadbolletguys.breadbread.user.domain.dto.response.UserResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,10 @@ public class UserService {
         return UserResponse.from(user, bakery);
     }
 
-    public void payForTicket(User user) {
+    public void payForTicket(User user, TicketPurchaseRequest ticketPurchaseRequest) {
+        int ticketCount = ticketPurchaseRequest.getCount();
+        countValidation(ticketCount);
+        long amount = 100L * ticketCount;
         Account account = accountRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
 
@@ -53,12 +57,12 @@ public class UserService {
                 user.getUserKey(),
                 adminAccount,
                 "입금",
-                1L,
+                amount / 100,
                 account.getAccountNo(),
                 "송금"
         );
         ssafyTransferService.accountTransfer(accountTransferRequest);
-        user.purchaseTicket();
+        user.purchaseTicket(ticketCount);
         transactionService.recordTransaction(
                 null,
                 account.getAccountNo(),
@@ -67,5 +71,11 @@ public class UserService {
                 TransactionType.TICKET_PURCHASE,
                 TransactionStatus.PURCHASE
         );
+    }
+
+    private void countValidation(int count) {
+        if (count <= 0 || count > 100) {
+            throw new BadRequestException(ErrorCode.INVALID_TICKET_PURCHASE_COUNT);
+        }
     }
 }

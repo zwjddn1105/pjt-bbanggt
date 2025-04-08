@@ -31,6 +31,8 @@ public enum ErrorCode {
     NOT_NONE_SOCIAL_USER(2004, "일반 로그인 유저가 아닙니다."),
     NOT_ADMIN_USER(2005, "관리자 권한이 없습니다."),
     UNABLE_TO_USE_TICKET(2006, "티켓 잔고가 없어 사용이 불가합니다"),
+    INVALID_TICKET_PURCHASE_COUNT(2007, "티켓은 1개 이상 100개 이하로만 구매할 수 있습니다."),
+
 
     UNAUTHORIZED_ACCESS(3000, "접근할 수 없는 리소스입니다."),
     INVALID_REFRESH_TOKEN(3001, "유효하지 않은 Refresh Token입니다."),
