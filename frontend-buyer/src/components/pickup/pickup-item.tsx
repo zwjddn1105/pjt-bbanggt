@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
-import { Navigation, MessageCircle } from "lucide-react" // MessageCircle 아이콘 추가
-import { useRouter } from "next/navigation" // 라우터 추가
+import { Navigation, MessageCircle, Clock } from "lucide-react"
+import { useRouter } from "next/navigation"
 
-// API 명세서에 맞게 Props 인터페이스 수정 (? 제거)
 interface PickupItemProps {
   orderId: number
   address: string
@@ -22,9 +21,9 @@ interface PickupItemProps {
   longitude: number
   slotNumber: number
   bakeryId: number
+  paymentDate?: string
 }
 
-// 빵 타입별 한글 이름 매핑
 const breadTypeNames: Record<string, string> = {
   SOBORO: "소보로빵",
   SWEET_RED_BEAN: "단팥빵",
@@ -54,11 +53,82 @@ export function PickupItem({
   vendingMachineId,
   slotNumber,
   bakeryId,
+  paymentDate,
 }: PickupItemProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [isChatLoading, setIsChatLoading] = useState(false) // 채팅 로딩 상태 추가
-  const [isRefundLoading, setIsRefundLoading] = useState(false) // 환불 로딩 상태 추가
-  const router = useRouter() // Next.js 라우터 사용
+  const [isChatLoading, setIsChatLoading] = useState(false)
+  const [isRefundLoading, setIsRefundLoading] = useState(false)
+  const [isPickupDisabled, setIsPickupDisabled] = useState(false)
+  const router = useRouter()
+
+  // 결제 시간 기준으로 픽업 버튼 활성화 여부 결정
+  useEffect(() => {
+    // 결제 시간이 없으면 비활성화하지 않음
+    if (!paymentDate) {
+      setIsPickupDisabled(false)
+      return
+    }
+
+    const checkPickupAvailability = () => {
+      const now = new Date()
+      const paymentDateTime = new Date(paymentDate)
+
+      // 현재 날짜의 오전 9시 30분 시간 생성
+      const todayCutoff = new Date(now)
+      todayCutoff.setHours(9, 30, 0, 0)
+
+      // 어제 날짜의 오전 9시 30분 시간 생성
+      const yesterdayCutoff = new Date(now)
+      yesterdayCutoff.setDate(yesterdayCutoff.getDate() - 1)
+      yesterdayCutoff.setHours(9, 30, 0, 0)
+
+      // 현재 시간이 오전 9시 30분 이후인지 확인
+      const isAfterCutoffToday = now >= todayCutoff
+
+      // 현재 시간이 자정부터 오전 9시 30분 사이인지 확인
+      const isBeforeCutoffToday = now < todayCutoff
+
+      // 결제 시간이 오늘 오전 9시 30분 이전인지 확인
+      const isPaymentBeforeTodayCutoff =
+        paymentDateTime < todayCutoff &&
+        paymentDateTime.getDate() === todayCutoff.getDate() &&
+        paymentDateTime.getMonth() === todayCutoff.getMonth() &&
+        paymentDateTime.getFullYear() === todayCutoff.getFullYear()
+
+      // 결제 시간이 어제 오전 9시 30분 이전인지 확인
+      const isPaymentBeforeYesterdayCutoff =
+        paymentDateTime < yesterdayCutoff &&
+        paymentDateTime.getDate() === yesterdayCutoff.getDate() &&
+        paymentDateTime.getMonth() === yesterdayCutoff.getMonth() &&
+        paymentDateTime.getFullYear() === yesterdayCutoff.getFullYear()
+
+      // 비활성화 조건:
+      // 1. 현재 시간이 오전 9시 30분 이후이고, 결제 시간이 오늘 오전 9시 30분 이전인 경우
+      // 2. 현재 시간이 자정부터 오전 9시 30분 사이이고, 결제 시간이 어제 오전 9시 30분 이전인 경우
+      const shouldDisable =
+        (isAfterCutoffToday && isPaymentBeforeTodayCutoff) || (isBeforeCutoffToday && isPaymentBeforeYesterdayCutoff)
+
+      setIsPickupDisabled(shouldDisable)
+
+      // 디버깅용 로그
+      console.log(`[픽업 버튼 상태] 주문 ID: ${orderId}, 결제 시간: ${paymentDate}`)
+      console.log(`[픽업 버튼 상태] 현재 시간: ${now.toLocaleString()}`)
+      console.log(
+        `[픽업 버튼 상태] 오늘 9시 30분 이후: ${isAfterCutoffToday}, 오늘 9시 30분 이전 결제: ${isPaymentBeforeTodayCutoff}`,
+      )
+      console.log(
+        `[픽업 버튼 상태] 오늘 9시 30분 이전: ${isBeforeCutoffToday}, 어제 9시 30분 이전 결제: ${isPaymentBeforeYesterdayCutoff}`,
+      )
+      console.log(`[픽업 버튼 상태] 비활성화: ${shouldDisable}`)
+    }
+
+    checkPickupAvailability()
+
+    // 1분마다 상태 업데이트 (시간이 지나면 자동으로 상태 변경)
+    const intervalId = setInterval(checkPickupAvailability, 60000)
+
+    return () => clearInterval(intervalId)
+  }, [paymentDate, orderId])
 
   // 빵 타입 한글 이름 가져오기
   const getBreadTypeName = (type: string): string => {
@@ -87,14 +157,12 @@ export function PickupItem({
 
   // 길찾기 기능 추가
   const handleNavigation = () => {
-    // 위도와 경도로 길찾기 실행
     const kakaoMapUrl = `https://map.kakao.com/link/to/${vendingMachineName},${latitude},${longitude}`
     window.open(kakaoMapUrl, "_blank")
   }
 
   // 주문 취소 함수 추가
   const handleRefund = async () => {
-    // 확인 다이얼로그 표시
     const confirmed = window.confirm("정말로 주문을 취소하시겠습니까?")
     if (!confirmed) {
       console.log("주문 취소가 취소되었습니다.")
@@ -103,19 +171,16 @@ export function PickupItem({
 
     setIsLoading(true)
     try {
-      // access_token 가져오기
       const token = localStorage.getItem("access_token")
       if (!token) {
         throw new Error("로그인이 필요합니다")
       }
 
-      // API URL 생성 및 로그 출력
       const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/order/${orderId}/refund`
       console.log(`[주문 취소 API 호출] URL: ${apiUrl}`)
       console.log(`[주문 취소 API 호출] 주문 ID: ${orderId}`)
       console.log(`[주문 취소 API 호출] 토큰: ${token.substring(0, 10)}...`)
 
-      // 환불 API 호출
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -126,7 +191,6 @@ export function PickupItem({
 
       console.log(`[주문 취소 API 응답] 상태 코드: ${response.status}`)
 
-      // 응답 데이터 로그 출력
       let responseData
       try {
         responseData = await response.json()
@@ -139,11 +203,9 @@ export function PickupItem({
         throw new Error(responseData?.message || "주문 취소 중 오류가 발생했습니다")
       }
 
-      // 성공 메시지 표시
       console.log("[주문 취소 API] 성공적으로 처리됨")
       alert("주문이 성공적으로 취소되었습니다")
 
-      // 페이지 새로고침 (목록 업데이트를 위해)
       window.location.reload()
     } catch (error) {
       console.error("[주문 취소 API 오류]", error)
@@ -155,7 +217,6 @@ export function PickupItem({
 
   // 새로운 환불 API를 사용하는 함수 추가
   const handleFinishedRefund = async () => {
-    // 확인 다이얼로그 표시
     const confirmed = window.confirm("정말로 환불을 요청하시겠습니까?")
     if (!confirmed) {
       console.log("환불 요청이 취소되었습니다.")
@@ -164,18 +225,15 @@ export function PickupItem({
 
     setIsRefundLoading(true)
     try {
-      // access_token 가져오기
       const token = localStorage.getItem("access_token")
       if (!token) {
         throw new Error("로그인이 필요합니다")
       }
 
-      // API URL 생성 및 로그 출력
       const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/refunds`
       console.log(`[환불 API 호출] URL: ${apiUrl}`)
       console.log(`[환불 API 호출] 주문 ID: ${orderId}`)
 
-      // 환불 API 호출
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -187,7 +245,6 @@ export function PickupItem({
 
       console.log(`[환불 API 응답] 상태 코드: ${response.status}`)
 
-      // 응답 데이터 로그 출력
       let responseData
       try {
         responseData = await response.json()
@@ -200,11 +257,9 @@ export function PickupItem({
         throw new Error(responseData?.message || "환불 처리 중 오류가 발생했습니다")
       }
 
-      // 성공 메시지 표시
       console.log("[환불 API] 성공적으로 처리됨")
       alert("환불이 요청되었습니다")
 
-      // 페이지 새로고침 (목록 업데이트를 위해)
       window.location.reload()
     } catch (error) {
       console.error("[환불 API 오류]", error)
@@ -216,6 +271,12 @@ export function PickupItem({
 
   // handlePickupComplete 함수를 다음과 같이 수정합니다:
   const handlePickupComplete = async () => {
+    // 픽업 버튼이 비활성화된 경우 알림 표시
+    if (isPickupDisabled) {
+      alert("픽업 가능 시간이 지났습니다. 다음 픽업 시간(오후 8시)에 다시 시도해주세요.")
+      return
+    }
+
     // FINISHED 상태인 경우 즉시 성공 메시지 표시
     if (productState === "FINISHED") {
       alert(`${vendingMachineName}의 빵긋이 열렸습니다`)
@@ -227,24 +288,21 @@ export function PickupItem({
       const confirmed = window.confirm("정말로 여시겠습니까?")
       if (!confirmed) {
         console.log("픽업 취소됨")
-        return // 취소 선택 시 함수 종료
+        return
       }
 
       setIsLoading(true)
       try {
-        // access_token 가져오기
         const token = localStorage.getItem("access_token")
         if (!token) {
           throw new Error("로그인이 필요합니다")
         }
 
-        // API URL 생성 및 로그 출력
         const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/order/${orderId}/pickup`
         console.log(`[픽업 API 호출] URL: ${apiUrl}`)
         console.log(`[픽업 API 호출] 주문 ID: ${orderId}`)
         console.log(`[픽업 API 호출] 토큰: ${token.substring(0, 10)}...`)
 
-        // pickup API 호출
         const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
@@ -255,7 +313,6 @@ export function PickupItem({
 
         console.log(`[픽업 API 응답] 상태 코드: ${response.status}`)
 
-        // 응답 데이터 로그 출력
         let responseData
         try {
           responseData = await response.json()
@@ -268,11 +325,9 @@ export function PickupItem({
           throw new Error(responseData?.message || "픽업 처리 중 오류가 발생했습니다")
         }
 
-        // 성공 메시지 표시
         console.log("[픽업 API] 성공적으로 처리됨")
         alert(`${vendingMachineName}의 빵긋이 열립니다`)
 
-        // 성공 후 페이지 새로고침 추가
         window.location.reload()
       } catch (error) {
         console.error("[픽업 API 오류]", error)
@@ -292,13 +347,11 @@ export function PickupItem({
 
     setIsChatLoading(true)
     try {
-      // access_token 가져오기
       const token = localStorage.getItem("access_token")
       if (!token) {
         throw new Error("로그인이 필요합니다")
       }
 
-      // 1. 채팅방 존재 여부 확인
       console.log(`[채팅방 확인 API 호출] 빵집 ID: ${bakeryId}`)
       const checkResponse = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-rooms/check?bakeryId=${bakeryId}`,
@@ -318,7 +371,6 @@ export function PickupItem({
 
       let chatRoomId: number
 
-      // 2. 채팅방이 없으면 생성
       if (!checkData.isExist) {
         console.log("[채팅방 생성 API 호출] 빵집 ID:", bakeryId)
         const createResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-rooms`, {
@@ -334,7 +386,6 @@ export function PickupItem({
           throw new Error("채팅방 생성 중 오류가 발생했습니다")
         }
 
-        // 채팅방 생성 후 ID 가져오기 위해 다시 확인 API 호출
         const recheckResponse = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-rooms/check?bakeryId=${bakeryId}`,
           {
@@ -351,11 +402,9 @@ export function PickupItem({
         const recheckData = await recheckResponse.json()
         chatRoomId = recheckData.id
       } else {
-        // 이미 존재하는 채팅방 ID 사용
         chatRoomId = checkData.id
       }
 
-      // 3. 채팅방으로 이동
       console.log(`[채팅방으로 이동] 채팅방 ID: ${chatRoomId}`)
       router.push(`/inquiry/${chatRoomId}`)
     } catch (error) {
@@ -379,13 +428,31 @@ export function PickupItem({
     return "빵긋 열기"
   }
 
+  // 결제 시간 포맷팅 함수
+  const formatPaymentDate = (dateString?: string) => {
+    if (!dateString) return ""
+
+    const date = new Date(dateString)
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const hours = date.getHours()
+    const minutes = date.getMinutes()
+
+    // 오전/오후 표시와 함께 시간 포맷팅
+    const ampm = hours < 12 ? "오전" : "오후"
+    const formattedHours = hours % 12 || 12 // 12시간제로 변환
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes
+
+    return `${month}/${day} ${ampm} ${formattedHours}:${formattedMinutes}`
+  }
+
   // 상태 라벨 정보 가져오기
   const statusLabel = getStatusLabel()
 
   return (
     <Card className="border-primary-custom mb-4">
       <div className="flex">
-        {/* 빵 이미지 - Next.js Image 대신 일반 img 태그 사용하여 오류 방지 */}
+        {/* 빵 이미지 */}
         <div className="w-20 h-20 relative rounded-md mr-3 overflow-hidden">
           <img
             src={image || "/bread-pattern.png"}
@@ -416,12 +483,23 @@ export function PickupItem({
             </div>
           </div>
 
-          {/* 벤딩머신 이름 - 글자 크기를 수량/가격과 동일하게 변경 */}
+          {/* 벤딩머신 이름 */}
           <p className="text-sm text-gray-700 mt-1">{vendingMachineName}</p>
           <p className="text-xs text-gray-500">{address}</p>
 
-          {/* 빵긋번호 추가 - 글자 크기를 수량/가격과 동일하게 설정 */}
+          {/* 빵긋번호 */}
           <p className="text-sm mt-1">빵긋번호: {slotNumber}번</p>
+
+          {/* 결제 시간 표시 (있는 경우에만) */}
+          {paymentDate && (
+            <div className="flex items-center text-sm mt-1 text-gray-600">
+              <Clock className="w-3 h-3 mr-1" />
+              <span>결제: {formatPaymentDate(paymentDate)}</span>
+
+              {/* 픽업 불가능한 경우 경고 표시 */}
+              {isPickupDisabled && <span className="ml-2 text-xs text-red-500">픽업 시간 초과</span>}
+            </div>
+          )}
 
           <p className="text-sm mt-1">수량: {count}개</p>
 
@@ -468,9 +546,11 @@ export function PickupItem({
                   )}
                 </button>
                 <button
-                  className="flex-1 bg-orange-500 text-white text-sm px-4 py-2 rounded-full"
+                  className={`flex-1 text-white text-sm px-4 py-2 rounded-full ${
+                    isPickupDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-orange-500"
+                  }`}
                   onClick={handlePickupComplete}
-                  disabled={isLoading}
+                  disabled={isLoading || isPickupDisabled}
                 >
                   {getButtonText()}
                 </button>
@@ -498,9 +578,11 @@ export function PickupItem({
                   )}
                 </button>
                 <button
-                  className="flex-1 bg-orange-500 text-white text-sm px-4 py-2 rounded-full"
+                  className={`flex-1 text-white text-sm px-4 py-2 rounded-full ${
+                    isPickupDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-orange-500"
+                  }`}
                   onClick={handlePickupComplete}
-                  disabled={isLoading}
+                  disabled={isLoading || isPickupDisabled}
                 >
                   {getButtonText()}
                 </button>
