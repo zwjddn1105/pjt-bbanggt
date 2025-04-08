@@ -23,6 +23,7 @@ public enum ErrorCode {
     BOOKMARK_NOT_FOUND(10013, "북마크가 존재하지 않습니다."),
     ALREADY_SELLER(10014, "이미 판매자입니다."),
     NOT_SELLER(10015, "판매자가 아닙니다."),
+    NOT_BUYER(10016, "구매자가 아닙니다."),
 
     UNABLE_TO_GET_USER_INFO(2001, "소셜 로그인 공급자로부터 유저 정보를 받아올 수 없습니다."),
     UNABLE_TO_GET_ACCESS_TOKEN(2002, "소셜 로그인 공급자로부터 인증 토큰을 받아올 수 없습니다."),
@@ -71,7 +72,12 @@ public enum ErrorCode {
 
     INVALID_IMP_UID(13000, "결제 식별자 imp_uid가 일치하지 않습니다."),
     INVALID_PAYMENT_AMOUNT(13001, "결제된 금액이 서버에서 계산한 금액과 일치하지 않습니다."),
-    IAMPORT_REQUEST_FAILED(13002, "아임포트 서버 요청 중 오류가 발생했습니다.");
+    IAMPORT_REQUEST_FAILED(13002, "아임포트 서버 요청 중 오류가 발생했습니다."),
+
+    ALREADY_EXIST_REFUND_REQUEST(14000, "이미 상품에 대해 환불 요청 기록이 있습니다."),
+    ORDER_REFUND_NOT_ALLOWED_YET(14001, "아직 환불할 수 없는 상태입니다."),
+    REFUND_NOT_FOUND(14002, "존재하지 않는 환불 요청 정보입니다."),
+    CAN_NOT_CONFIRM_REFUND(14003, "환불할 수 없는 상태입니다.");
 
     private final int code;
     private final String message;

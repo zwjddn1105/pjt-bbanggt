@@ -30,4 +30,8 @@ public class TransactionRepository {
     public List<Transaction> findAllByOrderIdIn(List<Long> orderIds) {
         return transactionJpaRepository.findAllByOrderIdIn(orderIds);
     }
+
+    public Optional<Transaction> findLatestTransactionByOrderId(Long orderId) {
+        return transactionJpaRepository.findLatestTransactionByOrderId(orderId);
+    }
 }

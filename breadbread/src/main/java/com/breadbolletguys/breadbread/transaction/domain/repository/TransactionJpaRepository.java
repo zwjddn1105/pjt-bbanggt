@@ -16,6 +16,13 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Lon
     List<Transaction> findAllByOrderIdIn(List<Long> orderIds);
 
     @Query("""
+        SELECT t
+        FROM Transaction t
+        WHERE t.orderId = :orderId
+        """)
+    List<Transaction> findAllByOrderId(Long orderId);
+
+    @Query("""
         SELECT t.orderId FROM Transaction t
         WHERE t.transactionStatus = 'PURCHASE'
         AND t.transactionDate < :before
@@ -25,4 +32,13 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Lon
         )
         """)
     List<Long> findAllSettleOrderId(@Param("before") LocalDateTime before);
+
+    @Query("""
+        SELECT t
+        FROM Transaction t
+        WHERE t.orderId = :orderId
+        ORDER BY t.id DESC
+        LIMIT 1
+        """)
+    Optional<Transaction> findLatestTransactionByOrderId(Long orderId);
 }
