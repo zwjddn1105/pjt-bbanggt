@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useProductStore } from "../../store/product-store";
 import { useLoading } from "../../components/loading-provider";
+import ProductDetailModal from "../../components/product-detail-modal";
 
 export default function ProductsPage() {
   const { setLoading } = useLoading();
@@ -36,6 +37,11 @@ export default function ProductsPage() {
 
   const [stockPage, setStockPage] = useState(0);
   const [soldoutPage, setSoldoutPage] = useState(0);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<{
+    productId: number;
+    vendingMachineId: number;
+  } | null>(null);
 
   // 컴포넌트 마운트 시 상품 목록 로드
   useEffect(() => {
@@ -55,9 +61,12 @@ export default function ProductsPage() {
   }, [soldoutCurrentPage]);
 
   // 상품 상세 보기 핸들러 (실제 구현은 나중에)
-  const handleProductDetail = (productId: number) => {
-    console.log(`상품 ${productId} 상세 정보로 이동합니다.`);
-    // 실제 구현은 나중에
+  const handleProductDetail = (productId: number, vendingMachineId: number) => {
+    setSelectedProduct({
+      productId,
+      vendingMachineId,
+    });
+    setShowDetailModal(true);
   };
 
   // 페이지 변경 함수 - 재고 상품
@@ -345,11 +354,13 @@ export default function ProductsPage() {
                     <span className="font-medium text-gray-800">
                       {item.count}
                     </span>
-                    <span className="text-gray-500 text-sm ml-1">칸</span>
+                    <span className="text-gray-500 text-sm ml-1">개</span>
                   </div>
                   <div className="col-span-3 flex justify-end">
                     <button
-                      onClick={() => handleProductDetail(item.id)}
+                      onClick={() =>
+                        handleProductDetail(item.id, item.vendingMachineId)
+                      }
                       className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-3 py-1.5 rounded-full transition-colors flex items-center"
                     >
                       자세히
@@ -427,7 +438,9 @@ export default function ProductsPage() {
                   </div>
                   <div className="col-span-3 flex justify-end">
                     <button
-                      onClick={() => handleProductDetail(item.id)}
+                      onClick={() =>
+                        handleProductDetail(item.id, item.vendingMachineId)
+                      }
                       className="bg-orange-500 hover:bg-orange-600 text-white text-sm px-3 py-1.5 rounded-full transition-colors flex items-center"
                     >
                       자세히
@@ -451,6 +464,14 @@ export default function ProductsPage() {
             )}
         </div>
       </div>
+      {showDetailModal && selectedProduct && (
+        <ProductDetailModal
+          isOpen={showDetailModal}
+          onClose={() => setShowDetailModal(false)}
+          vendingMachineId={selectedProduct.vendingMachineId}
+          productId={selectedProduct.productId}
+        />
+      )}
     </div>
   );
 }

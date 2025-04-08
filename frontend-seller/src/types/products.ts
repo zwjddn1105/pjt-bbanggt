@@ -7,6 +7,8 @@ export interface Product {
   memo: string; // 빵긋 위치 정보
   count: number; // 등록된 수량
   productState: ProductState;
+  vendingMachineId: number; // 벤딩머신 ID 추가
+  name?: string; // 벤딩머신 이름 추가
 }
 
 // 페이징 정보 타입
