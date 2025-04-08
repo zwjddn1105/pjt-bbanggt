@@ -33,4 +33,12 @@ public class UserController {
         userService.payForTicket(user);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/notice-toggle")
+    public ResponseEntity<Void> toggleNotice(
+            @AuthUser User user
+    ) {
+        userService.toggle(user.getId());
+        return ResponseEntity.noContent().build();
+    }
 }

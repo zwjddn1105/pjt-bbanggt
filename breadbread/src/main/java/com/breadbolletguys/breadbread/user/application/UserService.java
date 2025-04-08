@@ -1,6 +1,8 @@
 package com.breadbolletguys.breadbread.user.application;
 
 
+import com.breadbolletguys.breadbread.common.exception.BadRequestException;
+import com.breadbolletguys.breadbread.user.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +22,13 @@ import com.breadbolletguys.breadbread.user.domain.dto.response.UserResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
+    private final UserRepository userRepository;
     @Value("${app.admin.userId}")
     private String adminId;
 
@@ -67,5 +71,13 @@ public class UserService {
                 TransactionType.TICKET_PURCHASE,
                 TransactionStatus.PURCHASE
         );
+    }
+
+    @Transactional
+    public void toggle(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.USER_NOT_FOUND));
+
+        user.toggleNotice();
     }
 }

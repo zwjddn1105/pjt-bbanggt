@@ -99,4 +99,8 @@ public class User extends BaseTimeEntity {
         }
         this.tickets--;
     }
+
+    public void toggleNotice() {
+        noticeCheck = !noticeCheck;
+    }
 }
