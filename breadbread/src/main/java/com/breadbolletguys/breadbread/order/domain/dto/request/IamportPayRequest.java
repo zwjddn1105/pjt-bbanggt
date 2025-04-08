@@ -14,7 +14,4 @@ public class IamportPayRequest {
 
     @NotEmpty
     private String impUid;
-
-    @NotEmpty
-    private String account;
 }

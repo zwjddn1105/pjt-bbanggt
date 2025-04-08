@@ -79,7 +79,9 @@ public class OrderController {
             @PathVariable("orderId") Long orderId,
             @RequestBody IamportPayRequest iamportPayRequest
     ) {
+        vendingMachineCacheService.deleteByOrderId(orderId);
         orderService.payOrderWithIamport(user, orderId, iamportPayRequest);
+        vendingMachineCacheService.save(orderId);
         return ResponseEntity.ok().build();
     }
 

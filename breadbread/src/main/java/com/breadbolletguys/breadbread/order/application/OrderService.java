@@ -67,7 +67,6 @@ public class OrderService {
     private final TransactionService transactionService;
     private final S3Service s3Service;
     private final IpfsService ipfsService;
-    private final VendingMachineRepository vendingMachineRepository;
     private final PaymentValidator paymentValidator;
 
     @Transactional(readOnly = true)
@@ -148,7 +147,8 @@ public class OrderService {
     public void payOrderWithIamport(User user, Long orderId, IamportPayRequest iamportPayRequest) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
-
+        Account account  = accountRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
         if (!order.getProductState().equals(ProductState.AVAILABLE)) {
             throw new BadRequestException(ErrorCode.FORBIDDEN_ORDER_ACCESS);
         }
@@ -161,14 +161,14 @@ public class OrderService {
                 adminAccount,
                 "입금",
                 discountPrice / 100L,
-                iamportPayRequest.getAccount(),
+                account.getAccountNo(),
                 "송금"
         );
         ssafyTransferService.accountTransfer(accountTransferRequest);
         String sellerAccount = sellerAccount(orderId);
         transactionService.recordTransaction(
                 orderId,
-                iamportPayRequest.getAccount(),
+                account.getAccountNo(),
                 adminAccount,
                 (long) discountPrice,
                 TransactionType.BREAD_PURCHASE,
