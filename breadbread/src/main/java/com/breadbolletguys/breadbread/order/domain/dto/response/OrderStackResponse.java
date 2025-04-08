@@ -13,5 +13,7 @@ public class OrderStackResponse {
     private Long id;
     private String memo;
     private int count;
+    private Long vendingMachineId;
+    private String name;
     private ProductState productState;
 }
