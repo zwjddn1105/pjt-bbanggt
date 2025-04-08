@@ -44,7 +44,8 @@ public class TransactionService {
 
     public List<Long> findAllSettleOrderId() {
         LocalDateTime now = LocalDateTime.now();
-        return transactionRepository.findAllSettleOrderId(now);
+        LocalDateTime start = now.minusMonths(1);
+        return transactionRepository.findAllSettleOrderId(start, now);
     }
 
     public Transaction findByOrderId(Long orderId) {

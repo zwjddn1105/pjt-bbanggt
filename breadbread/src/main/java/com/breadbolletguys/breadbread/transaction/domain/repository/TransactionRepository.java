@@ -23,8 +23,8 @@ public class TransactionRepository {
         return transactionJpaRepository.findByOrderId(orderId);
     }
 
-    public List<Long> findAllSettleOrderId(LocalDateTime now) {
-        return transactionJpaRepository.findAllSettleOrderId(now);
+    public List<Long> findAllSettleOrderId(LocalDateTime start, LocalDateTime now) {
+        return transactionJpaRepository.findAllSettleOrderId(start, now);
     }
 
     public List<Transaction> findAllByOrderIdIn(List<Long> orderIds) {

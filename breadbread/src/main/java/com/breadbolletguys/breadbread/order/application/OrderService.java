@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -233,47 +234,6 @@ public class OrderService {
         space.releaseOccupied();
     }
 
-    public void settleOrder() {
-        List<Long> orderIds = transactionService.findAllSettleOrderId();
-        List<Transaction> transactions = transactionService.findAllByOrderIdIn(orderIds);
-        List<Order> orders = orderRepository.findAllById(orderIds);
-        List<Long> sellerIds = orders.stream()
-                .map(Order::getSellerId)
-                .distinct()
-                .collect(Collectors.toList());
-        List<Account> sellerAccounts = accountRepository.findAllAccountNosByUserIds(sellerIds);
-
-        Map<Long, String> sellerAccountMap = sellerAccounts.stream()
-                .collect(Collectors.toMap(Account::getUserId, Account::getAccountNo));
-
-        Map<Long, Long> orderSellerMap = orders.stream()
-                .collect(Collectors.toMap(Order::getId, Order::getSellerId));
-        for (Transaction transaction : transactions) {
-            Long orderId = transaction.getOrderId();
-            Long sellerId = orderSellerMap.get(orderId);
-            String sellerAccount = sellerAccountMap.get(sellerId);
-            AccountTransferRequest accountTransferRequest  = new AccountTransferRequest(
-                    adminKey,
-                    sellerAccount,
-                    "정산 입금",
-                    transaction.getTransactionBalance() / 100,
-                    adminAccount,
-                    "정산 송금"
-            );
-            ssafyTransferService.accountTransfer(accountTransferRequest);
-        }
-        for (Transaction transaction : transactions) {
-            Long orderId = transaction.getOrderId();
-            Long sellerId = orderSellerMap.get(orderId);
-            String sellerAccount = sellerAccountMap.get(sellerId);
-            transactionService.recordTransaction(orderId,
-                    adminAccount,
-                    sellerAccount,
-                    transaction.getTransactionBalance(),
-                    TransactionType.BREAD_PURCHASE,
-                    TransactionStatus.SETTLED);
-        }
-    }
 
     private int getWidth(List<Space> spaces) {
         return spaces.stream()
@@ -365,6 +325,52 @@ public class OrderService {
         Account account = accountRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
         return account.getAccountNo();
+    }
+
+//    /**
+//     * 매달 1일에 정산하는 스케줄러 구현
+//     */
+//    @Scheduled(cron = "0 0 3 1 * *", zone = "Asia/Seoul")
+    public void settleOrder() {
+        List<Long> orderIds = transactionService.findAllSettleOrderId();
+        List<Transaction> transactions = transactionService.findAllByOrderIdIn(orderIds);
+        List<Order> orders = orderRepository.findAllById(orderIds);
+        List<Long> sellerIds = orders.stream()
+                .map(Order::getSellerId)
+                .distinct()
+                .collect(Collectors.toList());
+        List<Account> sellerAccounts = accountRepository.findAllAccountNosByUserIds(sellerIds);
+
+        Map<Long, String> sellerAccountMap = sellerAccounts.stream()
+                .collect(Collectors.toMap(Account::getUserId, Account::getAccountNo));
+
+        Map<Long, Long> orderSellerMap = orders.stream()
+                .collect(Collectors.toMap(Order::getId, Order::getSellerId));
+        for (Transaction transaction : transactions) {
+            Long orderId = transaction.getOrderId();
+            Long sellerId = orderSellerMap.get(orderId);
+            String sellerAccount = sellerAccountMap.get(sellerId);
+            AccountTransferRequest accountTransferRequest  = new AccountTransferRequest(
+                    adminKey,
+                    sellerAccount,
+                    "정산 입금",
+                    transaction.getTransactionBalance() / 100,
+                    adminAccount,
+                    "정산 송금"
+            );
+            ssafyTransferService.accountTransfer(accountTransferRequest);
+        }
+        for (Transaction transaction : transactions) {
+            Long orderId = transaction.getOrderId();
+            Long sellerId = orderSellerMap.get(orderId);
+            String sellerAccount = sellerAccountMap.get(sellerId);
+            transactionService.recordTransaction(orderId,
+                    adminAccount,
+                    sellerAccount,
+                    transaction.getTransactionBalance(),
+                    TransactionType.BREAD_PURCHASE,
+                    TransactionStatus.SETTLED);
+        }
     }
 //    @Scheduled(cron = "0 10 10 * * *")
 //    @Transactional
