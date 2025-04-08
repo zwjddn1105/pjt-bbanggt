@@ -67,7 +67,11 @@ public enum ErrorCode {
     Transaction_NOT_FOUND(12000, "요청 OrderID에 해당하는 거래 내역이 존재하지 않습니다."),
     REFUND_TIME_EXCEEDED(12001, "환불 시간이 불가능한 상품입니다."),
     UNABLE_TO_PICKUP_ORDER(12002, "상품 픽업이 불가합니다."),
-    ALREADY_PICKUP_ORDER(12003, "이미 픽업한 상품입니다.");
+    ALREADY_PICKUP_ORDER(12003, "이미 픽업한 상품입니다."),
+
+    INVALID_IMP_UID(13000, "결제 식별자 imp_uid가 일치하지 않습니다."),
+    INVALID_PAYMENT_AMOUNT(13001, "결제된 금액이 서버에서 계산한 금액과 일치하지 않습니다."),
+    IAMPORT_REQUEST_FAILED(13002, "아임포트 서버 요청 중 오류가 발생했습니다.");
 
     private final int code;
     private final String message;
