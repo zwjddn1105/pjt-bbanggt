@@ -12,7 +12,7 @@ class ImageRequest(BaseModel):
 
 # 모델 로드 (예외 감싸보기)
 try:
-    model = YOLO("./20250327_best_model.pt")  # 가중치 경로
+    model = YOLO("./bad_bread_practice.pt")  # 가중치 경로
     print("✅ YOLO 모델 로드 성공")
 except Exception as e:
     print("❌ YOLO 모델 로드 실패:", e)
@@ -39,9 +39,10 @@ async def predict_image(file: bytes = File(...)):
             "stock": count
         })
 
-    # 최종 응답 구조
+    contains_bad_bread = (len(breads_list) == 0)
+
     response = {
-        "breads": breads_list
+        "containsBadBread": contains_bad_bread,
     }
 
     return response
