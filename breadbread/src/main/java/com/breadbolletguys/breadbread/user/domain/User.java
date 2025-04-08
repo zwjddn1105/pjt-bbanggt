@@ -89,8 +89,8 @@ public class User extends BaseTimeEntity {
         this.userRole = UserRole.SELLER;
     }
 
-    public void purchaseTicket() {
-        this.tickets++;
+    public void purchaseTicket(int count) {
+        this.tickets += count;
     }
 
     public void useTickets() {
