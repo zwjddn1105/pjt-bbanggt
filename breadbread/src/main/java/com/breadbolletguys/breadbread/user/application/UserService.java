@@ -1,5 +1,8 @@
 package com.breadbolletguys.breadbread.user.application;
 
+import com.breadbolletguys.breadbread.bakery.domain.Bakery;
+import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
+import com.breadbolletguys.breadbread.user.domain.dto.response.UserResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -32,16 +35,19 @@ public class UserService {
     private String adminAccount;
 
     private final AccountRepository accountRepository;
+    private final BakeryRepository bakeryRepository;
     private final SsafyTransferService ssafyTransferService;
     private final TransactionService transactionService;
 
-    public void payForTicket(User user, String accountNo) {
+    public UserResponse getMyInfo(User user) {
+        Bakery bakery = bakeryRepository.findByUserId(user.getId())
+                .orElse(null);
+        return UserResponse.from(user, bakery);
+    }
+
+    public void payForTicket(User user) {
         Account account = accountRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ACCOUNT_NOT_FOUND));
-
-        if (!accountNo.equals(account.getAccountNo())) {
-            throw new BadRequestException(ErrorCode.NOT_OWNED_ACCOUNT_ERROR);
-        }
 
         AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
                 user.getUserKey(),
