@@ -44,7 +44,7 @@ public class AiService {
         body.add("file", resource);
 
         return restClient.post()
-                .uri("https://" + serverIp + ":" + serverPort + "/predict2")
+                .uri("https//" + serverIp + ":" + serverPort + "/predict2")
                 .contentType(MediaType.MULTIPART_FORM_DATA)  // multipart/form-data로 전송
                 .body(body)
                 .retrieve()
@@ -66,7 +66,7 @@ public class AiService {
         body.add("file", resource);
 
         return restClient.post()
-                .uri("https://" + serverIp + ":" + serverPort2 + "/predict2")
+                .uri("http://" + serverIp + ":" + serverPort2 + "/predict2")
                 .contentType(MediaType.MULTIPART_FORM_DATA)  // multipart/form-data로 전송
                 .body(body)
                 .retrieve()
