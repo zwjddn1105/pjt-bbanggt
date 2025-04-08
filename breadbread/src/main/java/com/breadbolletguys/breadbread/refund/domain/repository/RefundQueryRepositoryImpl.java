@@ -45,9 +45,9 @@ public class RefundQueryRepositoryImpl implements RefundQueryRepository {
                 .join(space).on(space.id.eq(order.spaceId))
                 .join(vendingMachine).on(vendingMachine.id.eq(space.vendingMachineId))
                 .join(user).on(user.id.eq(refund.customerId))
-                .where(isInRange(pageToken)
-                        .and(refund.sellerId.eq(sellerId)
-                                .and(refund.state.eq(state)))
+                .where(isInRange(pageToken),
+                        refund.sellerId.eq(sellerId)
+                                .and(refund.state.eq(state))
                 )
                 .limit(pageSize + 1)
                 .fetch();
