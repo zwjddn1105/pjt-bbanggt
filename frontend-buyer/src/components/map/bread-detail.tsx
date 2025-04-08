@@ -19,14 +19,14 @@ const breadTypeNames: Record<BreadType, string> = {
   WHITE_BREAD: "식빵",
   BAGUETTE: "바게트",
   CROISSANT: "크루아상",
-  DONUT: "도넛",
-  CREAM_BREAD: "크림빵",
+  PIZZA_BREAD: "피자빵",
+  BAGEL: "베이글",
   GARLIC_BREAD: "마늘빵",
   OTHER: "기타",
   MIXED_BREAD: "모듬빵",
 }
 
-// BreadDetailProps 인터페이스 수정
+// BreadDetailProps 인터페이스 수���
 interface BreadDetailProps {
   vendingMachine: VendingMachine
   slotId: number
@@ -122,109 +122,17 @@ export default function BreadDetail({
     return accountNo.substring(0, visibleLength) + "*".repeat(maskedLength)
   }
 
-  // 빵 타입에 따른 더미 데이터
-  const getBreadData = (type: string, bakery: string) => {
-    // API에서 가져온 데이터가 있으면 그것을 사용
-    if (breadDetail) {
-      return {
+  // breadData 변수 선언 부분을 다음과 같이 변경:
+  const breadData = breadDetail
+    ? {
         name: breadTypeNames[breadDetail.breadType as BreadType] || breadDetail.breadType,
         bakery: breadDetail.bakeryName,
         price: breadDetail.price,
         salePrice: breadDetail.salePrice,
         count: breadDetail.count,
-        image: breadDetail.image,
+        image: breadDetail.image || "/bread-pattern.png",
       }
-    }
-
-    // API 데이터가 없으면 기존 로직 사용
-    const koreanName = breadTypeNames[type as BreadType] || type
-
-    switch (type) {
-      case "BAGUETTE":
-        return {
-          name: koreanName,
-          bakery: bakery,
-          price: 4000,
-          salePrice: 3000,
-          count: 1,
-          image: "/BAGUETTE.jpg",
-        }
-      case "CROISSANT":
-        return {
-          name: koreanName,
-          bakery: bakery,
-          price: 3500,
-          salePrice: 2500,
-          count: 1,
-          image: "/CROISSANT.jpg",
-        }
-      case "WHITE_BREAD":
-        return {
-          name: koreanName,
-          bakery: bakery,
-          price: 5000,
-          salePrice: 4000,
-          count: 1,
-          image: "/WHITE_BREAD.jpg",
-        }
-      case "SOBORO":
-        return {
-          name: koreanName,
-          bakery: bakery,
-          price: 2500,
-          salePrice: 2000,
-          count: 1,
-          image: "/SOBORO.jpg",
-        }
-      case "SWEET_RED_BEAN":
-        return {
-          name: koreanName,
-          bakery: bakery,
-          price: 2000,
-          salePrice: 1500,
-          count: 1,
-          image: "/SWEET_RED_BEAN.jpg",
-        }
-      case "DONUT":
-        return {
-          name: koreanName,
-          bakery: bakery,
-          price: 3000,
-          salePrice: 2500,
-          count: 1,
-          image: "/DONUT.jpg",
-        }
-      case "CREAM_BREAD":
-        return {
-          name: koreanName,
-          bakery: bakery,
-          price: 2500,
-          salePrice: 2000,
-          count: 1,
-          image: "/CREAM_BREAD.jpg",
-        }
-      case "GARLIC_BREAD":
-        return {
-          name: koreanName,
-          bakery: bakery,
-          price: 3500,
-          salePrice: 3000,
-          count: 1,
-          image: "/GARLIC_BREAD.jpg",
-        }
-      default:
-        return {
-          name: koreanName,
-          bakery: bakery,
-          price: 3000,
-          salePrice: 2500,
-          count: 1,
-          image: "/bread-pattern.png",
-        }
-    }
-  }
-
-  const breadData = getBreadData(breadType, bakeryName)
+    : null
 
   // 뒤로가기 또는 취소 버튼 클릭 시 자판기 상세 화면으로 이동
   const handleBack = () => {
@@ -366,160 +274,168 @@ export default function BreadDetail({
         <div className="w-16 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
 
         {/* 빵 상세 정보 카드 */}
-        <div className="mx-4 bg-white rounded-xl shadow-sm border overflow-hidden">
-          {/* 빵 이미지 */}
-          <div className="w-full h-64 bg-gray-100 flex items-center justify-center p-4">
-            <img
-              src={breadData.image || "/bread-pattern.png"}
-              alt={breadData.name}
-              className="max-w-full max-h-full object-contain"
-              onError={(e) => {
-                e.currentTarget.src = "/bread-pattern.png"
-              }}
-            />
-          </div>
-
-          {/* 빵 정보 */}
-          <div className="p-6 text-center">
-            {/* 빵집 이름과 북마크 버튼 */}
-            <div className="flex items-center justify-center mb-2">
-              <h2 className="text-xl font-bold">{breadData.bakery}</h2>
-              <button
-                onClick={handleBookmarkToggle}
-                disabled={bookmarkLoading || !bakeryId}
-                className="ml-2 p-1 focus:outline-none"
-                aria-label={isBookmarked ? "북마크 제거" : "북마크 추가"}
-              >
-                {bookmarkLoading ? (
-                  <div className="w-5 h-5 border-2 border-gray-300 border-t-orange-500 rounded-full animate-spin"></div>
-                ) : (
-                  <Bookmark
-                    className={`w-5 h-5 ${isBookmarked ? "fill-orange-500 text-orange-500" : "text-gray-400"}`}
-                  />
-                )}
-              </button>
+        {breadData ? (
+          <div className="mx-4 bg-white rounded-xl shadow-sm border overflow-hidden">
+            {/* 빵 이미지 */}
+            <div className="w-full h-64 bg-gray-100 flex items-center justify-center p-4">
+              <img
+                src={breadData.image || "/bread-pattern.png"}
+                alt={breadData.name}
+                className="max-w-full max-h-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.src = "/bread-pattern.png"
+                }}
+              />
             </div>
 
-            <p className="text-gray-700 mb-2">{breadData.name}</p>
-            <p className="text-sm text-gray-500 mb-4">
-              {breadDetail?.count ? `${breadDetail.count}개 구성` : "1개 구성"}
-            </p>
-            <div className="flex justify-center items-center mb-6">
-              <span className="text-gray-500 line-through mr-2">{breadData.price}원</span>
-              <span className="text-xl font-bold text-orange-500">{breadData.salePrice}원</span>
-            </div>
+            {/* 빵 정보 */}
+            <div className="p-6 text-center">
+              {/* 빵집 이름과 북마크 버튼 */}
+              <div className="flex items-center justify-center mb-2">
+                <h2 className="text-xl font-bold">{breadData.bakery}</h2>
+                <button
+                  onClick={handleBookmarkToggle}
+                  disabled={bookmarkLoading || !bakeryId}
+                  className="ml-2 p-1 focus:outline-none"
+                  aria-label={isBookmarked ? "북마크 제거" : "북마크 추가"}
+                >
+                  {bookmarkLoading ? (
+                    <div className="w-5 h-5 border-2 border-gray-300 border-t-orange-500 rounded-full animate-spin"></div>
+                  ) : (
+                    <Bookmark
+                      className={`w-5 h-5 ${isBookmarked ? "fill-orange-500 text-orange-500" : "text-gray-400"}`}
+                    />
+                  )}
+                </button>
+              </div>
 
-            {/* 계좌 정보 */}
-            <div className="mt-6 mb-6">
-              <div className="border rounded-lg p-4 bg-gray-50">
-                {accountLoading ? (
-                  <div className="flex justify-center items-center h-16">
-                    <div className="w-5 h-5 border-2 border-gray-300 border-t-orange-500 rounded-full animate-spin mr-2"></div>
-                    <p className="text-gray-500">계좌 정보를 불러오는 중...</p>
-                  </div>
-                ) : accountInfo.length > 0 ? (
-                  <div>
-                    <div className="flex items-center mb-2">
-                      <CreditCard className="w-5 h-5 text-gray-500 mr-2" />
-                      <span className="font-medium">결제 계좌 정보</span>
+              <p className="text-gray-700 mb-2">{breadData.name}</p>
+              <p className="text-sm text-gray-500 mb-4">{breadData.count ? `${breadData.count}개 구성` : "1개 구성"}</p>
+              <div className="flex justify-center items-center mb-6">
+                <span className="text-gray-500 line-through mr-2">{breadData.price}원</span>
+                <span className="text-xl font-bold text-orange-500">{breadData.salePrice}원</span>
+              </div>
+
+              {/* 계좌 정보 */}
+              <div className="mt-6 mb-6">
+                <div className="border rounded-lg p-4 bg-gray-50">
+                  {accountLoading ? (
+                    <div className="flex justify-center items-center h-16">
+                      <div className="w-5 h-5 border-2 border-gray-300 border-t-orange-500 rounded-full animate-spin mr-2"></div>
+                      <p className="text-gray-500">계좌 정보를 불러오는 중...</p>
                     </div>
-                    {accountInfo.map((account, index) => (
-                      <div key={index} className="mt-2">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">{account.bankName}</span>
-                          <span className="font-medium">{maskAccountNumber(account.accountNo)}</span>
-                        </div>
-                        <div className="flex justify-between mt-1">
-                          <span className="text-gray-600">잔액</span>
-                          <span className="font-medium text-orange-500">
-                            {account.accountBalance.toLocaleString()}원
-                          </span>
-                        </div>
+                  ) : accountInfo.length > 0 ? (
+                    <div>
+                      <div className="flex items-center mb-2">
+                        <CreditCard className="w-5 h-5 text-gray-500 mr-2" />
+                        <span className="font-medium">결제 계좌 정보</span>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex justify-center items-center h-16">
-                    <p className="text-gray-500">등록된 계좌가 없습니다.</p>
-                  </div>
-                )}
+                      {accountInfo.map((account, index) => (
+                        <div key={index} className="mt-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">{account.bankName}</span>
+                            <span className="font-medium">{maskAccountNumber(account.accountNo)}</span>
+                          </div>
+                          <div className="flex justify-between mt-1">
+                            <span className="text-gray-600">잔액</span>
+                            <span className="font-medium text-orange-500">
+                              {account.accountBalance.toLocaleString()}원
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex justify-center items-center h-16">
+                      <p className="text-gray-500">등록된 계좌가 없습니다.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* 구매 동의 체크박스 */}
+              <div className="flex items-center mb-6">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={agreeToTerms}
+                    onChange={(e) => setAgreeToTerms(e.target.checked)}
+                    className="w-5 h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                  />
+                  <span className="ml-2 text-gray-700">구매하는데 동의합니다</span>
+                </label>
+              </div>
+
+              {/* 버튼 영역 - 취소하기와 결제하기 버튼 */}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleBack}
+                  className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-lg font-medium"
+                  disabled={paymentLoading}
+                >
+                  취소하기
+                </button>
+                <button
+                  onClick={handlePayment}
+                  disabled={!agreeToTerms || paymentLoading || accountInfo.length === 0}
+                  className={`flex-1 py-3 px-4 rounded-lg font-medium ${
+                    agreeToTerms && !paymentLoading && accountInfo.length > 0
+                      ? "bg-orange-500 text-white"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                >
+                  {paymentLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      <span>결제 중...</span>
+                    </div>
+                  ) : (
+                    "결제하기"
+                  )}
+                </button>
               </div>
             </div>
-
-            {/* 구매 동의 체크박스 */}
-            <div className="flex items-center mb-6">
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={agreeToTerms}
-                  onChange={(e) => setAgreeToTerms(e.target.checked)}
-                  className="w-5 h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
-                />
-                <span className="ml-2 text-gray-700">구매하는데 동의합니다</span>
-              </label>
-            </div>
-
-            {/* 버튼 영역 - 취소하기와 결제하기 버튼 */}
-            <div className="flex gap-3">
-              <button
-                onClick={handleBack}
-                className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 rounded-lg font-medium"
-                disabled={paymentLoading}
-              >
-                취소하기
-              </button>
-              <button
-                onClick={handlePayment}
-                disabled={!agreeToTerms || paymentLoading || accountInfo.length === 0}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium ${
-                  agreeToTerms && !paymentLoading && accountInfo.length > 0
-                    ? "bg-orange-500 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-              >
-                {paymentLoading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    <span>결제 중...</span>
-                  </div>
-                ) : (
-                  "결제하기"
-                )}
-              </button>
-            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mx-4 p-6 bg-white rounded-xl shadow-sm border text-center">
+            <p className="text-gray-500">빵 정보를 불러올 수 없습니다.</p>
+            <button onClick={handleBack} className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg">
+              돌아가기
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 하단 버튼 */}
-      <div className="sticky bottom-0 bg-white border-t flex justify-between p-4">
-        <button
-          onClick={handleBack}
-          className="px-8 py-3 border border-gray-300 rounded-full text-gray-700"
-          disabled={paymentLoading}
-        >
-          취소
-        </button>
-        <button
-          onClick={handlePayment}
-          disabled={!agreeToTerms || paymentLoading || accountInfo.length === 0}
-          className={`px-8 py-3 rounded-full ${
-            agreeToTerms && !paymentLoading && accountInfo.length > 0
-              ? "bg-orange-500 text-white"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
-        >
-          {paymentLoading ? (
-            <div className="flex items-center justify-center">
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-              <span>결제 중...</span>
-            </div>
-          ) : (
-            "결제하기"
-          )}
-        </button>
-      </div>
+      {breadData && (
+        <div className="sticky bottom-0 bg-white border-t flex justify-between p-4">
+          <button
+            onClick={handleBack}
+            className="px-8 py-3 border border-gray-300 rounded-full text-gray-700"
+            disabled={paymentLoading}
+          >
+            취소
+          </button>
+          <button
+            onClick={handlePayment}
+            disabled={!agreeToTerms || paymentLoading || accountInfo.length === 0}
+            className={`px-8 py-3 rounded-full ${
+              agreeToTerms && !paymentLoading && accountInfo.length > 0
+                ? "bg-orange-500 text-white"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+          >
+            {paymentLoading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                <span>결제 중...</span>
+              </div>
+            ) : (
+              "결제하기"
+            )}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
-
