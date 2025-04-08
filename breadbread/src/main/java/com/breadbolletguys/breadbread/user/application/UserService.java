@@ -1,14 +1,13 @@
 package com.breadbolletguys.breadbread.user.application;
 
-import com.breadbolletguys.breadbread.bakery.domain.Bakery;
-import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
-import com.breadbolletguys.breadbread.user.domain.dto.response.UserResponse;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.breadbolletguys.breadbread.account.domain.Account;
 import com.breadbolletguys.breadbread.account.domain.repository.AccountRepository;
-import com.breadbolletguys.breadbread.common.exception.BadRequestException;
+import com.breadbolletguys.breadbread.bakery.domain.Bakery;
+import com.breadbolletguys.breadbread.bakery.domain.repository.BakeryRepository;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 import com.breadbolletguys.breadbread.common.exception.NotFoundException;
 import com.breadbolletguys.breadbread.ssafybank.transfer.request.AccountTransferRequest;
@@ -17,6 +16,7 @@ import com.breadbolletguys.breadbread.transaction.application.TransactionService
 import com.breadbolletguys.breadbread.transaction.domain.TransactionStatus;
 import com.breadbolletguys.breadbread.transaction.domain.TransactionType;
 import com.breadbolletguys.breadbread.user.domain.User;
+import com.breadbolletguys.breadbread.user.domain.dto.response.UserResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
