@@ -10,7 +10,5 @@ import lombok.NoArgsConstructor;
 public class BakeryRequest {
     private String name;
     private String businessNumber;
-    private String homepageUrl;
     private String address;
-    private String phone;
 }

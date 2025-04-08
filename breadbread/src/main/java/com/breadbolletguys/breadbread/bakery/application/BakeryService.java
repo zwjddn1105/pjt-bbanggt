@@ -33,13 +33,9 @@ public class BakeryService {
                 .userId(user.getId())
                 .name(bakeryRequest.getName())
                 .businessNumber(bakeryRequest.getBusinessNumber())
-                .homepageUrl(bakeryRequest.getHomepageUrl())
                 .address(bakeryRequest.getAddress())
-                .phone(bakeryRequest.getPhone())
                 .authenticationDate(LocalDateTime.now())
                 .authenticated(true)
-                .reviewCount(0)
-                .averageScore(0.0)
                 .build();
         bakeryRepository.save(bakery);
         user.changeSeller();
@@ -64,9 +60,7 @@ public class BakeryService {
         bakery.update(
                 bakeryRequest.getName(),
                 bakeryRequest.getBusinessNumber(),
-                bakeryRequest.getHomepageUrl(),
-                bakeryRequest.getAddress(),
-                bakeryRequest.getPhone()
+                bakeryRequest.getAddress()
         );
     }
 

@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 public class BakeryResponse {
     private Long id;
     private String name;
-    private String homepageUrl;
     private String address;
-    private String phone;
     private boolean isMark;
 
     public void updateMark(boolean isMark) {

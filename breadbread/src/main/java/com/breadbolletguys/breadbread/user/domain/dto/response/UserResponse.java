@@ -8,7 +8,8 @@ public record UserResponse(
     String name,
     boolean noticeCheck,
     int tickets,
-    String bakeryName
+    String bakeryName,
+    boolean business
 ) {
     public static UserResponse from(User user, Bakery bakery) {
         return new UserResponse(
@@ -16,7 +17,8 @@ public record UserResponse(
                 user.getName(),
                 user.isNoticeCheck(),
                 user.getTickets(),
-                bakery != null ? bakery.getName() : null
+                bakery != null ? bakery.getName() : null,
+                bakery != null
         );
     }
 }

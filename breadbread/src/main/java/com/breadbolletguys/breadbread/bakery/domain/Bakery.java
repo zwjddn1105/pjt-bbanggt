@@ -37,14 +37,8 @@ public class Bakery extends BaseTimeEntity {
     @Column(name = "business_number", length = 32, nullable = false)
     private String businessNumber;
 
-    @Column(name = "homepage_url", length = 128, nullable = false)
-    private String homepageUrl;
-
     @Column(name = "address", length = 128, nullable = false)
     private String address;
-
-    @Column(name = "phone", length = 16, nullable = false)
-    private String phone;
 
     @Column(name = "authentication_date", nullable = false)
     private LocalDateTime authenticationDate;
@@ -52,42 +46,27 @@ public class Bakery extends BaseTimeEntity {
     @Column(name = "authenticated", nullable = false)
     private Boolean authenticated;
 
-    @Column(name = "review_count", nullable = false)
-    private Integer reviewCount;
-
-    @Column(name = "average_score", nullable = false)
-    private Double averageScore;
 
     @Builder
     private Bakery(
         Long userId,
         String name,
         String businessNumber,
-        String homepageUrl,
         String address,
-        String phone,
         LocalDateTime authenticationDate,
-        Boolean authenticated,
-        Integer reviewCount,
-        Double averageScore
+        Boolean authenticated
     ) {
         this.userId = userId;
         this.name = name;
         this.businessNumber = businessNumber;
-        this.homepageUrl = homepageUrl;
         this.address = address;
-        this.phone = phone;
         this.authenticationDate = authenticationDate;
         this.authenticated = authenticated;
-        this.reviewCount = reviewCount;
-        this.averageScore = averageScore;
     }
 
-    public void update(String name, String businessNumber, String homepageUrl, String address, String phone) {
+    public void update(String name, String businessNumber, String address) {
         this.name = name;
         this.businessNumber = businessNumber;
-        this.homepageUrl = homepageUrl;
         this.address = address;
-        this.phone = phone;
     }
 }
