@@ -1,6 +1,8 @@
 package com.breadbolletguys.breadbread.order.domain;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,12 +14,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import com.breadbolletguys.breadbread.common.domain.BaseTimeEntity;
+import com.breadbolletguys.breadbread.user.domain.User;
 
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
@@ -106,4 +108,11 @@ public class Order extends BaseTimeEntity {
         this.productState = ProductState.FINISHED;
     }
 
+    public boolean isBuyer(User user) {
+        return Objects.equals(user.getId(), this.buyerId);
+    }
+
+    public boolean isFinish() {
+        return productState.equals(ProductState.FINISHED);
+    }
 }
