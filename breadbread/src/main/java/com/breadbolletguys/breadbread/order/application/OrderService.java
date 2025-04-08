@@ -234,14 +234,6 @@ public class OrderService {
         space.releaseOccupied();
     }
 
-
-    private int getWidth(List<Space> spaces) {
-        return spaces.stream()
-                .mapToInt(Space::getWidth)
-                .max()
-                .orElse(0);
-    }
-
     private Order saveSingleBreadOrder(
             User user,
             Long spaceId,
@@ -257,7 +249,7 @@ public class OrderService {
                 .spaceId(spaceId)
                 .buyerId(null)
                 .price(request.getPrice())
-                .discount(request.getDiscount() / 100)
+                .discount(request.getDiscount() * 1.0 / 100)
                 .count(request.getCount())
                 .image(imageUrl) // 이미지 업로드 시 로직 필요
                 .expirationDate(expirationDate)
