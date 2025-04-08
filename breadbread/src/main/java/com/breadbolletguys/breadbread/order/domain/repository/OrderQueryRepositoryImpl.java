@@ -286,7 +286,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         )).from(order)
                 .leftJoin(space).on(order.spaceId.eq(space.id))
                 .leftJoin(vendingMachine).on(space.vendingMachineId.eq(space.vendingMachineId))
-                .where(vendingMachine.id.in(vendingMachineIds))
+                .where(vendingMachine.id.in(vendingMachineIds).and(order.productState.eq(ProductState.AVAILABLE)))
                 .groupBy(vendingMachine.id)
                 .fetch();
     }
