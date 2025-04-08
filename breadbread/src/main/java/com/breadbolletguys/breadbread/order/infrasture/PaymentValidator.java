@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 import com.breadbolletguys.breadbread.common.exception.NotFoundException;
 import com.breadbolletguys.breadbread.order.domain.Order;
@@ -31,16 +32,16 @@ public class PaymentValidator {
             BigDecimal price = BigDecimal.valueOf(order.getPrice());
             BigDecimal discount = BigDecimal.valueOf(order.getDiscount());
             if (!payment.getImpUid().equals(impUid)) {
-                throw new IllegalArgumentException("ImpUID가 일치하지 않습니다.");
+                throw new BadRequestException(ErrorCode.INVALID_IMP_UID);
             }
             int expectedAmount = price.multiply(BigDecimal.ONE.subtract(discount))
                     .setScale(0, RoundingMode.DOWN)
                     .intValue();
             if (payment.getAmount().intValue() != expectedAmount) {
-                throw new IllegalArgumentException("결제 금액이 일치하지 않습니다.");
+                throw new BadRequestException(ErrorCode.INVALID_PAYMENT_AMOUNT);
             }
         } catch (Exception e) {
-            throw new IllegalArgumentException("IamPort 사용 시 오류 발생");
+            throw new BadRequestException(ErrorCode.IAMPORT_REQUEST_FAILED);
         }
     }
 
