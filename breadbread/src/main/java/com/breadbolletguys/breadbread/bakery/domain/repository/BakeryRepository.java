@@ -29,18 +29,6 @@ public class BakeryRepository {
         return bakeryQueryRepository.findBakeryBaseInfo(bakeryId);
     }
 
-    public void increaseReview(Long bakeryid) {
-        bakeryQueryRepository.increaseReview(bakeryid);
-    }
-
-    public void decreaseReview(Long bakeryId) {
-        bakeryQueryRepository.decreaseReview(bakeryId);
-    }
-
-    public void updateAverageScore(Long bakeryId, Integer score) {
-        bakeryQueryRepository.updateAverageScore(bakeryId, score);
-    }
-
     public Optional<Bakery> findByUserId(Long userId) {
         return bakeryJpaRepository.findByUserId(userId);
     }
