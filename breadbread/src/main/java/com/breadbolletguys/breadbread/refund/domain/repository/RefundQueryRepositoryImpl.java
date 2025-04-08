@@ -37,6 +37,7 @@ public class RefundQueryRepositoryImpl implements RefundQueryRepository {
                         refund.id,
                         order.id,
                         vendingMachine.name,
+                        user.name,
                         refund.createdAt,
                         order.price.intValue()
                 )).from(refund)
