@@ -24,16 +24,15 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponse> findById(@AuthUser User user) {
-        return ResponseEntity.ok(UserResponse.from(user));
+        return ResponseEntity.ok(userService.getMyInfo(user));
     }
 
     @PostMapping("/purchaseTickets")
     @Operation(description = "사용자가 티켓을 구매합니다.(티켓 구매가 100원)")
     public ResponseEntity<Void> purchaseTickets(
-            @AuthUser User user,
-            @RequestBody AccountRequest accountRequest
+            @AuthUser User user
     ) {
-        userService.payForTicket(user, accountRequest.getAccountNo());
+        userService.payForTicket(user);
         return ResponseEntity.ok().build();
     }
 }
