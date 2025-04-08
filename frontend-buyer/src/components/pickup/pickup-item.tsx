@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
-import { Navigation } from "lucide-react" // X 아이콘 추가
+import { Navigation, MessageCircle } from "lucide-react" // MessageCircle 아이콘 추가
+import { useRouter } from "next/navigation" // 라우터 추가
 
 // API 명세서에 맞게 Props 인터페이스 수정 (? 제거)
 interface PickupItemProps {
@@ -30,8 +31,8 @@ const breadTypeNames: Record<string, string> = {
   WHITE_BREAD: "식빵",
   BAGUETTE: "바게트",
   CROISSANT: "크루아상",
-  DONUT: "도넛",
-  CREAM_BREAD: "크림빵",
+  PIZZA_BREAD : "피자빵",
+  BAGEL : "베이글",
   GARLIC_BREAD: "마늘빵",
   OTHER: "기타",
   MIXED_BREAD: "모듬빵",
@@ -55,6 +56,8 @@ export function PickupItem({
   bakeryId,
 }: PickupItemProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [isChatLoading, setIsChatLoading] = useState(false) // 채팅 로딩 상태 추가
+  const router = useRouter() // Next.js 라우터 사용
 
   // 빵 타입 한글 이름 가져오기
   const getBreadTypeName = (type: string): string => {
@@ -218,6 +221,89 @@ export function PickupItem({
     }
   }
 
+  // 채팅 문의 함수 추가
+  const handleChatInquiry = async () => {
+    if (!bakeryId) {
+      alert("빵집 정보가 없어 문의할 수 없습니다.")
+      return
+    }
+
+    setIsChatLoading(true)
+    try {
+      // access_token 가져오기
+      const token = localStorage.getItem("access_token")
+      if (!token) {
+        throw new Error("로그인이 필요합니다")
+      }
+
+      // 1. 채팅방 존재 여부 확인
+      console.log(`[채팅방 확인 API 호출] 빵집 ID: ${bakeryId}`)
+      const checkResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-rooms/check?bakeryId=${bakeryId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+
+      if (!checkResponse.ok) {
+        throw new Error("채팅방 확인 중 오류가 발생했습니다")
+      }
+
+      const checkData = await checkResponse.json()
+      console.log("[채팅방 확인 API 응답]", checkData)
+
+      let chatRoomId: number
+
+      // 2. 채팅방이 없으면 생성
+      if (!checkData.isExist) {
+        console.log("[채팅방 생성 API 호출] 빵집 ID:", bakeryId)
+        const createResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-rooms`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ bakeryId }),
+        })
+
+        if (!createResponse.ok) {
+          throw new Error("채팅방 생성 중 오류가 발생했습니다")
+        }
+
+        // 채팅방 생성 후 ID 가져오기 위해 다시 확인 API 호출
+        const recheckResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-rooms/check?bakeryId=${bakeryId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        )
+
+        if (!recheckResponse.ok) {
+          throw new Error("채팅방 재확인 중 오류가 발생했습니다")
+        }
+
+        const recheckData = await recheckResponse.json()
+        chatRoomId = recheckData.id
+      } else {
+        // 이미 존재하는 채팅방 ID 사용
+        chatRoomId = checkData.id
+      }
+
+      // 3. 채팅방으로 이동
+      console.log(`[채팅방으로 이동] 채팅방 ID: ${chatRoomId}`)
+      router.push(`/inquiry/${chatRoomId}`)
+    } catch (error) {
+      console.error("[채팅 문의 오류]", error)
+      alert(error instanceof Error ? error.message : "채팅 문의 처리 중 오류가 발생했습니다")
+    } finally {
+      setIsChatLoading(false)
+    }
+  }
+
   // 버튼 텍스트를 상태에 따라 다르게 표시하도록 수정
   const getButtonText = () => {
     if (isLoading) {
@@ -276,11 +362,9 @@ export function PickupItem({
           <p className="text-sm mt-1">빵긋번호: {slotNumber}번</p>
 
           <p className="text-sm mt-1">수량: {count}개</p>
-          <p className="text-sm">
-            가격: {salePrice.toLocaleString()}원
-          </p>
+          <p className="text-sm">가격: {salePrice.toLocaleString()}원</p>
 
-          {/* 빵긋열기 버튼 */}
+          {/* 버튼 영역 */}
           <div className="mt-2 flex gap-2">
             {productState === "SOLD_OUT" && (
               <button
@@ -298,8 +382,30 @@ export function PickupItem({
                 )}
               </button>
             )}
+
+            {/* FINISHED 상태일 때 채팅 문의 버튼 추가 */}
+            {productState === "FINISHED" && (
+              <button
+                className="flex-1 bg-blue-500 text-white text-sm px-4 py-1 rounded-full"
+                onClick={handleChatInquiry}
+                disabled={isChatLoading}
+              >
+                {isChatLoading ? (
+                  <span className="flex items-center justify-center">
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></span>
+                    처리 중...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 mr-1" />
+                    문의하기
+                  </span>
+                )}
+              </button>
+            )}
+
             <button
-              className={`${productState === "SOLD_OUT" ? "flex-1" : "w-full"} bg-orange-500 text-white text-sm px-4 py-1 rounded-full`}
+              className={`${productState === "SOLD_OUT" || productState === "FINISHED" ? "flex-1" : "w-full"} bg-orange-500 text-white text-sm px-4 py-1 rounded-full`}
               onClick={handlePickupComplete}
               disabled={isLoading}
             >

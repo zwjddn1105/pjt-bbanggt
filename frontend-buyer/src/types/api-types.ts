@@ -15,8 +15,8 @@ export type BreadType =
   | "WHITE_BREAD" // 식빵
   | "BAGUETTE" // 바게트
   | "CROISSANT" // 크루아상
-  | "DONUT" // 도넛
-  | "CREAM_BREAD" // 크림빵
+  | "PIZZA_BREAD" // 피자빵
+  | "BAGEL" // 베이글
   | "GARLIC_BREAD" // 마늘빵
   | "OTHER" // 기타
   | "MIXED_BREAD" // 모듬빵
