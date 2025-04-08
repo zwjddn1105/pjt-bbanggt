@@ -97,3 +97,37 @@ export const fetchVendingMachineDetail = async (
     throw new Error("자판기 상세 정보를 가져오는 중 오류가 발생했습니다.");
   }
 };
+
+// 슬롯 구매 API 함수 추가
+export const buySlot = async (spaceId: number): Promise<boolean> => {
+  const authToken = getAuthToken();
+
+  if (!authToken) {
+    throw new Error("인증 토큰이 없습니다. 로그인이 필요합니다.");
+  }
+
+  try {
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/spaces/${spaceId}/buy`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      }
+    );
+
+    return true;
+  } catch (error) {
+    console.error("슬롯 구매 실패:", error);
+
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        console.error("응답 상태:", error.response.status);
+        console.error("응답 데이터:", error.response.data);
+      }
+    }
+
+    throw new Error("슬롯 구매 중 오류가 발생했습니다.");
+  }
+};

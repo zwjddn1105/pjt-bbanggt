@@ -244,16 +244,18 @@ export interface VendingMachineDetailResponse {
   sellerResponseList: SlotResponse[]; // slotResponseList에서 sellerResponseList로 변경
 }
 
-// 슬롯 정보 타입
+// 슬롯 정보 타입 업데이트 - spaceId 추가
 export interface SlotResponse {
   slotNumber: number;
-  stackSummaryResponse: StackSummaryResponse | null; // orderSummaryResponse에서 stackSummaryResponse로 변경
+  spaceId: number;
+  mine: boolean; // 바깥으로 빠져나온 mine 필드
+  stackSummaryResponse: StackSummaryResponse | null;
 }
 
 // 주문 요약 정보 타입 (이름 변경)
 export interface StackSummaryResponse {
   orderId: number;
-  mine: boolean; // isMine에서 mine으로 변경
+  // mine 필드 제거됨
 }
 
 // 슬롯 상태 타입 (UI 표시용)
@@ -269,4 +271,29 @@ export interface SlotUI {
   slotNumber: number;
   status: SlotStatus;
   orderId?: number;
+}
+
+// 빵 종류 타입 추가
+export enum BreadType {
+  SOBORO = "SOBORO",
+  CREAM = "CREAM",
+  MILK = "MILK",
+  CHEESE = "CHEESE",
+  CHOCOLATE = "CHOCOLATE",
+  PLAIN = "PLAIN",
+  OTHER = "OTHER",
+}
+
+// 주문 요청 타입 추가
+export interface OrderRequest {
+  price: number;
+  count: number;
+  discount: number;
+  breadType: BreadType;
+}
+
+// 주문 생성 요청 타입 추가
+export interface CreateOrderRequest {
+  orderRequests: OrderRequest[];
+  image: string | File;
 }

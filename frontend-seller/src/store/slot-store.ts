@@ -1,7 +1,16 @@
 import { create } from "zustand";
-import type { VendingMachineDetailResponse, SlotUI } from "../types/map";
+import type { VendingMachineDetailResponse } from "../types/map";
 import { SlotStatus } from "../types/map";
 import { fetchVendingMachineDetail } from "../api/vending-machine";
+
+// SlotUI 인터페이스 업데이트
+export interface SlotUI {
+  slotNumber: number;
+  spaceId: number;
+  status: SlotStatus;
+  orderId?: number;
+  hasBread: boolean; // 빵 정보가 있는지 여부 추가
+}
 
 interface SlotState {
   // 모달 표시 상태
@@ -47,6 +56,10 @@ interface SlotState {
 
   // 모달 초기화
   resetModal: () => void;
+
+  // 원래 상태 저장 (계산용)
+  originalSlots: SlotUI[];
+  setOriginalSlots: (slots: SlotUI[]) => void;
 }
 
 export const useSlotStore = create<SlotState>((set, get) => ({
@@ -62,6 +75,10 @@ export const useSlotStore = create<SlotState>((set, get) => ({
 
   slots: [],
   setSlots: (slots) => set({ slots: slots }),
+
+  // 원래 상태 저장 (계산용)
+  originalSlots: [],
+  setOriginalSlots: (slots) => set({ originalSlots: slots }),
 
   selectedSlotNumber: null,
   setSelectedSlotNumber: (slotNumber) =>
@@ -81,6 +98,7 @@ export const useSlotStore = create<SlotState>((set, get) => ({
       setVendingMachineDetail,
       setSlots,
       resetSlots,
+      setOriginalSlots,
     } = get();
 
     try {
@@ -116,72 +134,130 @@ export const useSlotStore = create<SlotState>((set, get) => ({
       ) {
         console.warn("슬롯 응답 목록이 없거나 배열이 아닙니다.");
         setSlots([]);
+        setOriginalSlots([]);
         return;
       }
 
-      // 슬롯 UI 상태 초기화 - 필드 이름 변경 반영
+      // 데이터 구조 변경에 맞게 슬롯 UI 상태 초기화 로직 수정
       const slotsUI: SlotUI[] = detail.sellerResponseList.map((slot) => {
         let status: SlotStatus;
+        let hasBread = false;
 
-        if (!slot.stackSummaryResponse) {
-          status = SlotStatus.AVAILABLE;
-        } else if (slot.stackSummaryResponse.mine) {
-          // isMine에서 mine으로 변경
+        // 수정된 로직: mine 필드가 바깥으로 빠져나옴
+        if (slot.mine) {
           status = SlotStatus.MINE;
+          // stackSummaryResponse가 null이 아니면 빵 정보가 있음
+          hasBread = slot.stackSummaryResponse !== null;
         } else {
-          status = SlotStatus.OCCUPIED;
+          // mine이 false일 때
+          if (!slot.stackSummaryResponse) {
+            status = SlotStatus.AVAILABLE; // 이용 가능
+          } else {
+            status = SlotStatus.OCCUPIED; // 타인이 사용 중
+          }
         }
 
         return {
           slotNumber: slot.slotNumber,
+          spaceId: slot.spaceId,
           status: status,
           orderId: slot.stackSummaryResponse?.orderId,
+          hasBread: hasBread,
         };
       });
 
       setSlots(slotsUI);
+      // 원본 상태 저장 (계산용)
+      setOriginalSlots([...slotsUI]);
     } catch (error) {
       console.error("벤딩머신 상세 정보 로드 실패:", error);
       setError(
         error instanceof Error ? error.message : "벤딩머신 상세 정보 로드 실패"
       );
       setSlots([]);
+      setOriginalSlots([]);
     } finally {
       setIsLoading(false);
     }
   },
 
-  // 슬롯 선택 처리
+  // 슬롯 선택 처리 함수 수정
   selectSlot: (slotNumber) => {
-    const { slots, setSlots, setSelectedSlotNumber } = get();
+    const {
+      slots,
+      originalSlots,
+      selectedSlotNumber,
+      setSlots,
+      setSelectedSlotNumber,
+    } = get();
 
-    // 이미 선택된 슬롯이 있으면 선택 해제
-    const updatedSlots = slots.map((slot) => {
-      if (slot.status === SlotStatus.SELECTED) {
-        return { ...slot, status: SlotStatus.AVAILABLE };
-      }
-      return slot;
-    });
+    // 현재 선택된 슬롯과 동일한 슬롯을 클릭한 경우 (선택 해제)
+    if (selectedSlotNumber === slotNumber) {
+      // 모든 슬롯을 원래 상태로 복원
+      const updatedSlots = slots.map((slot) => {
+        // 현재 선택된 슬롯만 원래 상태로 복원
+        if (slot.slotNumber === slotNumber) {
+          const originalStatus =
+            originalSlots.find((origSlot) => origSlot.slotNumber === slotNumber)
+              ?.status || SlotStatus.AVAILABLE;
 
-    // 선택한 슬롯 찾기
-    const selectedSlot = updatedSlots.find(
-      (slot) => slot.slotNumber === slotNumber
-    );
+          return { ...slot, status: originalStatus };
+        }
+        return slot;
+      });
 
-    // 선택한 슬롯이 이용 가능한 상태인 경우에만 선택 처리
-    if (selectedSlot && selectedSlot.status === SlotStatus.AVAILABLE) {
-      selectedSlot.status = SlotStatus.SELECTED;
-      setSelectedSlotNumber(slotNumber);
-    } else {
+      setSlots(updatedSlots);
       setSelectedSlotNumber(null);
+      return;
     }
 
-    setSlots(updatedSlots);
+    // 새로운 슬롯 선택 시
+    const clickedSlotIndex = slots.findIndex(
+      (slot) => slot.slotNumber === slotNumber
+    );
+    if (clickedSlotIndex === -1) return;
+
+    const clickedSlot = slots[clickedSlotIndex];
+
+    // 이용 가능한 슬롯만 선택 가능 (MINE 상태 제외)
+    if (clickedSlot.status !== SlotStatus.AVAILABLE) {
+      return;
+    }
+
+    // 새로운 슬롯 배열 생성
+    const newSlots = [...slots];
+
+    // 이전에 선택된 슬롯이 있으면 원래 상태로 복원
+    if (selectedSlotNumber !== null) {
+      const prevSelectedIndex = newSlots.findIndex(
+        (slot) => slot.slotNumber === selectedSlotNumber
+      );
+      if (prevSelectedIndex !== -1) {
+        const originalStatus =
+          originalSlots.find(
+            (origSlot) => origSlot.slotNumber === selectedSlotNumber
+          )?.status || SlotStatus.AVAILABLE;
+
+        newSlots[prevSelectedIndex] = {
+          ...newSlots[prevSelectedIndex],
+          status: originalStatus,
+        };
+      }
+    }
+
+    // 새로 선택한 슬롯만 SELECTED 상태로 변경
+    newSlots[clickedSlotIndex] = {
+      ...clickedSlot,
+      status: SlotStatus.SELECTED,
+    };
+
+    setSlots(newSlots);
+    setSelectedSlotNumber(slotNumber);
   },
 
   // 슬롯 초기화
   resetSlots: () => {
-    set({ slots: [], selectedSlotNumber: null });
+    set({ slots: [], originalSlots: [], selectedSlotNumber: null });
   },
 
   // 모달 초기화
@@ -191,6 +267,7 @@ export const useSlotStore = create<SlotState>((set, get) => ({
       selectedVendingMachineId: null,
       vendingMachineDetail: null,
       slots: [],
+      originalSlots: [],
       selectedSlotNumber: null,
       error: null,
     });

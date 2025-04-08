@@ -5,12 +5,14 @@ import { useLoading } from "../../components/loading-provider";
 import { isLoggedIn } from "../../lib/auth";
 import { useRouter } from "next/navigation";
 import { useMapStore } from "../../store/map-store";
+import { useSellerProductsStore } from "../../store/seller-products-store";
 import SlotSelectionModal from "../../components/map/slot-selection-modal";
 import MapContainer from "../../components/map/map-container";
 import SearchBar from "../../components/map/search-bar";
 import ControlPanel from "../../components/map/control-panel";
 import Legend from "../../components/map/legend";
 import VendingMachinePanel from "../../components/map/vending-machine-panel";
+import SellerProductsModal from "../../components/map/seller-products-modal";
 import type { KakaoMap } from "../../types/map";
 
 export default function MapPage() {
@@ -26,6 +28,9 @@ export default function MapPage() {
     setSelectedVendingMachine,
     showLegend,
   } = useMapStore();
+
+  const { isProductsModalOpen, setIsProductsModalOpen } =
+    useSellerProductsStore();
 
   // 로그인 상태 확인
   useEffect(() => {
@@ -81,6 +86,16 @@ export default function MapPage() {
 
       {/* 슬롯 선택 모달 */}
       <SlotSelectionModal />
+
+      {/* 등록한 빵 목록 모달 */}
+      {isProductsModalOpen && selectedVendingMachine && (
+        <SellerProductsModal
+          isOpen={isProductsModalOpen}
+          onClose={() => setIsProductsModalOpen(false)}
+          vendingMachineId={selectedVendingMachine.id}
+          vendingMachineName={selectedVendingMachine.name || "빵긋 자판기"}
+        />
+      )}
     </div>
   );
 }
