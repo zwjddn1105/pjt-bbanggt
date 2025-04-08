@@ -253,7 +253,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .where(
                         qOrder.id.eq(orderId),
                         qVendingMachine.id.eq(vendingMachineId),
-                        qOrder.productState.eq(ProductState.AVAILABLE)
+                        qOrder.productState.in(ProductState.AVAILABLE, ProductState.SOLD_OUT)
                 )
                 .fetchOne();
 
