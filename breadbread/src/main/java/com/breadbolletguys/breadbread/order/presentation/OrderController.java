@@ -73,13 +73,15 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{order}/pay/iamport")
+    @PostMapping("/{orderId}/pay/iamport")
     public ResponseEntity<Void> payOrderWithIamport(
             @AuthUser User user,
             @PathVariable("orderId") Long orderId,
             @RequestBody IamportPayRequest iamportPayRequest
     ) {
+        vendingMachineCacheService.deleteByOrderId(orderId);
         orderService.payOrderWithIamport(user, orderId, iamportPayRequest);
+        vendingMachineCacheService.save(orderId);
         return ResponseEntity.ok().build();
     }
 

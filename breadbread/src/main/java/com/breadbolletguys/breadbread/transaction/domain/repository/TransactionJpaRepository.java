@@ -25,10 +25,12 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Lon
     @Query("""
         SELECT t.orderId FROM Transaction t
         WHERE t.transactionStatus = 'PURCHASE'
-        AND t.transactionDate < :before
+        AND t.transactionDate >= :start
+        AND t.transactionDate < :end
         AND t.orderId NOT IN (
             SELECT t2.orderId FROM Transaction t2
             WHERE t2.transactionStatus = 'REFUND'
+                OR t2.transactionStatus = 'SETTLED'
         )
         """)
     List<Long> findAllSettleOrderId(@Param("before") LocalDateTime before);
@@ -41,4 +43,9 @@ public interface TransactionJpaRepository extends JpaRepository<Transaction, Lon
         LIMIT 1
         """)
     Optional<Transaction> findLatestTransactionByOrderId(Long orderId);
+
+    List<Long> findAllSettleOrderId(
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end
+    );
 }

@@ -156,6 +156,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.id,
                         qVendingMachine.address,
                         qOrder.count,
+                        qVendingMachine.id,
+                        qVendingMachine.name,
                         qOrder.productState
                 ))
                 .from(qOrder)
@@ -189,13 +191,15 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.id,
                         qVendingMachine.address,
                         qOrder.count,
+                        qVendingMachine.id,
+                        qVendingMachine.name,
                         qOrder.productState
                 ))
                 .from(qOrder)
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
                 .where(qOrder.sellerId.eq(userId)
-                        .and(qOrder.productState.eq(ProductState.SOLD_OUT)))
+                        .and(qOrder.productState.in(ProductState.SOLD_OUT, ProductState.FINISHED)))
                 .orderBy(qOrder.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -253,7 +257,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .where(
                         qOrder.id.eq(orderId),
                         qVendingMachine.id.eq(vendingMachineId),
-                        qOrder.productState.eq(ProductState.AVAILABLE)
+                        qOrder.productState.in(ProductState.AVAILABLE, ProductState.SOLD_OUT, ProductState.FINISHED)
                 )
                 .fetchOne();
 
