@@ -195,7 +195,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
                 .where(qOrder.sellerId.eq(userId)
-                        .and(qOrder.productState.eq(ProductState.SOLD_OUT)))
+                        .and(qOrder.productState.in(ProductState.SOLD_OUT, ProductState.FINISHED)))
                 .orderBy(qOrder.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
