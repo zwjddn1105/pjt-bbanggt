@@ -73,7 +73,7 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{order}/pay/iamport")
+    @PostMapping("/{orderId}/pay/iamport")
     public ResponseEntity<Void> payOrderWithIamport(
             @AuthUser User user,
             @PathVariable("orderId") Long orderId,
