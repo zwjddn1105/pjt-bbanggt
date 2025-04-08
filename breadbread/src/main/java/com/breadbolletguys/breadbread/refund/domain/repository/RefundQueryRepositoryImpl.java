@@ -38,7 +38,7 @@ public class RefundQueryRepositoryImpl implements RefundQueryRepository {
                         order.id,
                         vendingMachine.name,
                         refund.createdAt,
-                        order.price
+                        order.price.intValue()
                 )).from(refund)
                 .join(order).on(order.id.eq(refund.orderId))
                 .join(space).on(space.id.eq(order.spaceId))
