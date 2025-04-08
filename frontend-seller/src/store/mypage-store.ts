@@ -7,7 +7,8 @@ interface MyPageState {
   isLoading: boolean;
   error: string | null;
   fetchUserData: () => Promise<void>;
-  updateNoticeCheck: (value: boolean) => Promise<void>;
+  updateNoticeCheck: () => Promise<void>;
+  setUserData: (data: UserData) => void;
 }
 
 export const useMyPageStore = create<MyPageState>((set, get) => ({
@@ -31,13 +32,13 @@ export const useMyPageStore = create<MyPageState>((set, get) => ({
   },
 
   // 알림 설정 변경
-  updateNoticeCheck: async (value: boolean) => {
+  updateNoticeCheck: async () => {
     set({ isLoading: true, error: null });
     try {
-      await updateNoticeSettings(value);
+      await updateNoticeSettings();
       set((state) => ({
         userData: state.userData
-          ? { ...state.userData, noticeCheck: value }
+          ? { ...state.userData, noticeCheck: !state.userData.noticeCheck }
           : null,
         isLoading: false,
       }));
@@ -48,6 +49,11 @@ export const useMyPageStore = create<MyPageState>((set, get) => ({
         isLoading: false,
       });
     }
+  },
+
+  // 사용자 데이터 직접 설정 (사업자 인증 후 업데이트용)
+  setUserData: (data: UserData) => {
+    set({ userData: data });
   },
 }));
 
