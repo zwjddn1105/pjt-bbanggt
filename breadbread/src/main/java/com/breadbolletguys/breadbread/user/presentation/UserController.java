@@ -3,11 +3,9 @@ package com.breadbolletguys.breadbread.user.presentation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.breadbolletguys.breadbread.account.domain.dto.request.AccountRequest;
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
 import com.breadbolletguys.breadbread.user.application.UserService;
 import com.breadbolletguys.breadbread.user.domain.User;

@@ -198,7 +198,7 @@ public class OrderService {
                 transaction.getSenderAccount(),
                 "환불 입금",
                 transaction.getTransactionBalance() / 100,
-                transaction.getSenderAccount(),
+                adminAccount,
                 "환불 송금"
         );
         ssafyTransferService.accountTransfer(accountTransferRequest);
@@ -338,30 +338,43 @@ public class OrderService {
 
         Map<Long, Long> orderSellerMap = orders.stream()
                 .collect(Collectors.toMap(Order::getId, Order::getSellerId));
-        for (Transaction transaction : transactions) {
-            Long orderId = transaction.getOrderId();
-            Long sellerId = orderSellerMap.get(orderId);
+
+        Map<Long, List<Transaction>> sellerTransactionMap = transactions.stream()
+                .collect(Collectors.groupingBy(t -> orderSellerMap.get(t.getOrderId())));
+
+        for (Map.Entry<Long, List<Transaction>> entry : sellerTransactionMap.entrySet()) {
+            Long sellerId = entry.getKey();
+            List<Transaction> sellerTransactions = entry.getValue();
             String sellerAccount = sellerAccountMap.get(sellerId);
-            AccountTransferRequest accountTransferRequest  = new AccountTransferRequest(
+
+            // 총 정산 금액 계산
+            long totalAmount = sellerTransactions.stream()
+                    .mapToLong(Transaction::getTransactionBalance)
+                    .sum();
+
+            // 정산 송금 요청 (판매자당 1회)
+            AccountTransferRequest accountTransferRequest = new AccountTransferRequest(
                     adminKey,
                     sellerAccount,
                     "정산 입금",
-                    transaction.getTransactionBalance() / 100,
+                    totalAmount / 100,
                     adminAccount,
                     "정산 송금"
             );
             ssafyTransferService.accountTransfer(accountTransferRequest);
-        }
-        for (Transaction transaction : transactions) {
-            Long orderId = transaction.getOrderId();
-            Long sellerId = orderSellerMap.get(orderId);
-            String sellerAccount = sellerAccountMap.get(sellerId);
-            transactionService.recordTransaction(orderId,
-                    adminAccount,
-                    sellerAccount,
-                    transaction.getTransactionBalance(),
-                    TransactionType.BREAD_PURCHASE,
-                    TransactionStatus.SETTLED);
+
+            // 주문별 트랜잭션 기록
+            for (Transaction transaction : sellerTransactions) {
+                Long orderId = transaction.getOrderId();
+                transactionService.recordTransaction(
+                        orderId,
+                        adminAccount,
+                        sellerAccount,
+                        transaction.getTransactionBalance(),
+                        TransactionType.BREAD_PURCHASE,
+                        TransactionStatus.SETTLED
+                );
+            }
         }
     }
 //    @Scheduled(cron = "0 10 10 * * *")
