@@ -156,6 +156,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.id,
                         qVendingMachine.address,
                         qOrder.count,
+                        qVendingMachine.id,
+                        qVendingMachine.name,
                         qOrder.productState
                 ))
                 .from(qOrder)
@@ -189,6 +191,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.id,
                         qVendingMachine.address,
                         qOrder.count,
+                        qVendingMachine.id,
+                        qVendingMachine.name,
                         qOrder.productState
                 ))
                 .from(qOrder)
