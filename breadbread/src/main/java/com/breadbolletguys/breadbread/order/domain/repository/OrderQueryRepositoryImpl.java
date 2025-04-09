@@ -103,6 +103,11 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         QBakery qBakery = QBakery.bakery;
         QVendingMachine qVendingMachine = vendingMachine;
         QTransaction qTransaction = QTransaction.transaction;
+        QTransaction subQTransaction = new QTransaction("subTransaction");
+        JPQLQuery<Long> latestTransactionIdSubquery = JPAExpressions
+                .select(subQTransaction.id.max())
+                .from(subQTransaction)
+                .where(subQTransaction.orderId.eq(qOrder.id));
         LocalDateTime now = LocalDateTime.now();
         NumberTemplate<Integer> slotNumberExpr = Expressions.numberTemplate(
                 Integer.class,
@@ -143,11 +148,16 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
                 .leftJoin(qTransaction).on(
-                        qTransaction.orderId.eq(qOrder.id)
+                        qTransaction.id.eq(latestTransactionIdSubquery)
+                                .and(qTransaction.transactionStatus.eq(TransactionStatus.PURCHASE))
                 )
                 .where(qVendingMachine.id.eq(vendingMachineId)
                         .and(qOrder.sellerId.eq(userId))
-                        .and(qOrder.productState.in(ProductState.AVAILABLE, ProductState.SOLD_OUT))
+                        .and(qOrder.productState.in(
+                                ProductState.AVAILABLE,
+                                ProductState.SOLD_OUT,
+                                ProductState.FINISHED)
+                        )
                 )
                 .fetch();
     }
