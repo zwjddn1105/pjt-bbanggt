@@ -157,6 +157,7 @@ public class VendingMachineService {
                     new SlotSellerResponse(space.getId(),
                             i + 1,
                             stackSummaryResponse,
+                            space.isOccupied(),
                             isMine)
             );
         }
