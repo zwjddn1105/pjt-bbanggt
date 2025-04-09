@@ -461,7 +461,7 @@ export default function ProductRegistrationModal({
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-[90vw] max-h-[90vh] overflow-hidden">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-[80vw] max-h-[90vh] overflow-hidden">
           {/* 헤더 */}
           <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-orange-50">
             <div>

@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button";
 import { useEffect, useState } from "react";
-import { useLoading } from "@/components/loading-provider";
-import { BreadIcon, KakaoIcon, CheckIcon } from "@/components/icons";
+import { useLoading } from "../components/loading-provider";
+import { BreadIcon, KakaoIcon, CheckIcon } from "../components/icons";
 
 export default function Home() {
   const { setLoading } = useLoading();

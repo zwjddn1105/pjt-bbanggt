@@ -10,6 +10,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useSellerProductsStore } from "../../store/seller-products-store";
+import type { SellerProductFilter } from "../../types/seller-products";
 import Image from "next/image";
 
 interface SellerProductsModalProps {
@@ -31,18 +32,22 @@ export default function SellerProductsModal({
     loadSellerProducts,
     filterStatus,
     setFilterStatus,
-    getFilteredProducts,
   } = useSellerProductsStore();
 
-  // 컴포넌트 마운트 시 상품 목록 로드
+  // 컴포넌트 마운트 시 상품 목록 로드 - 한 번만 호출되도록 수정
   useEffect(() => {
     if (isOpen && vendingMachineId) {
+      // 모달이 열릴 때 필터 상태를 "전체"로 초기화
+      setFilterStatus("전체");
+      // 상품 목록 로드
       loadSellerProducts(vendingMachineId);
     }
-  }, [isOpen, vendingMachineId, loadSellerProducts]);
+  }, [isOpen, vendingMachineId, loadSellerProducts, setFilterStatus]);
+
+  // 필터링된 상품 목록을 getFilteredProducts()로 가져오도록 수정
 
   // 필터링된 상품 목록
-  const filteredProducts = getFilteredProducts();
+  const filteredProducts = useSellerProductsStore().getFilteredProducts();
 
   // 빵 종류에 따른 한글 이름 반환
   const getBreadTypeName = (breadType: string): string => {
@@ -71,14 +76,14 @@ export default function SellerProductsModal({
         );
       case "SOLD_OUT":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            판매완료
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+            판매중
           </span>
         );
-      case "EXPIRED":
+      case "FINISHED":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            기간만료
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            판매완료
           </span>
         );
       default:
@@ -106,6 +111,14 @@ export default function SellerProductsModal({
     }
   };
 
+  // 필터 버튼 클릭 핸들러
+  const handleFilterChange = (filter: SellerProductFilter) => {
+    // 필터 변경 시 API 다시 호출
+    if (vendingMachineId) {
+      useSellerProductsStore.getState().changeFilter(filter, vendingMachineId);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -123,7 +136,7 @@ export default function SellerProductsModal({
             {/* 필터 버튼 */}
             <div className="flex rounded-md shadow-sm">
               <button
-                onClick={() => setFilterStatus("전체")}
+                onClick={() => handleFilterChange("전체")}
                 className={`px-4 py-2 text-sm font-medium rounded-l-md ${
                   filterStatus === "전체"
                     ? "bg-orange-500 text-white"
@@ -133,7 +146,7 @@ export default function SellerProductsModal({
                 전체
               </button>
               <button
-                onClick={() => setFilterStatus("판매중")}
+                onClick={() => handleFilterChange("판매중")}
                 className={`px-4 py-2 text-sm font-medium ${
                   filterStatus === "판매중"
                     ? "bg-orange-500 text-white"
@@ -143,7 +156,7 @@ export default function SellerProductsModal({
                 판매중
               </button>
               <button
-                onClick={() => setFilterStatus("판매완료")}
+                onClick={() => handleFilterChange("판매완료")}
                 className={`px-4 py-2 text-sm font-medium rounded-r-md ${
                   filterStatus === "판매완료"
                     ? "bg-orange-500 text-white"
@@ -183,79 +196,83 @@ export default function SellerProductsModal({
                 다시 시도
               </button>
             </div>
-          ) : filteredProducts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-              <ShoppingBag className="w-12 h-12 mb-4 text-gray-300" />
-              <p>등록된 상품이 없습니다.</p>
-            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product.orderId}
-                  className="bg-white rounded-lg overflow-hidden shadow-md border border-gray-200 hover:shadow-lg transition-shadow"
-                >
-                  <div className="relative h-48">
-                    {product.image ? (
-                      <div className="relative w-full h-full">
-                        <Image
-                          src={product.image || "/placeholder.svg"}
-                          alt={getBreadTypeName(product.breadType)}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <Image
-                        src="/placeholder.svg?height=200&width=300"
-                        alt={getBreadTypeName(product.breadType)}
-                        fill
-                        className="object-cover"
-                      />
-                    )}
-                    <div className="absolute top-2 right-2">
-                      {getStatusBadge(product.productState)}
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
-                      <h3 className="text-white font-bold text-lg truncate">
-                        {product.bakeryName}
-                      </h3>
-                      <p className="text-white/90 text-sm truncate">
-                        {getBreadTypeName(product.breadType)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="p-4 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center text-gray-600 text-sm">
-                        <Tag className="w-4 h-4 mr-1" />
-                        <span>슬롯 {product.slotNumber}번</span>
-                      </div>
-                      <div className="flex items-center text-gray-600 text-sm">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        <span>{formatDate(product.paymentDate)}</span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <span className="text-sm text-gray-500 line-through mr-2">
-                          {product.price.toLocaleString()}원
-                        </span>
-                        <span className="font-bold text-orange-600">
-                          {product.salePrice.toLocaleString()}원
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        수량: {product.count}개
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-600 truncate">
-                      {product.address}
-                    </div>
-                  </div>
+            <>
+              {filteredProducts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                  <ShoppingBag className="w-12 h-12 mb-4 text-gray-300" />
+                  <p>등록된 상품이 없습니다.</p>
                 </div>
-              ))}
-            </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProducts.map((product) => (
+                    <div
+                      key={product.orderId}
+                      className="bg-white rounded-lg overflow-hidden shadow-md border border-gray-200 hover:shadow-lg transition-shadow"
+                    >
+                      <div className="relative h-48">
+                        {product.image ? (
+                          <div className="relative w-full h-full">
+                            <Image
+                              src={product.image || "/placeholder.svg"}
+                              alt={getBreadTypeName(product.breadType)}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <Image
+                            src="/placeholder.svg?height=200&width=300"
+                            alt={getBreadTypeName(product.breadType)}
+                            fill
+                            className="object-cover"
+                          />
+                        )}
+                        <div className="absolute top-2 right-2">
+                          {getStatusBadge(product.productState)}
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                          <h3 className="text-white font-bold text-lg truncate">
+                            {product.bakeryName}
+                          </h3>
+                          <p className="text-white/90 text-sm truncate">
+                            {getBreadTypeName(product.breadType)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="p-4 space-y-3">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center text-gray-600 text-sm">
+                            <Tag className="w-4 h-4 mr-1" />
+                            <span>슬롯 {product.slotNumber}번</span>
+                          </div>
+                          <div className="flex items-center text-gray-600 text-sm">
+                            <Calendar className="w-4 h-4 mr-1" />
+                            <span>{formatDate(product.paymentDate)}</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center">
+                            <span className="text-sm text-gray-500 line-through mr-2">
+                              {product.price.toLocaleString()}원
+                            </span>
+                            <span className="font-bold text-orange-600">
+                              {product.salePrice.toLocaleString()}원
+                            </span>
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            수량: {product.count}개
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-600 truncate">
+                          {product.address}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -5,10 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import { fetchChatMessages, sendChatMessage } from "../../../api/chat-messages";
 import { useChatStore } from "../../../store/chat-store";
 import type { ChatMessage } from "../../../types/chat-message";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
 import { ArrowLeft, Send, Loader2 } from "lucide-react";
-import { useLoading } from "@/components/loading-provider";
+import { useLoading } from "../../../components/loading-provider";
 
 export default function ChatRoomPage() {
   const params = useParams();

@@ -21,8 +21,8 @@ export interface SellerProduct {
 // 상품 상태 타입
 export type ProductState =
   | "AVAILABLE"
-  | "SOLD"
   | "SOLD_OUT"
+  | "FINISHED"
   | "EXPIRED"
   | "DELETED";
 

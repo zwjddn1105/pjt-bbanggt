@@ -2,9 +2,9 @@ import type React from "react";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
-import Navbar from "@/components/navbar";
-import { LoadingProvider } from "@/components/loading-provider";
-import { ThemeProvider } from "@/components/theme-provider";
+import Navbar from "../components/navbar";
+import { LoadingProvider } from "../components/loading-provider";
+import { ThemeProvider } from "../components/theme-provider";
 
 // Noto Sans Korean 폰트 설정 (한글 지원이 우수한 폰트)
 const notoSansKr = Noto_Sans_KR({

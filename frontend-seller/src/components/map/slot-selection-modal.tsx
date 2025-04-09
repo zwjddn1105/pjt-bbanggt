@@ -230,6 +230,8 @@ export default function SlotSelectionModal() {
   // 등록한 빵 목록 모달 닫기 핸들러
   const handleCloseProductsModal = () => {
     setIsProductsModalOpen(false);
+    // 스토어 초기화 추가
+    useSellerProductsStore.getState().resetStore();
   };
 
   if (!isModalOpen) return null;

@@ -3,7 +3,7 @@
 import type React from "react";
 import { createContext, useContext, useState, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { BreadIcon } from "@/components/icons";
+import { BreadIcon } from "../components/icons";
 
 // 로딩 컨텍스트 생성
 type LoadingContextType = {
