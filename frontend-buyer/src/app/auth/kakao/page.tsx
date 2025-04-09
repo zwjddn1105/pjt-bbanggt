@@ -193,12 +193,12 @@ export default function KakaoAuthPage() {
   }
 
   // 성공 상태 UI
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-        <p>로그인 성공! 홈페이지로 이동합니다.</p>
-      </div>
-    </div>
-  )
+  // return (
+  //   <div className="flex flex-col items-center justify-center min-h-screen">
+  //     <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+  //       <p>로그인 성공! 홈페이지로 이동합니다.</p>
+  //     </div>
+  //   </div>
+  // )
 }
 

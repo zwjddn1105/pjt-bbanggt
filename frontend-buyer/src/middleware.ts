@@ -8,6 +8,21 @@ export async function middleware(request: NextRequest) {
   // 현재 요청 경로
   const path = request.nextUrl.pathname
 
+  // 이미지 파일 및 정적 자산 요청은 건너뛰기
+  if (
+    path.includes("/_next/") ||
+    path.includes("/images/") ||
+    path.endsWith(".png") ||
+    path.endsWith(".jpg") ||
+    path.endsWith(".jpeg") ||
+    path.endsWith(".svg") ||
+    path.endsWith(".gif") ||
+    path === "/favicon.ico"
+  ) {
+    return NextResponse.next()
+  }
+
+
   console.log("미들웨어 실행:", path)
 
   // 공개 경로인지 확인

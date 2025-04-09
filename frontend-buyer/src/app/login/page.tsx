@@ -29,7 +29,7 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           <div className="w-24 h-24 mx-auto mb-4 relative">
             <Image
-              src="/logo.jpg"
+              src="/mascot.png"
               alt="빵긋 로고"
               fill
               sizes="(max-width: 768px) 40px, 80px"
@@ -56,12 +56,12 @@ export default function LoginPage() {
           </p>
 
           {/* 개발 중 임시 링크 */}
-          <div className="mt-8 text-center text-sm text-gray-700">
+          {/* <div className="mt-8 text-center text-sm text-gray-700">
             <p>개발 중에는 로그인 없이도 모든 페이지에 접근할 수 있습니다.</p>
             <a href="/" className="text-primary-custom underline mt-2 inline-block">
               홈으로 바로가기
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
 
