@@ -1,8 +1,5 @@
 package com.breadbolletguys.breadbread.order.presentation;
 
-import com.breadbolletguys.breadbread.common.exception.BadRequestException;
-import com.breadbolletguys.breadbread.vendingmachine.application.VendingMachineService;
-import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachine;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -21,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.breadbolletguys.breadbread.auth.annotation.AuthUser;
+import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.order.application.OrderService;
 import com.breadbolletguys.breadbread.order.domain.dto.request.IamportPayRequest;
 import com.breadbolletguys.breadbread.order.domain.dto.request.OrderRequest;
@@ -29,6 +27,8 @@ import com.breadbolletguys.breadbread.order.domain.dto.response.OrderResponse;
 import com.breadbolletguys.breadbread.order.domain.dto.response.OrderStackResponse;
 import com.breadbolletguys.breadbread.user.domain.User;
 import com.breadbolletguys.breadbread.vendingmachine.application.VendingMachineCacheService;
+import com.breadbolletguys.breadbread.vendingmachine.application.VendingMachineService;
+import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachine;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,7 +82,7 @@ public class OrderController {
         try {
             orderService.payForOrder(user, orderId, payRequest.getAccountNo());
             vendingMachineCacheService.save(orderId);
-        } catch (BadRequestException e){
+        } catch (BadRequestException e) {
             vendingMachineCacheService.save(orderId);
             throw e;
         }
