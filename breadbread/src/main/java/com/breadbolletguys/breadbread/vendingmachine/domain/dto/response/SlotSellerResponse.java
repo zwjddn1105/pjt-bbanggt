@@ -11,6 +11,6 @@ public class SlotSellerResponse {
     private Long spaceId;
     private int slotNumber;
     private StackSummaryResponse stackSummaryResponse;
-    private boolean isOcucupied;
+    private boolean isOccupied;
     private boolean isMine;
 }
