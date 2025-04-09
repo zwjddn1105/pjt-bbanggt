@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { fetchVendingMachines, fetchBookmarkedVendingMachines } from "./breadgut-api"
-import type { VendingMachine } from "@/types/vending-machine"
+import type { VendingMachine } from "../types/vending-machine"
 
 interface UseVendingMachinesProps {
   latitude?: number

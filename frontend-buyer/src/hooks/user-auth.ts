@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { AuthService } from "@/services"
-import type { LoginRequest } from "@/types/api-types"
+import { AuthService } from "../services"
+import type { LoginRequest } from "../types/api-types"
 
 export const useAuth = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)

@@ -1,5 +1,5 @@
 import axios from "axios"
-import type { ChatRequest, ChatRoomCreateRequest } from "@/types/chat"
+import type { ChatRequest, ChatRoomCreateRequest } from "../types/chat"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://43.203.248.254:8082"
 

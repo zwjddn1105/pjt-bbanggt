@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
-import { ChatService } from "@/services"
-import type { ChatRequest, ChatResponse } from "@/types/api-types"
+import { ChatService } from "../services"
+import type { ChatRequest, ChatResponse } from "../types/api-types"
 
 export const useChat = (chatRoomId: number) => {
   const [messages, setMessages] = useState<ChatResponse[]>([])

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { fetchData, postData, putData, deleteData } from "@/lib/api"
+import { fetchData, postData, putData, deleteData } from "../lib/api"
 
 // 제네릭 타입을 사용한 API 훅
 export function useApi<T, P = any>() {

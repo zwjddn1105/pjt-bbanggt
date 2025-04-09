@@ -1,4 +1,4 @@
-import type { PageInfoChatResponse, PageInfoChatRoomBuyerOnlyResponse } from "@/types/chat"
+import type { PageInfoChatResponse, PageInfoChatRoomBuyerOnlyResponse } from "../types/chat"
 
 // 환경 변수에서 API URL 가져오기
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://43.203.248.254:8082"

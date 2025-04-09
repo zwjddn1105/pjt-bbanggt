@@ -1,5 +1,5 @@
-import { api } from "@/lib/api"
-import type { AccessTokenResponse, LoginRequest, UserTokens } from "@/types/api-types"
+import { api } from "../lib/api"
+import type { AccessTokenResponse, LoginRequest, UserTokens } from "../types/api-types"
 
 // 인증 관련 API 서비스
 export const AuthService = {

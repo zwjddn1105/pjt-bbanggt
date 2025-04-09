@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import ChatDetail from "@/components/inquiry/chat-detail"
+import ChatDetail from "../../../components/inquiry/chat-detail"
 
 interface ChatDetailPageProps {
   params: {
