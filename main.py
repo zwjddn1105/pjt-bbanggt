@@ -21,28 +21,16 @@ except Exception as e:
 @app.post("/predict2")
 async def predict_image(file: bytes = File(...)):
     image = Image.open(BytesIO(file))
-    results = model.predict(image)
-    detection_counts = {}
+    results = model.predict(image, conf=0.8)
 
+    contains_bad_bread = False
     for result in results:
-        for box in result.boxes:
-            cls = int(box.cls[0].item())  # 클래스 인덱스 (Tensor -> int)
-            class_name = model.names.get(cls, f"cls_{cls}")  # 클래스 이름
-
-            detection_counts[class_name] = detection_counts.get(class_name, 0) + 1
-
-    # detection_counts를 BreadClassificationResponse 형태에 맞춰서 변환
-    breads_list = []
-    for class_name, count in detection_counts.items():
-        breads_list.append({
-            "classification": class_name,
-            "stock": count
-        })
-
-    contains_bad_bread = (len(breads_list) == 0)
+        if len(result.boxes) != 0:
+            contains_bad_bread = True
+            break
 
     response = {
-        "containsBadBread": contains_bad_bread,
+        "containsBadBread": contains_bad_bread
     }
 
     return response
