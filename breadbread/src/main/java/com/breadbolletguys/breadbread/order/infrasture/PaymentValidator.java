@@ -15,7 +15,9 @@ import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.response.Payment;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @Transactional
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class PaymentValidator {
 
     public void validatePayment(Long orderId, String impUid) {
         try {
+            log.info("ImpUID : {}", impUid);
             Payment payment = iamportClient.paymentByImpUid(impUid).getResponse();
             Order order = orderRepository.findById(orderId)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
