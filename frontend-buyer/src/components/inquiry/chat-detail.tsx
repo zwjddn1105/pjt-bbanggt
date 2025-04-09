@@ -5,8 +5,8 @@ import type React from "react"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { fetchChatMessages, sendChatMessage, fetchChatRooms } from "@/lib/chat"
-import type { ChatResponse } from "@/types/chat"
+import { fetchChatMessages, sendChatMessage, fetchChatRooms } from "../../lib/chat"
+import type { ChatResponse } from "../../types/chat"
 
 interface ChatDetailProps {
   chatRoomId: number

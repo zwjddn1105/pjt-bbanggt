@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
-import { ChatRoomService } from "@/services"
-import type { ChatRoomCreateRequest, ChatRoomBuyerOnlyResponse } from "@/types/api-types"
+import { ChatRoomService } from "../services"
+import type { ChatRoomCreateRequest, ChatRoomBuyerOnlyResponse } from "../types/api-types"
 
 // 구매자 전용 채팅방 훅
 export const useChatRooms = () => {

@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Header } from "@/components/ui/header"
-import PickupTimer from "@/components/pickup-timer"
-import { PickupItem } from "@/components/pickup/pickup-item"
+import { Header } from "../../components/ui/header"
+import PickupTimer from "../../components/pickup-timer"
+import { PickupItem } from "../../components/pickup/pickup-item"
 
 // API 명세서에 맞게 타입 정의 수정
 interface PickupItemType {

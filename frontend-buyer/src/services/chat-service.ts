@@ -1,5 +1,5 @@
-import { api } from "@/lib/api"
-import type { ChatRequest, PageInfoChatResponse } from "@/types/api-types"
+import { api } from "../lib/api"
+import type { ChatRequest, PageInfoChatResponse } from "../types/api-types"
 
 // 채팅 메시지 관련 API 서비스
 export const ChatService = {

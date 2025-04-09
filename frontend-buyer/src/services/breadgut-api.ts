@@ -1,4 +1,4 @@
-import { api } from "@/lib/api"
+import { api } from "../lib/api"
 import type {
   VendingMachineCreateJsonRequest,
   VendingMachineResponse,
@@ -7,7 +7,7 @@ import type {
   AccountResponse,
   PayRequest,
   BakeryResponse,
-} from "@/types/api-types"
+} from "../types/api-types"
 
 // 자판기 관련 API 서비스
 export const VendingMachineService = {

@@ -1,5 +1,5 @@
-import { api } from "@/lib/api"
-import type { BakeryRequest, BakeryResponse } from "@/types/api-types"
+import { api } from "../lib/api"
+import type { BakeryRequest, BakeryResponse } from "../types/api-types"
 
 // 빵집 관련 API 서비스
 export const BakeryService = {

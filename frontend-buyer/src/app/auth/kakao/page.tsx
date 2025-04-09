@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { useAuthContext } from "@/context/auth-context"
+import { useAuthContext } from "../../../context/auth-context"
 import axios from "axios"
 
 export default function KakaoAuthPage() {

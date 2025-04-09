@@ -1,4 +1,4 @@
-import { apiClient } from "@/config/api"
+import { apiClient } from "../config/api"
 import type { AxiosRequestConfig } from "axios"
 
 // 에러 타입

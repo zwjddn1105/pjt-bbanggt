@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { MapPin, Clock, Navigation, X, Package, Info } from "lucide-react"
-import { addBakeryBookmark, removeBakeryBookmark } from "@/services/breadgut-api"
-import type { VendingMachine } from "@/types/vending-machine"
+import { addBakeryBookmark, removeBakeryBookmark } from "../../services/breadgut-api"
+import type { VendingMachine } from "../../types/vending-machine"
 import VendingMachineDetail from "./vending-machine-detail"
 import BreadDetail from "./bread-detail"
 

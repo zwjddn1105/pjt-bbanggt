@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { VendingMachineService } from "@/services"
-import type { VendingMachineResponse } from "@/types/api-types"
+import { VendingMachineService } from "../services"
+import type { VendingMachineResponse } from "../types/api-types"
 
 export const useVendingMachines = () => {
   const [vendingMachines, setVendingMachines] = useState<VendingMachineResponse[]>([])

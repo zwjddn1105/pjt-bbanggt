@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { createChatRoom } from "@/lib/chat"
+import { createChatRoom } from "../../lib/chat"
 
 interface InquiryButtonProps {
   bakeryId: number

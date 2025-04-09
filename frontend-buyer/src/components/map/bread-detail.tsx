@@ -1,7 +1,7 @@
 "use client"
 import { ArrowLeft, MapPin, Bookmark } from "lucide-react"
-import type { VendingMachine } from "@/types/vending-machine"
-import type { OrderResponse, BreadType, AccountResponse } from "@/types/api-types"
+import type { VendingMachine } from "../../types/vending-machine"
+import type { OrderResponse, BreadType, AccountResponse } from "../../types/api-types"
 import { useEffect, useState } from "react"
 import {
   fetchOrderDetail,
@@ -9,7 +9,7 @@ import {
   addBakeryBookmark,
   removeBakeryBookmark,
   fetchBakeryById,
-} from "@/services/breadgut-api"
+} from "../../services/breadgut-api"
 import { useRouter } from "next/navigation"
 
 declare global {

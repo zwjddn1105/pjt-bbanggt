@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { X, Bookmark } from "lucide-react"
-import { fetchBookmarkedBakeries, removeBakeryBookmark } from "@/services/breadgut-api"
-import type { BakeryResponse } from "@/types/api-types"
+import { fetchBookmarkedBakeries, removeBakeryBookmark } from "../../services/breadgut-api"
+import type { BakeryResponse } from "../../types/api-types"
 
 interface FilterButtonsProps {
   onFilterChange?: (showBookmarkedOnly: boolean) => void

@@ -3,10 +3,10 @@
 import type React from "react"
 
 import { X } from "lucide-react"
-import type { VendingMachine } from "@/types/vending-machine"
-import type { SlotResponse, VendingMachineSlotResponse, BreadType } from "@/types/api-types"
+import type { VendingMachine } from "../../types/vending-machine"
+import type { SlotResponse, VendingMachineSlotResponse, BreadType } from "../../types/api-types"
 import { useEffect, useRef, useState } from "react"
-import { fetchVendingMachineById } from "@/services/breadgut-api"
+import { fetchVendingMachineById } from "../../services/breadgut-api"
 
 interface VendingMachineDetailProps {
   vendingMachine: VendingMachine

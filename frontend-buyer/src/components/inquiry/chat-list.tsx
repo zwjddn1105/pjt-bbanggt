@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { fetchChatRooms, fetchChatMessages } from "@/lib/chat"
-import type { ChatRoomBuyerOnlyResponse } from "@/types/chat"
+import { fetchChatRooms, fetchChatMessages } from "../../lib/chat"
+import type { ChatRoomBuyerOnlyResponse } from "../../types/chat"
 
 // 마지막 메시지 시간을 저장하는 타입
 interface LastMessageTimes {

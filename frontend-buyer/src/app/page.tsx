@@ -3,14 +3,14 @@
 import type React from "react"
 
 import { useEffect, useRef, useState } from "react"
-import BottomNavTab from "@/components/bottom-navtab"
-import CurrentLocationButton from "@/components/map/current-location-button"
-import FilterButtons from "@/components/map/filter-buttons"
-import MarkerDetail from "@/components/map/marker-detail"
-import CustomMarker from "@/components/map/custom-marker"
-import { fetchVendingMachines, fetchBookmarkedVendingMachines } from "@/services/breadgut-api"
-import type { VendingMachine } from "@/types/vending-machine"
-import { addBakeryBookmark, removeBakeryBookmark } from "@/services/breadgut-api"
+import BottomNavTab from "../components/bottom-navtab"
+import CurrentLocationButton from "../components/map/current-location-button"
+import FilterButtons from "../components/map/filter-buttons"
+import MarkerDetail from "../components/map/marker-detail"
+import CustomMarker from "../components/map/custom-marker"
+import { fetchVendingMachines, fetchBookmarkedVendingMachines } from "../services/breadgut-api"
+import type { VendingMachine } from "../types/vending-machine"
+import { addBakeryBookmark, removeBakeryBookmark } from "../services/breadgut-api"
 
 declare global {
   interface Window {

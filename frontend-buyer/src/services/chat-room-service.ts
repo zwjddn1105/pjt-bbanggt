@@ -1,5 +1,5 @@
-import { api } from "@/lib/api"
-import type { ChatRoomCreateRequest, PageInfoChatRoomBuyerOnlyResponse } from "@/types/api-types"
+import { api } from "../lib/api"
+import type { ChatRoomCreateRequest, PageInfoChatRoomBuyerOnlyResponse } from "../types/api-types"
 
 // 채팅방 관련 API 서비스 (구매자 관점)
 export const ChatRoomService = {

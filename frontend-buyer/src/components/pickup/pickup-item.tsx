@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card } from "@/components/ui/card"
+import { Card } from "../../components/ui/card"
 import { Navigation, MessageCircle, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -482,7 +482,7 @@ export function PickupItem({
               </button>
             </div>
           </div>
-
+          <p className="text-ㅡ text-gray-700">{bakeryName}</p>
           {/* 벤딩머신 이름 */}
           <p className="text-sm text-gray-700 mt-1">{vendingMachineName}</p>
           <p className="text-xs text-gray-500">{address}</p>
