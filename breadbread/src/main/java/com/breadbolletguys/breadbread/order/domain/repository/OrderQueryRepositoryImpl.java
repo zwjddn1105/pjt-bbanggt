@@ -66,9 +66,9 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.price,
                         Expressions.numberTemplate(
                                 Integer.class,
-                                "CAST({0} * (1 - {1}) AS INTEGER)",
-                                order.price,
-                                order.discount
+                                "FLOOR({0} * (1 - {1}))",
+                                qOrder.price,
+                                qOrder.discount
                         ),
                         qOrder.count,
                         qOrder.image,
@@ -122,9 +122,9 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.price,
                         Expressions.numberTemplate(
                                 Integer.class,
-                                "CAST({0} * (1 - {1}) AS INTEGER)",
-                                order.price,
-                                order.discount
+                                "FLOOR({0} * (1 - {1}))",
+                                qOrder.price,
+                                qOrder.discount
                         ),
                         qOrder.count,
                         qOrder.image,
@@ -243,7 +243,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                         qOrder.price,
                         Expressions.numberTemplate(
                                 Integer.class,
-                                "CAST({0} * (1 - {1}) AS INTEGER)",
+                                "FLOOR({0} * (1 - {1}))",
                                 qOrder.price,
                                 qOrder.discount
                         ),
