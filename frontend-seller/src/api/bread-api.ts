@@ -33,7 +33,7 @@ export const analyzeBreadImage = async (
     formData.append("multipartFile", imageFile); // "image"에서 "multipartFile"로 변경
 
     const response = await axios.post<BreadAnalysisResult>(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/ai`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/ai`,
       formData,
       {
         headers: {
@@ -42,7 +42,7 @@ export const analyzeBreadImage = async (
         },
       }
     );
-
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("빵 이미지 분석 중 오류가 발생했습니다:", error);
@@ -65,7 +65,7 @@ export const validateBreadType = async (
     formData.append("multipartFile", imageFile); // "image"에서 "multipartFile"로 변경
 
     const response = await axios.post<BreadValidationResult>(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/ai/2`,
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/ai/2`,
       formData,
       {
         headers: {

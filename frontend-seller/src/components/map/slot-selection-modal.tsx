@@ -80,6 +80,12 @@ export default function SlotSelectionModal() {
       return;
     }
 
+    // 타인이 사용 중인 슬롯인 경우 (회색) - 클릭 불가
+    if (status === SlotStatus.OCCUPIED) {
+      alert("이미 다른 사용자가 구매한 칸입니다.");
+      return;
+    }
+
     // 이용 가능한 슬롯만 선택 가능 (흰색)
     if (status === SlotStatus.AVAILABLE || status === SlotStatus.SELECTED) {
       selectSlot(slotNumber);
@@ -115,6 +121,11 @@ export default function SlotSelectionModal() {
     // 내 슬롯이면서 빵 정보가 없는 경우에도 클릭 가능
     if (status === SlotStatus.MINE && !hasBread) {
       return "cursor-pointer";
+    }
+
+    // 타인이 사용 중인 슬롯은 클릭 불가
+    if (status === SlotStatus.OCCUPIED) {
+      return "cursor-not-allowed";
     }
 
     // 이용 가능한 슬롯과 이미 선택된 슬롯만 클릭 가능

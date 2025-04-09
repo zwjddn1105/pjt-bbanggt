@@ -218,8 +218,8 @@ export default function ProductRegistrationModal({
       // 빵 등록 가능 여부 확인 API 호출
       const validationResult = await validateBreadType(file);
 
-      if (!validationResult.containsBadBread) {
-        // 등록 불가능한 빵
+      if (validationResult.containsBadBread) {
+        // 등록 불가능한 빵 (containsBadBread가 true면 나쁜 빵이 포함되어 있음)
         setIsInvalidBread(true);
         setShowInvalidModal(true);
       } else {

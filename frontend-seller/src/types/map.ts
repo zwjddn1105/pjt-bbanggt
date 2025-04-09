@@ -249,6 +249,7 @@ export interface SlotResponse {
   slotNumber: number;
   spaceId: number;
   mine: boolean; // 바깥으로 빠져나온 mine 필드
+  occupied: boolean; // 다른 사람이 구매했는지 여부 (API에서는 ocucupied로 오타가 있을 수 있음)
   stackSummaryResponse: StackSummaryResponse | null;
 }
 

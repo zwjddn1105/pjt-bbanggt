@@ -1,9 +1,84 @@
 import { create } from "zustand";
+import { fetchVendingMachineDetail } from "../api/vending-machine";
 import type { VendingMachineDetailResponse } from "../types/map";
 import { SlotStatus } from "../types/map";
-import { fetchVendingMachineDetail } from "../api/vending-machine";
 
-// SlotUI 인터페이스 업데이트
+// Define the missing types
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  imageUrl: string;
+  // Add other properties as needed
+}
+
+interface ProductsResponse {
+  items: Product[];
+  total: number;
+  page: number;
+  size: number;
+  // Add other pagination properties as needed
+}
+
+interface ProductFilter {
+  category?: string;
+  brand?: string;
+  // Add other filter properties as needed
+}
+
+interface ProductState {
+  // 상품 목록 상태
+  stockProducts: Product[];
+  setStockProducts: (products: Product[]) => void;
+
+  soldoutProducts: Product[];
+  setSoldoutProducts: (products: Product[]) => void;
+
+  // 현재 응답 데이터 (페이지네이션 정보 포함)
+  stockResponse: ProductsResponse | null;
+  setStockResponse: (response: ProductsResponse | null) => void;
+
+  soldoutResponse: ProductsResponse | null;
+  setSoldoutResponse: (response: ProductsResponse | null) => void;
+
+  // 로딩 상태
+  isStockLoading: boolean;
+  setIsStockLoading: (isLoading: boolean) => void;
+
+  isSoldoutLoading: boolean;
+  setIsSoldoutLoading: (isLoading: boolean) => void;
+
+  // 에러 상태
+  stockError: string | null;
+  setStockError: (error: string | null) => void;
+
+  soldoutError: string | null;
+  setSoldoutError: (error: string | null) => void;
+
+  // 필터 상태
+  filterStatus: ProductFilter;
+  setFilterStatus: (status: ProductFilter) => void;
+
+  // 현재 페이지 번호
+  stockCurrentPage: number;
+  setStockCurrentPage: (page: number) => void;
+
+  soldoutCurrentPage: number;
+  setSoldoutCurrentPage: (page: number) => void;
+
+  // 데이터 로드 액션
+  loadStockProducts: () => Promise<void>;
+  loadSoldoutProducts: () => Promise<void>;
+  loadNextStockPage: () => Promise<void>;
+  loadNextSoldoutPage: () => Promise<void>;
+  loadSpecificStockPage: (page: number) => Promise<void>;
+  loadSpecificSoldoutPage: (page: number) => Promise<void>;
+
+  // 필터링된 상품 목록 가져오기
+  getFilteredStockProducts: () => Product[];
+}
+
+// 슬롯 UI 인터페이스 업데이트
 export interface SlotUI {
   slotNumber: number;
   spaceId: number;
@@ -143,6 +218,13 @@ export const useSlotStore = create<SlotState>((set, get) => ({
         let status: SlotStatus;
         let hasBread = false;
 
+        // 디버깅 로그 추가
+        console.log(`슬롯 ${slot.slotNumber} 정보:`, {
+          mine: slot.mine,
+          occupied: slot.occupied,
+          stackSummaryResponse: slot.stackSummaryResponse,
+        });
+
         // 수정된 로직: mine 필드가 바깥으로 빠져나옴
         if (slot.mine) {
           status = SlotStatus.MINE;
@@ -150,7 +232,13 @@ export const useSlotStore = create<SlotState>((set, get) => ({
           hasBread = slot.stackSummaryResponse !== null;
         } else {
           // mine이 false일 때
-          if (!slot.stackSummaryResponse) {
+          // 수정된 로직: occupied가 true이면 다른 사람이 구매한 상태 (두 가지 경우 모두 처리)
+          if (slot.occupied === true) {
+            status = SlotStatus.OCCUPIED; // 타인이 사용 중 (회색)
+            console.log(
+              `슬롯 ${slot.slotNumber}는 다른 사람이 구매함 (회색으로 표시)`
+            );
+          } else if (!slot.stackSummaryResponse) {
             status = SlotStatus.AVAILABLE; // 이용 가능
           } else {
             status = SlotStatus.OCCUPIED; // 타인이 사용 중
