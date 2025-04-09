@@ -19,7 +19,7 @@ import com.breadbolletguys.breadbread.ai.service.AiService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/ai")
+@RequestMapping("/api/v1/ai")
 @RequiredArgsConstructor
 public class AiController {
     private final AiService aiService;
