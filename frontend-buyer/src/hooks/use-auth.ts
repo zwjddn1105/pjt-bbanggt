@@ -187,6 +187,12 @@ export function useAuth() {
     // 사용자 정보 저장
     localStorage.setItem("user_info", JSON.stringify(user))
 
+    // 사용자 ID가 있으면 로컬 스토리지와 쿠키에 저장
+    if (user && user.id) {
+      localStorage.setItem("user_id", user.id.toString())
+      document.cookie = `user_id=${user.id}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
+    }
+
     // 쿠키에도 저장 (미들웨어에서 확인하기 위함)
     document.cookie = `auth_token=${accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
 
@@ -208,9 +214,11 @@ export function useAuth() {
     localStorage.removeItem("access_token")
     localStorage.removeItem("refresh_token")
     localStorage.removeItem("user_info")
+    localStorage.removeItem("user_id")
 
     // 쿠키에서도 제거
     document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax"
+    document.cookie = "user_id=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax"
 
     // 서버에 로그아웃 요청
     if (token) {
@@ -263,4 +271,3 @@ export function useAuth() {
     checkAuthStatus,
   }
 }
-

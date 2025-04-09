@@ -25,15 +25,28 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const [readMessages, setReadMessages] = useState<Record<number, { time: string; lastContent: string }>>({})
   const [lastContent, setLastContent] = useState<string>("")
+  const [isAtBottom, setIsAtBottom] = useState(true)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [prevMessagesLength, setPrevMessagesLength] = useState(0)
 
   // 사용자 ID 가져오기
   useEffect(() => {
-    // 로컬 스토리지에서 사용자 ID 가져오기
+    // 로컬 스토리지와 쿠키에서 사용자 ID 가져오기
     const getUserId = () => {
       if (typeof window !== "undefined") {
+        // 1. 로컬 스토리지에서 확인
         const userIdFromStorage = localStorage.getItem("user_id")
         if (userIdFromStorage) {
           return Number.parseInt(userIdFromStorage, 10)
+        }
+
+        // 2. 쿠키에서 확인
+        const cookies = document.cookie.split(";")
+        for (const cookie of cookies) {
+          const [name, value] = cookie.trim().split("=")
+          if (name === "user_id" && value) {
+            return Number.parseInt(value, 10)
+          }
         }
       }
       return null
@@ -41,7 +54,28 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
 
     const fetchedUserId = getUserId()
     if (fetchedUserId) {
+      console.log("🔍 사용자 ID 확인:", fetchedUserId)
       setUserId(fetchedUserId)
+    } else {
+      console.warn("⚠️ 사용자 ID를 찾을 수 없습니다.")
+    }
+  }, [])
+
+  // 스크롤 위치 감지
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!messagesContainerRef.current) return
+
+      const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current
+      // 스크롤이 하단에서 20px 이내에 있으면 하단으로 간주
+      const isBottom = scrollHeight - scrollTop - clientHeight < 20
+      setIsAtBottom(isBottom)
+    }
+
+    const container = messagesContainerRef.current
+    if (container) {
+      container.addEventListener("scroll", handleScroll)
+      return () => container.removeEventListener("scroll", handleScroll)
     }
   }, [])
 
@@ -95,6 +129,9 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
         const token = refresh ? null : pageToken
         const response = await fetchChatMessages(chatRoomId, token)
 
+        // 현재 메시지 길이 저장
+        setPrevMessagesLength(messages.length)
+
         if (refresh) {
           setMessages(response.data.reverse()) // 최신 메시지가 아래에 오도록 역순 정렬
         } else {
@@ -124,9 +161,12 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
         console.error("메시지를 불러오는 중 오류가 발생했습니다:", error)
       } finally {
         setLoading(false)
+        if (refresh) {
+          setIsInitialLoad(false)
+        }
       }
     },
-    [chatRoomId, pageToken, readMessages, lastContent, fetchChatRoomInfo],
+    [chatRoomId, pageToken, readMessages, lastContent, fetchChatRoomInfo, messages.length],
   )
 
   // 폴링 설정
@@ -141,10 +181,13 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
     return () => clearInterval(intervalId)
   }, [loadMessages])
 
-  // 새 메시지가 추가되면 스크롤을 아래로 이동
+  // 스크롤 관리
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    // 초기 로딩 시 또는 사용자가 스크롤을 하단에 위치시켰을 때만 스크롤 이동
+    if (isInitialLoad || isAtBottom || messages.length > prevMessagesLength) {
+      messagesEndRef.current?.scrollIntoView({ behavior: isInitialLoad ? "auto" : "smooth" })
+    }
+  }, [messages, isInitialLoad, isAtBottom, prevMessagesLength])
 
   // 메시지 전송
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -159,6 +202,8 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
       await sendChatMessage(chatRoomId, trimmedText)
       // 메시지 전송 후 즉시 새로고침하여 전송된 메시지 확인
       loadMessages(true)
+      // 메시지 전송 후 항상 스크롤을 아래로 이동
+      setIsAtBottom(true)
     } catch (error) {
       console.error("메시지 전송 중 오류가 발생했습니다:", error)
     }
@@ -204,22 +249,19 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
 
   // 메시지가 내 메시지인지 확인하는 함수
   const isMyMessage = (message: ChatResponse) => {
-    // 사용자 ID가 있는 경우 비교
+    // 사용자 ID가 있는 경우 senderId와 비교
     if (userId !== null) {
-      return message.senderId === userId
+      const isMine = message.senderId === userId
+      return isMine
     }
 
-    // 사용자 ID를 알 수 없는 경우, 메시지 패턴을 분석
-    // 이 부분은 실제 API 응답 데이터를 분석하여 수정해야 합니다
-
-    // 예: 메시지 전송 시간을 기준으로 판단
-    // 현재 시간과 가까운 메시지는 사용자가 보낸 메시지일 가능성이 높음
+    // 사용자 ID를 알 수 없는 경우 (fallback)
+    console.warn("사용자 ID를 알 수 없어 시간 기반으로 메시지 소유자를 추정합니다.")
     const now = new Date().getTime()
     const messageTime = new Date(message.createdAt).getTime()
     const timeDiff = now - messageTime
 
     // 최근 1시간 이내의 메시지는 사용자가 보낸 것으로 가정
-    // (이 로직은 실제 상황에 맞게 조정 필요)
     return timeDiff < 3600000
   }
 
@@ -330,7 +372,32 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
           전송
         </button>
       </form>
+
+      {/* 스크롤 하단으로 이동 버튼 (스크롤이 위에 있을 때만 표시) */}
+      {!isAtBottom && messages.length > 0 && (
+        <button
+          onClick={() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+            setIsAtBottom(true)
+          }}
+          className="fixed bottom-24 right-4 bg-gray-800 text-white rounded-full p-2 shadow-lg"
+          aria-label="스크롤 하단으로 이동"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      )}
     </div>
   )
 }
-

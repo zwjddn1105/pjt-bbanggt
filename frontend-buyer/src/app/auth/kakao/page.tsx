@@ -92,9 +92,22 @@ export default function KakaoAuthPage() {
         console.log("✅ 백엔드 응답 상태:", response.status)
         console.log("✅ 백엔드 응답 데이터:", response.data)
 
-        // 응답 데이터에서 accessToken과 refreshToken 가져오기
+        // 응답 데이터에서 userId, accessToken과 refreshToken 가져오기
+        const userId = response.data.userId
         const accessToken = response.data.accessToken
         const refreshToken = response.data.refreshToken
+
+        // 로컬 스토리지에 userId 저장
+        if (userId) {
+          localStorage.setItem("user_id", userId.toString())
+          console.log("✅ 사용자 ID 저장 완료:", userId)
+
+          // 쿠키에도 userId 저장 (7일 유효기간)
+          document.cookie = `user_id=${userId}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
+          console.log("✅ 사용자 ID 쿠키 저장 완료")
+        } else {
+          console.warn("⚠️ 백엔드에서 사용자 ID를 제공하지 않았습니다.")
+        }
 
         if (!accessToken) {
           throw new Error("액세스 토큰이 응답에 없습니다.")
@@ -113,7 +126,7 @@ export default function KakaoAuthPage() {
 
         // 백엔드에서 user 정보를 반환하지 않는 경우, 기본 사용자 정보 사용
         const user = response.data.user || {
-          id: 0,
+          id: userId || 0, // userId가 있으면 사용, 없으면 0
           nickname: "사용자",
         }
 
@@ -191,14 +204,4 @@ export default function KakaoAuthPage() {
       </div>
     )
   }
-
-  // 성공 상태 UI
-  // return (
-  //   <div className="flex flex-col items-center justify-center min-h-screen">
-  //     <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-  //       <p>로그인 성공! 홈페이지로 이동합니다.</p>
-  //     </div>
-  //   </div>
-  // )
 }
-
