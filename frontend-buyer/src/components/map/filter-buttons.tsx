@@ -67,14 +67,14 @@ export default function FilterButtons({ onFilterChange, onBookmarkClick }: Filte
       <div className="flex gap-2 overflow-x-auto py-2 no-scrollbar">
         <button
           onClick={handleMyBakeriesClick}
-          className="px-4 py-1 rounded-full text-sm whitespace-nowrap bg-gray-100 text-gray-700"
+          className="px-4 py-1 rounded-full text-sm whitespace-nowrap bg-white text-gray-700"
         >
           내 빵집 보기
         </button>
         <button
           onClick={handleBookmarkedFilterClick}
           className={`px-4 py-1 rounded-full text-sm whitespace-nowrap ${
-            showBookmarkedOnly ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-700"
+            showBookmarkedOnly ? "bg-orange-500 text-white" : "bg-white text-gray-700"
           }`}
         >
           내 빵집 빵긋 보기
