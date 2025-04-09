@@ -1,5 +1,8 @@
 package com.breadbolletguys.breadbread.order.presentation;
 
+import com.breadbolletguys.breadbread.common.exception.BadRequestException;
+import com.breadbolletguys.breadbread.vendingmachine.application.VendingMachineService;
+import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachine;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -37,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderController {
     private final OrderService orderService;
     private final VendingMachineCacheService vendingMachineCacheService;
+    private final VendingMachineService vendingMachineService;
 
     @PostMapping(value = "/createOrder/{spaceId}",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -47,8 +51,15 @@ public class OrderController {
             @RequestPart("image") MultipartFile image
     ) {
         vendingMachineCacheService.deleteBySpaceId(spaceId);
-        Long orderId = orderService.save(user, spaceId, orderRequests, image);
-        vendingMachineCacheService.save(orderId);
+        try {
+            Long orderId = orderService.save(user, spaceId, orderRequests, image);
+            vendingMachineCacheService.save(orderId);
+        } catch (BadRequestException e) {
+            VendingMachine vendingMachine = vendingMachineService.findBySpaceId(spaceId);
+            vendingMachineCacheService.save(vendingMachine);
+            throw e;
+        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -68,8 +79,14 @@ public class OrderController {
             @RequestBody PayRequest payRequest
     ) {
         vendingMachineCacheService.deleteByOrderId(orderId);
-        orderService.payForOrder(user, orderId, payRequest.getAccountNo());
-        vendingMachineCacheService.save(orderId);
+        try {
+            orderService.payForOrder(user, orderId, payRequest.getAccountNo());
+            vendingMachineCacheService.save(orderId);
+        } catch (BadRequestException e){
+            vendingMachineCacheService.save(orderId);
+            throw e;
+        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -80,8 +97,14 @@ public class OrderController {
             @RequestBody IamportPayRequest iamportPayRequest
     ) {
         vendingMachineCacheService.deleteByOrderId(orderId);
-        orderService.payOrderWithIamport(user, orderId, iamportPayRequest);
-        vendingMachineCacheService.save(orderId);
+        try {
+            orderService.payOrderWithIamport(user, orderId, iamportPayRequest);
+            vendingMachineCacheService.save(orderId);
+        } catch (BadRequestException e) {
+            vendingMachineCacheService.save(orderId);
+            throw e;
+        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -91,8 +114,14 @@ public class OrderController {
             @PathVariable("orderId") Long orderId
     ) {
         vendingMachineCacheService.deleteByOrderId(orderId);
-        orderService.refundOrder(user, orderId);
-        vendingMachineCacheService.save(orderId);
+        try {
+            orderService.refundOrder(user, orderId);
+            vendingMachineCacheService.save(orderId);
+        } catch (BadRequestException e) {
+            vendingMachineCacheService.save(orderId);
+            throw e;
+        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -102,8 +131,14 @@ public class OrderController {
             @PathVariable("orderId") Long orderId
     ) {
         vendingMachineCacheService.deleteByOrderId(orderId);
-        orderService.pickupOrder(user, orderId);
-        vendingMachineCacheService.save(orderId);
+        try {
+            orderService.pickupOrder(user, orderId);
+            vendingMachineCacheService.save(orderId);
+        } catch (BadRequestException e) {
+            vendingMachineCacheService.save(orderId);
+            throw e;
+        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -137,5 +172,4 @@ public class OrderController {
     ) {
         return ResponseEntity.ok(orderService.getOrdersBySellerId(user, vendingMachineId));
     }
-
 }

@@ -169,6 +169,11 @@ public class VendingMachineService {
         );
     }
 
+    public VendingMachine findBySpaceId(Long spaceId) {
+        return vendingMachineRepository.findBySpaceId(spaceId)
+                .orElseThrow(() -> new BadRequestException(NOT_FOUND_VENDING_MACHINE));
+    }
+
     private List<Long> convertToSpaceIds(List<Space> spaces) {
         return spaces.stream()
                 .map(Space::getId)
