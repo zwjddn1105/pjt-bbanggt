@@ -237,7 +237,7 @@ export default function SlotSelectionModal() {
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-[90vw] max-h-[90vh] overflow-hidden flex flex-col">
           {/* 헤더 */}
           <div className="p-4 border-b border-gray-200 flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-800">

@@ -61,6 +61,8 @@ export default function ProductRegistrationModal({
   const [showInvalidModal, setShowInvalidModal] = useState(false);
   const [rawFile, setRawFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // 여러 빵 정보를 관리하기 위한 상태 추가
+  const [breadForms, setBreadForms] = useState<BreadInfo[]>([defaultBreadInfo]);
 
   // 빵 종류 옵션
   const breadTypeOptions: BreadTypeOption[] = [
@@ -109,6 +111,7 @@ export default function ProductRegistrationModal({
   const handleClose = () => {
     resetBreadInfo();
     clearBreadList();
+    setBreadForms([defaultBreadInfo]);
     onClose();
   };
 
@@ -227,14 +230,26 @@ export default function ProductRegistrationModal({
         const analysisResult = await analyzeBreadImage(file);
 
         if (analysisResult.breads && analysisResult.breads.length > 0) {
-          const bread = analysisResult.breads[0];
-          const breadType = mapClassificationToBreadType(bread.classification);
-
-          // 분석 결과로 폼 업데이트
-          setBreadInfo({
-            breadType,
-            quantity: bread.stock > 0 ? bread.stock : 1,
+          // 감지된 모든 빵 종류에 대한 폼 생성
+          const newBreadForms = analysisResult.breads.map((bread) => {
+            const breadType = mapClassificationToBreadType(
+              bread.classification
+            );
+            return {
+              breadType: breadType,
+              originalPrice: "",
+              discountRate: "",
+              finalPrice: "",
+              quantity: bread.stock > 0 ? bread.stock : 1,
+              productName: getBreadTypeName(breadType), // 빵 종류에 따른 기본 상품명 설정
+            } as BreadInfo;
           });
+
+          // 빵 폼 상태 업데이트
+          setBreadForms(newBreadForms);
+
+          // 기존 빵 목록 초기화
+          clearBreadList();
         }
       }
     } catch (error) {
@@ -243,6 +258,22 @@ export default function ProductRegistrationModal({
       // 로딩 종료
       setLoading(false);
     }
+  };
+
+  // 빵 종류에 따른 한글 이름 반환 함수 추가
+  const getBreadTypeName = (breadType: BreadType): string => {
+    const breadTypeMap: Record<BreadType, string> = {
+      [BreadType.SOBORO]: "소보로빵",
+      [BreadType.SWEET_RED_BEAN]: "단팥빵",
+      [BreadType.WHITE_BREAD]: "식빵",
+      [BreadType.BAGUETTE]: "바게트",
+      [BreadType.CROISSANT]: "크루아상",
+      [BreadType.PIZZA_BREAD]: "피자빵",
+      [BreadType.BAGEL]: "베이글",
+      [BreadType.GARLIC_BREAD]: "마늘빵",
+      [BreadType.OTHER]: "기타 빵",
+    };
+    return breadTypeMap[breadType] || "빵";
   };
 
   // 카메라 열기 핸들러
@@ -282,8 +313,73 @@ export default function ProductRegistrationModal({
     // 폼 초기화 (이미지는 유지)
     setBreadInfo({
       ...defaultBreadInfo,
-      breadType: breadInfo.breadType, // 빵 종류는 유지
+      productName: "", // 상품명 초기화
     });
+  };
+
+  // 추가: 다음 빵 종류 선택 함수
+  const handleNextBreadType = () => {
+    if (!rawFile) return;
+
+    // 로딩 시작
+    setLoading(true);
+
+    try {
+      // 이미 분석된 결과를 사용하여 다음 빵 종류 선택
+      analyzeBreadImage(rawFile).then((analysisResult) => {
+        if (analysisResult.breads && analysisResult.breads.length > 1) {
+          // 이미 추가된 빵 종류들
+          const addedBreadTypes = breadList.map((bread) => bread.breadType);
+
+          // 현재 폼에 있는 빵 종류도 추가된 것으로 간주
+          if (breadInfo.productName) {
+            addedBreadTypes.push(breadInfo.breadType);
+          }
+
+          // 아직 추가되지 않은 빵 종류 찾기
+          for (const bread of analysisResult.breads) {
+            const breadType = mapClassificationToBreadType(
+              bread.classification
+            );
+
+            // 아직 추가되지 않은 빵 종류라면 폼에 설정
+            if (!addedBreadTypes.includes(breadType)) {
+              setBreadInfo({
+                ...defaultBreadInfo,
+                breadType: breadType,
+                quantity: bread.stock > 0 ? bread.stock : 1,
+                productName: getBreadTypeName(breadType),
+              });
+              break;
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error("다음 빵 종류 선택 중 오류 발생:", error);
+    } finally {
+      // 로딩 종료
+      setLoading(false);
+    }
+  };
+
+  // 특정 인덱스의 빵 폼 업데이트 함수
+  const updateBreadForm = (index: number, updates: Partial<BreadInfo>) => {
+    setBreadForms((prevForms) => {
+      const newForms = [...prevForms];
+      newForms[index] = { ...newForms[index], ...updates };
+      return newForms;
+    });
+  };
+
+  // 특정 인덱스의 빵 폼 삭제 함수
+  const removeBreadForm = (index: number) => {
+    setBreadForms((prevForms) => prevForms.filter((_, i) => i !== index));
+  };
+
+  // 새 빵 폼 추가 함수
+  const addNewBreadForm = () => {
+    setBreadForms((prevForms) => [...prevForms, { ...defaultBreadInfo }]);
   };
 
   // 제품 등록 핸들러
@@ -291,18 +387,20 @@ export default function ProductRegistrationModal({
     e.preventDefault();
 
     // 등록할 빵이 없는 경우
-    if (breadList.length === 0) {
-      // 현재 입력된 정보가 있으면 추가
-      if (
-        breadInfo.originalPrice !== "" &&
-        breadInfo.finalPrice !== "" &&
-        breadInfo.productName
-      ) {
-        addBread({ ...breadInfo });
-      } else {
-        alert("등록할 빵 정보가 없습니다.");
-        return;
-      }
+    if (breadForms.length === 0) {
+      alert("등록할 빵 정보가 없습니다.");
+      return;
+    }
+
+    // 필수 필드 검증
+    const invalidForms = breadForms.filter(
+      (form) =>
+        form.originalPrice === "" || form.finalPrice === "" || !form.productName
+    );
+
+    if (invalidForms.length > 0) {
+      alert("모든 빵의 상품명, 원가, 가격을 입력해주세요.");
+      return;
     }
 
     if (!image || !rawFile) {
@@ -318,28 +416,28 @@ export default function ProductRegistrationModal({
     try {
       setIsSubmitting(true);
 
-      // 현재 등록할 빵 (목록의 첫 번째 항목 또는 현재 입력된 정보)
-      const breadToRegister = breadList.length > 0 ? breadList[0] : breadInfo;
+      // 첫 번째 빵 등록
+      const firstBread = breadForms[0];
 
       console.log("상품 등록 시작:", {
         spaceId,
-        productName: breadToRegister.productName,
-        originalPrice: Number(breadToRegister.originalPrice),
-        discountRate: Number(breadToRegister.discountRate || 0),
-        finalPrice: Number(breadToRegister.finalPrice),
-        quantity: breadToRegister.quantity,
-        breadType: breadToRegister.breadType,
+        productName: firstBread.productName,
+        originalPrice: Number(firstBread.originalPrice),
+        discountRate: Number(firstBread.discountRate || 0),
+        finalPrice: Number(firstBread.finalPrice),
+        quantity: firstBread.quantity,
+        breadType: firstBread.breadType,
       });
 
       // API 호출
       await createOrder({
         spaceId,
-        productName: breadToRegister.productName,
-        originalPrice: Number(breadToRegister.originalPrice),
-        discountRate: Number(breadToRegister.discountRate || 0),
-        finalPrice: Number(breadToRegister.finalPrice),
-        quantity: breadToRegister.quantity,
-        breadType: String(breadToRegister.breadType), // BreadType을 String으로 변환
+        productName: firstBread.productName,
+        originalPrice: Number(firstBread.originalPrice),
+        discountRate: Number(firstBread.discountRate || 0),
+        finalPrice: Number(firstBread.finalPrice),
+        quantity: firstBread.quantity,
+        breadType: String(firstBread.breadType), // BreadType을 String으로 변환
         image: rawFile,
       });
 
@@ -363,7 +461,7 @@ export default function ProductRegistrationModal({
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-[90vw] max-h-[90vh] overflow-hidden">
           {/* 헤더 */}
           <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-orange-50">
             <div>
@@ -420,201 +518,244 @@ export default function ProductRegistrationModal({
             </div>
 
             {/* 오른쪽 - 상품 정보 테이블 */}
-            <div className="w-2/3 p-6">
-              <div className="mb-6">
-                <div className="grid grid-cols-5 gap-4 mb-4 font-medium text-gray-700 text-center">
-                  <div>빵 종류</div>
-                  <div>원가</div>
-                  <div>가격</div>
-                  <div>수량</div>
-                  <div>할인률</div>
-                </div>
-
-                <div className="grid grid-cols-5 gap-4 items-center">
-                  <div>
-                    <select
-                      value={breadInfo.breadType}
-                      onChange={(e) =>
-                        setBreadInfo({ breadType: e.target.value as BreadType })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    >
-                      {breadTypeOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center">
-                      <input
-                        type="number"
-                        value={breadInfo.originalPrice}
-                        onChange={handleOriginalPriceChange}
-                        placeholder="0"
-                        min="0"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      />
-                      <span className="ml-1 text-gray-600">원</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center">
-                      <input
-                        type="number"
-                        value={breadInfo.finalPrice}
-                        onChange={handleFinalPriceChange}
-                        placeholder="0"
-                        min="0"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      />
-                      <span className="ml-1 text-gray-600">원</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center">
-                    <button
-                      type="button"
-                      onClick={handleDecreaseQuantity}
-                      disabled={breadInfo.quantity <= 1}
-                      className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-l-md bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
-                    >
-                      -
-                    </button>
-                    <input
-                      type="number"
-                      value={breadInfo.quantity}
-                      onChange={(e) =>
-                        setBreadInfo({
-                          quantity: Math.max(1, Number(e.target.value)),
-                        })
-                      }
-                      min="1"
-                      className="w-12 h-8 px-2 py-1 border-t border-b border-gray-300 text-center focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleIncreaseQuantity}
-                      className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-r-md bg-gray-50 text-gray-600 hover:bg-gray-100"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <div className="flex items-center justify-center">
-                    <input
-                      type="number"
-                      value={breadInfo.discountRate}
-                      onChange={handleDiscountRateChange}
-                      placeholder="0"
-                      min="0"
-                      max="100"
-                      className="w-16 px-2 py-2 border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    />
-                    <span className="ml-1 text-gray-600">%</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 상품명 입력 */}
-              <div className="mb-6">
-                <label
-                  htmlFor="productName"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+            <div className="w-2/3 p-6 overflow-y-auto max-h-[70vh]">
+              {/* 빵 폼 목록 */}
+              {breadForms.map((breadForm, index) => (
+                <div
+                  key={index}
+                  className="mb-8 p-4 border border-gray-200 rounded-lg"
                 >
-                  상품명
-                </label>
-                <input
-                  type="text"
-                  id="productName"
-                  value={breadInfo.productName}
-                  onChange={(e) =>
-                    setBreadInfo({ productName: e.target.value })
-                  }
-                  placeholder="상품명을 자유롭게 입력해주세요"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  required
-                />
-              </div>
-
-              {/* 추가 버튼 (활성화) */}
-              <div className="mb-6">
-                <button
-                  type="button"
-                  onClick={handleAddBread}
-                  disabled={
-                    !breadInfo.productName ||
-                    breadInfo.originalPrice === "" ||
-                    breadInfo.finalPrice === ""
-                  }
-                  className="w-full py-2 rounded-md border border-orange-300 bg-orange-50 text-orange-500 hover:bg-orange-100 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-50"
-                >
-                  <Plus className="w-5 h-5 mr-1" />
-                  추가
-                </button>
-              </div>
-
-              {/* 빵 목록 */}
-              {breadList.length > 0 && (
-                <div className="mb-6 border border-gray-200 rounded-md overflow-hidden">
-                  <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 font-medium text-gray-700">
-                    추가된 빵 목록
-                  </div>
-                  <div className="divide-y divide-gray-200">
-                    {breadList.map((bread, index) => (
-                      <div
-                        key={index}
-                        className="px-4 py-3 flex justify-between items-center"
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-800">
+                      빵 #{index + 1}
+                    </h3>
+                    {breadForms.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeBreadForm(index)}
+                        className="text-red-500 hover:text-red-700"
                       >
-                        <div>
-                          <div className="font-medium">{bread.productName}</div>
-                          <div className="text-sm text-gray-500">
-                            {
-                              breadTypeOptions.find(
-                                (option) => option.value === bread.breadType
-                              )?.label
-                            }{" "}
-                            /{bread.quantity}개 /{" "}
-                            {Number(bread.finalPrice).toLocaleString()}원
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => removeBread(index)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-5 gap-4 mb-4 font-medium text-gray-700 text-center">
+                    <div>빵 종류</div>
+                    <div>원가</div>
+                    <div>가격</div>
+                    <div>수량</div>
+                    <div>할인률</div>
+                  </div>
+
+                  <div className="grid grid-cols-5 gap-4 items-center mb-4">
+                    <div>
+                      <select
+                        value={breadForm.breadType}
+                        onChange={(e) =>
+                          updateBreadForm(index, {
+                            breadType: e.target.value as BreadType,
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      >
+                        {breadTypeOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center">
+                        <input
+                          type="number"
+                          value={breadForm.originalPrice}
+                          onChange={(e) => {
+                            const value =
+                              e.target.value === ""
+                                ? ""
+                                : Number(e.target.value);
+                            updateBreadForm(index, { originalPrice: value });
+
+                            // 할인율이 있으면 최종 가격 자동 계산
+                            if (breadForm.discountRate !== "") {
+                              const calculatedPrice = Math.round(
+                                Number(value) *
+                                  (1 - Number(breadForm.discountRate) / 100)
+                              );
+                              updateBreadForm(index, {
+                                originalPrice: value,
+                                finalPrice: calculatedPrice,
+                              });
+                            }
+                          }}
+                          placeholder="0"
+                          min="0"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                        <span className="ml-1 text-gray-600">원</span>
                       </div>
-                    ))}
+                    </div>
+
+                    <div>
+                      <div className="flex items-center">
+                        <input
+                          type="number"
+                          value={breadForm.finalPrice}
+                          onChange={(e) => {
+                            const value =
+                              e.target.value === ""
+                                ? ""
+                                : Number(e.target.value);
+                            updateBreadForm(index, { finalPrice: value });
+
+                            // 원가가 있으면 할인율 자동 계산
+                            if (breadForm.originalPrice !== "") {
+                              const original = Number(breadForm.originalPrice);
+                              const final = Number(value);
+
+                              if (
+                                original > 0 &&
+                                final >= 0 &&
+                                final <= original
+                              ) {
+                                const calculatedRate = Math.round(
+                                  (1 - final / original) * 100
+                                );
+                                updateBreadForm(index, {
+                                  finalPrice: value,
+                                  discountRate: calculatedRate,
+                                });
+                              }
+                            }
+                          }}
+                          placeholder="0"
+                          min="0"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        />
+                        <span className="ml-1 text-gray-600">원</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-center">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (breadForm.quantity > 1) {
+                            updateBreadForm(index, {
+                              quantity: breadForm.quantity - 1,
+                            });
+                          }
+                        }}
+                        disabled={breadForm.quantity <= 1}
+                        className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-l-md bg-gray-50 text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        value={breadForm.quantity}
+                        onChange={(e) =>
+                          updateBreadForm(index, {
+                            quantity: Math.max(1, Number(e.target.value)),
+                          })
+                        }
+                        min="1"
+                        className="w-12 h-8 px-2 py-1 border-t border-b border-gray-300 text-center focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateBreadForm(index, {
+                            quantity: breadForm.quantity + 1,
+                          })
+                        }
+                        className="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-r-md bg-gray-50 text-gray-600 hover:bg-gray-100"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-center">
+                      <input
+                        type="number"
+                        value={breadForm.discountRate}
+                        onChange={(e) => {
+                          const value =
+                            e.target.value === "" ? "" : Number(e.target.value);
+                          updateBreadForm(index, { discountRate: value });
+
+                          // 원가가 있으면 최종 가격 자동 계산
+                          if (breadForm.originalPrice !== "") {
+                            const calculatedPrice = Math.round(
+                              Number(breadForm.originalPrice) *
+                                (1 - Number(value) / 100)
+                            );
+                            updateBreadForm(index, {
+                              discountRate: value,
+                              finalPrice: calculatedPrice,
+                            });
+                          }
+                        }}
+                        placeholder="0"
+                        min="0"
+                        max="100"
+                        className="w-16 px-2 py-2 border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      />
+                      <span className="ml-1 text-gray-600">%</span>
+                    </div>
+                  </div>
+
+                  {/* 상품명 입력 */}
+                  <div>
+                    <label
+                      htmlFor={`productName-${index}`}
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      상품명
+                    </label>
+                    <input
+                      type="text"
+                      id={`productName-${index}`}
+                      value={breadForm.productName}
+                      onChange={(e) =>
+                        updateBreadForm(index, { productName: e.target.value })
+                      }
+                      placeholder="상품명을 자유롭게 입력해주세요"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      required
+                    />
                   </div>
                 </div>
-              )}
+              ))}
+
+              {/* 새 빵 추가 버튼 */}
+              <button
+                type="button"
+                onClick={addNewBreadForm}
+                className="w-full py-3 mb-6 rounded-md border border-dashed border-orange-300 bg-orange-50 text-orange-500 hover:bg-orange-100 transition-colors flex items-center justify-center"
+              >
+                <Plus className="w-5 h-5 mr-1" />새 빵 추가
+              </button>
 
               {/* 총 금액 표시 */}
               <div className="flex justify-between items-center mb-6 bg-gray-50 p-4 rounded-md">
                 <div>
-                  <span className="text-sm text-gray-600">모든 빵</span>
-                  <div className="flex items-baseline">
-                    <span className="text-xl font-bold text-gray-800">
-                      {breadInfo.finalPrice
-                        ? Number(breadInfo.finalPrice).toLocaleString()
-                        : 0}
-                    </span>
-                    <span className="ml-1 text-gray-600">원</span>
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    총 {breadInfo.discountRate ? breadInfo.discountRate : 0}%
-                    할인된 가격입니다
-                  </span>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-sm text-gray-600">수량</span>
+                  <span className="text-sm text-gray-600">총 상품 수</span>
                   <div className="text-xl font-bold text-gray-800">
-                    {breadInfo.quantity}
+                    {breadForms.length}개
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm text-gray-600">총 수량</span>
+                  <div className="text-xl font-bold text-gray-800">
+                    {breadForms.reduce(
+                      (total, form) => total + form.quantity,
+                      0
+                    )}
+                    개
                   </div>
                 </div>
               </div>
