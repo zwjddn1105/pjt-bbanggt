@@ -29,6 +29,7 @@ public class PaymentValidator {
         try {
             log.info("ImpUID : {}", impUid);
             Payment payment = iamportClient.paymentByImpUid(impUid).getResponse();
+            log.info("Payment : {}", payment.toString());
             Order order = orderRepository.findById(orderId)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
 
