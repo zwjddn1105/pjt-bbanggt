@@ -24,6 +24,7 @@ export default function SlotSelectionModal() {
     loadVendingMachineDetail,
     selectedVendingMachineId,
     setSelectedSlotNumber,
+    setIsLoading,
   } = useSlotStore();
 
   const { selectedVendingMachine } = useMapStore();
@@ -218,8 +219,26 @@ export default function SlotSelectionModal() {
   };
 
   // 상품 등록 모달 닫기 핸들러
-  const handleCloseProductModal = () => {
+  const handleCloseProductModal = async () => {
     setShowProductModal(false);
+
+    // 모달이 닫힐 때 슬롯 정보 다시 로드하여 초기화
+    if (selectedVendingMachineId) {
+      try {
+        // 로딩 상태 설정
+        setIsLoading(true);
+
+        // 자판기 상세 정보 다시 로드
+        await loadVendingMachineDetail(selectedVendingMachineId);
+
+        // 선택된 슬롯 초기화
+        setSelectedSlotNumber(null);
+      } catch (error) {
+        console.error("자판기 정보 다시 로드 중 오류 발생:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   // 등록한 빵 목록 모달 열기 핸들러
