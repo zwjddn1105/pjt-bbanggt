@@ -29,7 +29,7 @@ public class PaymentValidator {
         try {
             log.info("ImpUID : {}", impUid);
             Payment payment = iamportClient.paymentByImpUid(impUid).getResponse();
-            log.info("Payment : {}", payment.toString());
+            log.info("Payment : {}", payment);
             Order order = orderRepository.findById(orderId)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
 
@@ -45,6 +45,7 @@ public class PaymentValidator {
                 throw new BadRequestException(ErrorCode.INVALID_PAYMENT_AMOUNT);
             }
         } catch (Exception e) {
+            log.error("아임포트 요청 중 예외 발생: {}", e.getMessage(), e);
             throw new BadRequestException(ErrorCode.IAMPORT_REQUEST_FAILED);
         }
     }
