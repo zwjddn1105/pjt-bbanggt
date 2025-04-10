@@ -48,7 +48,10 @@ public class LoginService {
     private final SsafyTransferService ssafyTransferService;
 
     public LoginResponse login(LoginRequest loginRequest) {
-        String kakaoAccessToken = kakaoOAuthProvider.fetchKakaoAccessToken(loginRequest.getCode());
+        String kakaoAccessToken = kakaoOAuthProvider.fetchKakaoAccessToken(
+                loginRequest.getCode(),
+                loginRequest.getEnvironment()
+        );
         KakaoUserInfo userInfo = kakaoOAuthProvider.getUserInfo(kakaoAccessToken);
 
         User user = findOrCreateUser(

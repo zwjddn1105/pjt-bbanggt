@@ -15,6 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.breadbolletguys.breadbread.auth.domain.Environment;
 import com.breadbolletguys.breadbread.common.exception.BadRequestException;
 import com.breadbolletguys.breadbread.common.exception.ErrorCode;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,21 +30,39 @@ public class KakaoOAuthProvider {
     private final RestTemplate restTemplate;
     private final String clientId;
     private final String clientSecret;
-    private final String redirectUri;
+    private final String appRedirectUrl;
+    private final String webRedirectUrl;
+    private final String appLocalRedirectUrl;
+    private final String webLocalRedirectUrl;
     private final String tokenUri;
     private final String userInfoUri;
 
     public KakaoOAuthProvider(
             RestTemplate restTemplate,
-            @Value("${spring.security.oauth2.client.registration.kakao.client-id}") String clientId,
-            @Value("${spring.security.oauth2.client.registration.kakao.client-secret}") String clientSecret,
-            @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}") String redirectUri,
-            @Value("${spring.security.oauth2.client.provider.kakao.token-uri}") String tokenUri,
-            @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}") String userInfoUri) {
+            @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+            String clientId,
+            @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+            String clientSecret,
+            @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri-app}")
+            String appRedirectUrl,
+            @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri-web}")
+            String webRedirectUrl,
+            @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri-app-local}")
+            String appLocalRedirectUrl,
+            @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri-web-local}")
+            String webLocalRedirectUrl,
+            @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
+            String tokenUri,
+            @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
+            String userInfoUri
+    ) {
         this.restTemplate = restTemplate;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
-        this.redirectUri = redirectUri;
+        this.appRedirectUrl = appRedirectUrl;
+        this.webRedirectUrl = webRedirectUrl;
+        this.appLocalRedirectUrl = appLocalRedirectUrl;
+        this.webLocalRedirectUrl = webLocalRedirectUrl;
         this.tokenUri = tokenUri;
         this.userInfoUri = userInfoUri;
     }
@@ -73,19 +92,31 @@ public class KakaoOAuthProvider {
         throw new BadRequestException(ErrorCode.UNABLE_TO_GET_USER_INFO);
     }
 
-    public String fetchKakaoAccessToken(String code) {
+    public String fetchKakaoAccessToken(String code, Environment environment) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+
+        if (Environment.APP.equals(environment)) {
+            params.add("redirect_uri", appRedirectUrl);
+            log.info("redirect_app_uri: {}", appRedirectUrl);
+        } else if (Environment.WEB.equals(environment)) {
+            params.add("redirect_uri", webRedirectUrl);
+            log.info("redirect_web_uri: {}", webRedirectUrl);
+        } else if (Environment.LOCAL_APP.equals(environment)) {
+            params.add("redirect_uri", appLocalRedirectUrl);
+            log.info("redirect_local_app_uri: {}", appLocalRedirectUrl);
+        } else if (Environment.LOCAL_WEB.equals(environment)) {
+            params.add("redirect_uri", webLocalRedirectUrl);
+            log.info("redirect_local_web_uri: {}", webLocalRedirectUrl);
+        }
+
         params.add("code", code);
         params.add("client_id", clientId);
         params.add("client_secret", clientSecret);
-        params.add("redirect_uri", redirectUri);
         params.add("grant_type", "authorization_code");
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
-
-        log.info("redirect_uri: {}", redirectUri);
 
         ResponseEntity<KakaoTokenResponse> response = restTemplate.exchange(
                 tokenUri,
