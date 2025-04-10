@@ -9,9 +9,9 @@ export default function BottomNavTab() {
   const pathname = usePathname()
 
   const tabs = [
-    { id: "문의", icon: MessageCircle, href: "/inquiry" },
-    { id: "주문", icon: ShoppingCart, href: "/" },
-    { id: "픽업", icon: ShoppingCart, href: "/pickup" },
+    { id: "문의", icon: MessageCircle, href: "/buyer/inquiry" },
+    { id: "주문", icon: ShoppingCart, href: "/buyer" },
+    { id: "픽업", icon: ShoppingCart, href: "/buyer/pickup" },
   ]
 
   return (
