@@ -445,7 +445,7 @@ export function PickupItem({
       }
 
       // console.log(`[채팅방으로 이동] 채팅방 ID: ${chatRoomId}`)
-      router.push(`/inquiry/${chatRoomId}`)
+      router.push(`/buyer/inquiry/${chatRoomId}`)
     } catch (error) {
       // console.error("[채팅 문의 오류]", error)
       alert(error instanceof Error ? error.message : "채팅 문의 처리 중 오류가 발생했습니다")

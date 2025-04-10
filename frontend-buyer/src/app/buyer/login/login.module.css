@@ -15,7 +15,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url("/bread-pattern.png");
+  background-image: url("/movingbreadgut.gif");
 
   /* 정확히 2열로 표시되도록 설정 */
   background-size: 50% auto; /* 가로: 화면 너비의 절반(2열) */

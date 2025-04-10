@@ -1,4 +1,4 @@
-import ChatList from "../../components/inquiry/chat-list"
+import ChatList from "../../../components/inquiry/chat-list"
 
 export default function InquiryPage() {
   return (
