@@ -76,9 +76,14 @@ export default function VendingMachineDoor3D({
       <div
         className={cn(
           "absolute inset-0 transform-style-3d transition-transform duration-300 shadow-lg",
-          isHovered && status !== SlotStatus.OCCUPIED ? "rotate-y-30" : "",
           status === SlotStatus.SELECTED ? "ring-2 ring-green-600" : ""
         )}
+        style={{
+          transform:
+            isHovered && status !== SlotStatus.OCCUPIED
+              ? "rotateY(-30deg)"
+              : "",
+        }}
       >
         {/* 문 앞면 */}
         <div
