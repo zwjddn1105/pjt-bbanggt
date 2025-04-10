@@ -189,7 +189,7 @@ export default function BreadDetail({
           }
 
           alert("결제가 성공적으로 완료되었습니다!")
-          router.push("/buyer/pickup")
+          router.push("/pickup")
         } catch (err) {
           // console.error("결제 처리 중 오류:", err)
           alert(err instanceof Error ? err.message : "결제 처리 중 오류가 발생했습니다.")
@@ -246,7 +246,7 @@ export default function BreadDetail({
         throw new Error(errorData.message || "결제에 실패했습니다.")
       }
 
-      router.push("/buyer/pickup")
+      router.push("/pickup")
     } catch (err) {
       // console.error("결제 오류:", err)
       alert(err instanceof Error ? err.message : "결제 실패")

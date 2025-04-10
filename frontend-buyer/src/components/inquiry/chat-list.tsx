@@ -188,7 +188,7 @@ export default function ChatList() {
           ) : (
             filteredChatRooms.map((room) => (
               <Link
-                href={`/buyer/inquiry/${room.chatRoomId}`}
+                href={`/inquiry/${room.chatRoomId}`}
                 key={room.chatRoomId}
                 className="py-4 flex justify-between items-center hover:bg-gray-50 relative"
                 onClick={() => {

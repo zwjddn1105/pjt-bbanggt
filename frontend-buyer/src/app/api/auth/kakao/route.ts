@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
       },
       body: new URLSearchParams({
         grant_type: "authorization_code",
-        client_id: "816bd85980092eeaa14987da42be1788",
-        redirect_uri: "https://j12a209.p.ssafy.io/buyer/auth/kakao",
+        client_id: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID || "",
+        redirect_uri: process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || "",
         code,
         // 클라이언트 시크릿 사용하지 않음
       }),
