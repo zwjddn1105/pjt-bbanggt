@@ -59,7 +59,7 @@ export async function GET(request: Request) {
     }
 
     // 리다이렉트 응답 생성
-    const redirectUrl = new URL("/mypage", request.url);
+    const redirectUrl = new URL("/mypage", baseUrl);
     const nextResponse = NextResponse.redirect(redirectUrl);
 
     // accessToken을 쿠키에 저장
