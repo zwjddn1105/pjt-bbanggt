@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-
 // 로그인이 필요하지 않은 공개 경로들
 const publicPaths = ["/login", "/auth/kakao"]
 
 export async function middleware(request: NextRequest) {
   // 현재 요청 경로
   const path = request.nextUrl.pathname
-  // 루트 경로(/)인 경우 /로 리디렉션
-  if (path === "/") {
-    return NextResponse.redirect(new URL("/", request.url))
-  }
 
   // 이미지 파일 및 정적 자산 요청은 건너뛰기
   if (
