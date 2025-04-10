@@ -6,7 +6,8 @@ const publicPaths = ["/login", "/auth/kakao"];
 
 export async function middleware(request: NextRequest) {
   // 현재 요청 경로
-  const path = request.nextUrl.pathname;
+  // const path = request.nextUrl.pathname;
+  const path = request.nextUrl.pathname.replace(/^\/buyer/, "");
 
   // 이미지 파일 및 정적 자산 요청은 건너뛰기
   if (
