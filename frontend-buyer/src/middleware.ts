@@ -72,7 +72,7 @@ export async function middleware(request: NextRequest) {
   // 인증되지 않았고 공개 경로가 아닌 경우 로그인 페이지로 리다이렉트
   if (!isAuthenticated && !isPublicPath) {
     // console.log("미들웨어 - 인증 실패, 로그인으로 리다이렉트")
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL("/buyer/login", request.url);
     // 로그인 후 원래 페이지로 돌아갈 수 있도록 리다이렉트 URL 추가
     loginUrl.searchParams.set("redirect", path);
 
@@ -89,7 +89,7 @@ export async function middleware(request: NextRequest) {
   // 이미 인증되었는데 로그인 페이지에 접근하는 경우 홈으로 리다이렉트 (선택적)
   if (isAuthenticated && path === "/login") {
     // console.log("미들웨어 - 이미 인증됨, 홈으로 리다이렉트")
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/buyer", request.url));
   }
 
   return NextResponse.next();
