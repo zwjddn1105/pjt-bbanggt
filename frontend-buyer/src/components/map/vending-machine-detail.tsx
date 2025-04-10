@@ -96,7 +96,7 @@ export default function VendingMachineDetail({
         className="w-full h-full object-cover rounded-md"
         onError={(e) => {
           // 이미지 로드 실패 시 기본 이미지로 대체
-          e.currentTarget.src = "/bread-pattern.png"
+          e.currentTarget.src = "/buyer/bread-pattern.png"
           e.currentTarget.className = "w-8 h-8 object-contain"
         }}
       />
@@ -412,7 +412,7 @@ export default function VendingMachineDetail({
                         alt={breadTypeNames[type as BreadType]}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.src = "/bread-pattern.png"
+                          e.currentTarget.src = "/buyer/bread-pattern.png"
                         }}
                       />
                     </div>

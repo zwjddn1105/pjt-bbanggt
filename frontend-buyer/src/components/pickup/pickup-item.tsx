@@ -494,11 +494,11 @@ export function PickupItem({
         {/* 빵 이미지 */}
         <div className="w-20 h-20 relative rounded-md mr-3 overflow-hidden">
           <img
-            src={image || "/bread-pattern.png"}
+            src={image || "/buyer/bread-pattern.png"}
             alt={getBreadTypeName(breadType)}
             className="w-full h-full object-cover"
             onError={(e) => {
-              e.currentTarget.src = "/bread-pattern.png"
+              e.currentTarget.src = "/buyer/bread-pattern.png"
             }}
           />
         </div>

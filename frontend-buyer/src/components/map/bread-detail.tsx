@@ -300,7 +300,7 @@ export default function BreadDetail({
                 alt={breadData.name}
                 className="max-w-full max-h-full object-contain"
                 onError={(e) => {
-                  e.currentTarget.src = "/bread-pattern.png"
+                  e.currentTarget.src = "/buyer/bread-pattern.png"
                 }}
               />
             </div>
