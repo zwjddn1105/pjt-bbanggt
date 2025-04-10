@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     // axios를 사용하여 API 요청
     const response = await axios.post(
       `${baseUrl}/api/v1/auth/login/kakao`,
-      { code },
+      { code, environment: "WEB" },
       {
         headers: { "Content-Type": "application/json" },
         // 쿠키 헤더를 받기 위한 설정
