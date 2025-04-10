@@ -1,8 +1,8 @@
 import type React from "react"
 import "./globals.css"
 import type { Metadata } from "next"
-import BottomNavTab from "../../components/bottom-navtab"
-import { AuthProvider } from "../../context/auth-context"
+import BottomNavTab from "../components/bottom-navtab"
+import { AuthProvider } from "../context/auth-context"
 import Script from 'next/script';
 export const metadata: Metadata = {
   title: "빵긋 - 빵 주문 앱",
