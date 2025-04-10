@@ -38,7 +38,7 @@ export const fetchMyStocks = async (
 
     return response.data;
   } catch (error) {
-    console.error("상품 재고 목록을 가져오는 중 오류가 발생했습니다:", error);
+    // console.error("상품 재고 목록을 가져오는 중 오류가 발생했습니다:", error);
     throw error;
   }
 };
@@ -66,10 +66,10 @@ export const fetchMySoldout = async (
 
     return response.data;
   } catch (error) {
-    console.error(
-      "판매 완료 상품 목록을 가져오는 중 오류가 발생했습니다:",
-      error
-    );
+    // console.error(
+    //   "판매 완료 상품 목록을 가져오는 중 오류가 발생했습니다:",
+    //   error
+    // );
     throw error;
   }
 };
@@ -128,7 +128,7 @@ export const fetchProductDetail = async (
 
     return response.data;
   } catch (error) {
-    console.error("상품 상세 정보를 가져오는 중 오류가 발생했습니다:", error);
+    // console.error("상품 상세 정보를 가져오는 중 오류가 발생했습니다:", error);
     throw error;
   }
 };
@@ -180,22 +180,22 @@ export const createOrder = async (productData: {
       formData.append("image", productData.image);
     }
 
-    // API 호출 시 디버깅 정보 추가
-    console.log(
-      "요청 URL:",
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/order/createOrder/${productData.spaceId}`
-    );
-    console.log("spaceId:", productData.spaceId);
-    console.log("orderRequests:", orderRequests);
-    console.log(
-      "formData 내용:",
-      Array.from(formData.entries()).map((entry) => {
-        if (entry[1] instanceof Blob) {
-          return [entry[0], `Blob (${entry[1].size} bytes)`];
-        }
-        return entry;
-      })
-    );
+    // // API 호출 시 디버깅 정보 추가
+    // console.log(
+    //   "요청 URL:",
+    //   `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/order/createOrder/${productData.spaceId}`
+    // );
+    // console.log("spaceId:", productData.spaceId);
+    // console.log("orderRequests:", orderRequests);
+    // console.log(
+    //   "formData 내용:",
+    //   Array.from(formData.entries()).map((entry) => {
+    //     if (entry[1] instanceof Blob) {
+    //       return [entry[0], `Blob (${entry[1].size} bytes)`];
+    //     }
+    //     return entry;
+    //   })
+    // );
 
     // API 호출
     const response = await axios.post(
@@ -209,12 +209,12 @@ export const createOrder = async (productData: {
       }
     );
 
-    console.log("상품 등록 성공", response.data);
+    // console.log("상품 등록 성공", response.data);
   } catch (error) {
-    console.error("상품 등록 중 오류가 발생했습니다:", error);
+    // console.error("상품 등록 중 오류가 발생했습니다:", error);
     if (axios.isAxiosError(error) && error.response) {
-      console.error("응답 상태:", error.response.status);
-      console.error("응답 데이터:", error.response.data);
+      // console.error("응답 상태:", error.response.status);
+      // console.error("응답 데이터:", error.response.data);
 
       // 특정 오류 메시지 처리
       if (error.response.status === 404) {

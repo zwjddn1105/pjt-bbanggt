@@ -47,7 +47,7 @@ export const useRefundStore = create<RefundStore>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      console.error("환불 목록을 가져오는 중 오류 발생:", error);
+      // console.error("환불 목록을 가져오는 중 오류 발생:", error);
       set({
         error: "환불 목록을 가져오는 중 오류가 발생했습니다.",
         isLoading: false,
@@ -72,7 +72,7 @@ export const useRefundStore = create<RefundStore>((set, get) => ({
         isLoading: false,
       });
     } catch (error) {
-      console.error("환불 승인 중 오류 발생:", error);
+      // console.error("환불 승인 중 오류 발생:", error);
       set({
         error: "환불 승인 중 오류가 발생했습니다.",
         isLoading: false,

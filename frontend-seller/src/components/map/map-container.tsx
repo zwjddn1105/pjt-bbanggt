@@ -112,7 +112,7 @@ export default function MapContainer({ onMapLoad }: MapContainerProps) {
     (lat: number, lng: number, radiusKm: number) => {
       if (!window.kakao || !window.kakao.maps || !kakaoMapRef.current) return;
 
-      console.log(`원 그리기: 위도=${lat}, 경도=${lng}, 반경=${radiusKm}km`);
+      // console.log(`원 그리기: 위도=${lat}, 경도=${lng}, 반경=${radiusKm}km`);
 
       // 이전 원이 있으면 제거
       if (searchCircleRef.current) {
@@ -235,7 +235,7 @@ ${machine.remainSpaceCount || 0}
           });
         });
       } catch (error) {
-        console.error("빵긋 자판기 조회 실패:", error);
+        // console.error("빵긋 자판기 조회 실패:", error);
       } finally {
         setIsSearching(false);
       }
@@ -315,7 +315,7 @@ ${machine.remainSpaceCount || 0}
   useEffect(() => {
     const handleUpdateSearchRadius = (event: CustomEvent) => {
       const { lat, lng, distance } = event.detail;
-      console.log(`이벤트 수신: 위도=${lat}, 경도=${lng}, 반경=${distance}km`);
+      // console.log(`이벤트 수신: 위도=${lat}, 경도=${lng}, 반경=${distance}km`);
 
       // 검색 반경 원 표시
       showSearchRadius(lat, lng, distance);
@@ -386,11 +386,11 @@ ${machine.remainSpaceCount || 0}
           searchVendingMachines(latitude, longitude, 3);
         },
         (error) => {
-          console.error("위치 정보를 가져오는데 실패했습니다:", error);
+          // console.error("위치 정보를 가져오는데 실패했습니다:", error);
         }
       );
     } else {
-      console.error("이 브라우저에서는 Geolocation이 지원되지 않습니다.");
+      // console.error("이 브라우저에서는 Geolocation이 지원되지 않습니다.");
     }
   }, [
     setMap,

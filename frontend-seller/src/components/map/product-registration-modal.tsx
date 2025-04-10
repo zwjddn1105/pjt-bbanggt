@@ -253,7 +253,7 @@ export default function ProductRegistrationModal({
         }
       }
     } catch (error) {
-      console.error("이미지 분석 중 오류 발생:", error);
+      // console.error("이미지 분석 중 오류 발생:", error);
     } finally {
       // 로딩 종료
       setLoading(false);
@@ -356,7 +356,7 @@ export default function ProductRegistrationModal({
         }
       });
     } catch (error) {
-      console.error("다음 빵 종류 선택 중 오류 발생:", error);
+      // console.error("다음 빵 종류 선택 중 오류 발생:", error);
     } finally {
       // 로딩 종료
       setLoading(false);
@@ -419,15 +419,15 @@ export default function ProductRegistrationModal({
       // 첫 번째 빵 등록
       const firstBread = breadForms[0];
 
-      console.log("상품 등록 시작:", {
-        spaceId,
-        productName: firstBread.productName,
-        originalPrice: Number(firstBread.originalPrice),
-        discountRate: Number(firstBread.discountRate || 0),
-        finalPrice: Number(firstBread.finalPrice),
-        quantity: firstBread.quantity,
-        breadType: firstBread.breadType,
-      });
+      // console.log("상품 등록 시작:", {
+      //   spaceId,
+      //   productName: firstBread.productName,
+      //   originalPrice: Number(firstBread.originalPrice),
+      //   discountRate: Number(firstBread.discountRate || 0),
+      //   finalPrice: Number(firstBread.finalPrice),
+      //   quantity: firstBread.quantity,
+      //   breadType: firstBread.breadType,
+      // });
 
       // API 호출
       await createOrder({
@@ -445,7 +445,7 @@ export default function ProductRegistrationModal({
       alert("상품이 성공적으로 등록되었습니다.");
       handleClose();
     } catch (error) {
-      console.error("상품 등록 중 오류 발생:", error);
+      // console.error("상품 등록 중 오류 발생:", error);
       if (error instanceof Error) {
         alert(`상품 등록 중 오류가 발생했습니다: ${error.message}`);
       } else {

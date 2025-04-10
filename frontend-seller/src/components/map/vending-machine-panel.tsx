@@ -31,11 +31,11 @@ export default function VendingMachinePanel({
     if (!vendingMachine || getRemainingSpaceCount() <= 0) return;
 
     try {
-      console.log(
-        `상품 등록하기 버튼 클릭: 자판기 ID=${
-          vendingMachine.id
-        }, 타입=${typeof vendingMachine.id}`
-      );
+      // console.log(
+      //   `상품 등록하기 버튼 클릭: 자판기 ID=${
+      //     vendingMachine.id
+      //   }, 타입=${typeof vendingMachine.id}`
+      // );
 
       // 자판기 ID 설정
       setSelectedVendingMachineId(vendingMachine.id);
@@ -46,7 +46,7 @@ export default function VendingMachinePanel({
       // 모달 열기
       setIsModalOpen(true);
     } catch (error) {
-      console.error("상품 등록 처리 중 오류 발생:", error);
+      // console.error("상품 등록 처리 중 오류 발생:", error);
       alert("상품 등록을 처리하는 중 오류가 발생했습니다.");
     }
   };

@@ -62,7 +62,7 @@ export default function NFTModal({ isOpen, onClose }: NFTModalProps) {
       const response = await fetchNFTs();
       setProducts(response);
     } catch (error) {
-      console.error("NFT 목록을 불러오는 중 오류가 발생했습니다:", error);
+      // console.error("NFT 목록을 불러오는 중 오류가 발생했습니다:", error);
       setError(
         error instanceof Error
           ? error.message
@@ -93,7 +93,7 @@ export default function NFTModal({ isOpen, onClose }: NFTModalProps) {
 
   // 필터링된 상품 목록
   const filteredProducts = getFilteredProducts();
-  console.log(filteredProducts);
+  // console.log(filteredProducts);
   // 다음 카드로 이동
   const nextCard = () => {
     if (filteredProducts.length === 0) return;

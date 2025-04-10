@@ -94,10 +94,10 @@ export const useSellerProductsStore = create<SellerProductsState>(
         const response = await fetchSellerProducts(vendingMachineId);
         setProducts(response);
       } catch (error) {
-        console.error(
-          "판매자 상품 목록을 불러오는 중 오류가 발생했습니다:",
-          error
-        );
+        // console.error(
+        //   "판매자 상품 목록을 불러오는 중 오류가 발생했습니다:",
+        //   error
+        // );
         setError(
           error instanceof Error
             ? error.message

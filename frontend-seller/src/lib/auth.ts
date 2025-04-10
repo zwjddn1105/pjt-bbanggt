@@ -29,16 +29,16 @@ function getAuthToken(): string | null {
 export async function logout(): Promise<void> {
   try {
     const authToken = getAuthToken();
-    console.log(authToken);
+    // console.log(authToken);
     if (!authToken) {
-      console.error("토큰이 없습니다.");
+      // console.error("토큰이 없습니다.");
       return;
     }
     document.cookie =
       "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "";
-    console.log("aaaaaaaaaaaaaaaaa");
-    console.log(baseUrl);
+    // console.log("aaaaaaaaaaaaaaaaa");
+    // console.log(baseUrl);
     // API 로그아웃 요청
     // withCredentials: true를 설정하면 쿠키가 자동으로 요청에 포함됨
     // 이렇게 하면 refresh-token 쿠키도 자동으로 요청에 포함됨
@@ -52,14 +52,14 @@ export async function logout(): Promise<void> {
         withCredentials: true, // 중요: 쿠키를 요청에 포함시킴
       }
     );
-    console.log("bbbbbbbbbbbbbbbbbbbbbbb");
+    // console.log("bbbbbbbbbbbbbbbbbbbbbbb");
     // 성공적으로 로그아웃 API 호출 후 쿠키 삭제
 
     document.cookie =
       "refresh-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-    console.log("로그아웃 완료");
+    // console.log("로그아웃 완료");
   } catch (error) {
-    console.error("로그아웃 중 오류 발생:", error);
+    // console.error("로그아웃 중 오류 발생:", error);
   }
 }

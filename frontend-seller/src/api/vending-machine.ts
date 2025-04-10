@@ -47,7 +47,7 @@ export const fetchVendingMachines = async (
 
     return response.data;
   } catch (error) {
-    console.error("빵긋 자판기 목록 조회 실패:", error);
+    // console.error("빵긋 자판기 목록 조회 실패:", error);
     throw error;
   }
 };
@@ -63,9 +63,9 @@ export const fetchVendingMachineDetail = async (
   }
 
   try {
-    console.log(
-      `자판기 상세 정보 요청: ID=${vendingMachineId}, 타입=${typeof vendingMachineId}`
-    );
+    // console.log(
+    //   `자판기 상세 정보 요청: ID=${vendingMachineId}, 타입=${typeof vendingMachineId}`
+    // );
 
     const response = await axios.get<VendingMachineDetailResponse>(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/vending-machines/seller/${vendingMachineId}`,
@@ -76,7 +76,7 @@ export const fetchVendingMachineDetail = async (
       }
     );
 
-    console.log("자판기 상세 정보 응답:", response.data);
+    // console.log("자판기 상세 정보 응답:", response.data);
 
     // 응답 데이터 유효성 검사 - 필드 이름 변경 반영
     if (!response.data || !response.data.sellerResponseList) {
@@ -85,12 +85,12 @@ export const fetchVendingMachineDetail = async (
 
     return response.data;
   } catch (error) {
-    console.error("빵긋 자판기 상세 정보 조회 실패:", error);
+    // console.error("빵긋 자판기 상세 정보 조회 실패:", error);
 
     if (axios.isAxiosError(error)) {
       if (error.response) {
-        console.error("응답 상태:", error.response.status);
-        console.error("응답 데이터:", error.response.data);
+        // console.error("응답 상태:", error.response.status);
+        // console.error("응답 데이터:", error.response.data);
       }
     }
 
@@ -119,12 +119,12 @@ export const buySlot = async (spaceId: number): Promise<boolean> => {
 
     return true;
   } catch (error) {
-    console.error("슬롯 구매 실패:", error);
+    // console.error("슬롯 구매 실패:", error);
 
     if (axios.isAxiosError(error)) {
       if (error.response) {
-        console.error("응답 상태:", error.response.status);
-        console.error("응답 데이터:", error.response.data);
+        // console.error("응답 상태:", error.response.status);
+        // console.error("응답 데이터:", error.response.data);
       }
     }
 

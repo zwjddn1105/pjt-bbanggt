@@ -37,7 +37,7 @@ export const fetchSellerProducts = async (
 
     return response.data;
   } catch (error) {
-    console.error("판매자 상품 목록을 가져오는 중 오류가 발생했습니다:", error);
+    // console.error("판매자 상품 목록을 가져오는 중 오류가 발생했습니다:", error);
     throw error;
   }
 };

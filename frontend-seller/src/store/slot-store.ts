@@ -181,9 +181,9 @@ export const useSlotStore = create<SlotState>((set, get) => ({
       setError(null);
       resetSlots();
 
-      console.log(
-        `슬롯 스토어에서 자판기 상세 정보 로드 시작: ID=${vendingMachineId}, 타입=${typeof vendingMachineId}`
-      );
+      // console.log(
+      //   `슬롯 스토어에서 자판기 상세 정보 로드 시작: ID=${vendingMachineId}, 타입=${typeof vendingMachineId}`
+      // );
 
       // ID가 유효한지 확인
       if (vendingMachineId === null || vendingMachineId === undefined) {
@@ -194,7 +194,7 @@ export const useSlotStore = create<SlotState>((set, get) => ({
       const stringId = String(vendingMachineId);
 
       const detail = await fetchVendingMachineDetail(stringId);
-      console.log("받은 자판기 상세 정보:", detail);
+      // console.log("받은 자판기 상세 정보:", detail);
 
       if (!detail) {
         throw new Error("자판기 상세 정보가 없습니다.");
@@ -207,7 +207,7 @@ export const useSlotStore = create<SlotState>((set, get) => ({
         !detail.sellerResponseList ||
         !Array.isArray(detail.sellerResponseList)
       ) {
-        console.warn("슬롯 응답 목록이 없거나 배열이 아닙니다.");
+        // console.warn("슬롯 응답 목록이 없거나 배열이 아닙니다.");
         setSlots([]);
         setOriginalSlots([]);
         return;
@@ -219,11 +219,11 @@ export const useSlotStore = create<SlotState>((set, get) => ({
         let hasBread = false;
 
         // 디버깅 로그 추가
-        console.log(`슬롯 ${slot.slotNumber} 정보:`, {
-          mine: slot.mine,
-          occupied: slot.occupied,
-          stackSummaryResponse: slot.stackSummaryResponse,
-        });
+        // console.log(`슬롯 ${slot.slotNumber} 정보:`, {
+        //   mine: slot.mine,
+        //   occupied: slot.occupied,
+        //   stackSummaryResponse: slot.stackSummaryResponse,
+        // });
 
         // 수정된 로직: mine 필드가 바깥으로 빠져나옴
         if (slot.mine) {
@@ -235,9 +235,9 @@ export const useSlotStore = create<SlotState>((set, get) => ({
           // 수정된 로직: occupied가 true이면 다른 사람이 구매한 상태 (두 가지 경우 모두 처리)
           if (slot.occupied === true) {
             status = SlotStatus.OCCUPIED; // 타인이 사용 중 (회색)
-            console.log(
-              `슬롯 ${slot.slotNumber}는 다른 사람이 구매함 (회색으로 표시)`
-            );
+            // console.log(
+            //   `슬롯 ${slot.slotNumber}는 다른 사람이 구매함 (회색으로 표시)`
+            // );
           } else if (!slot.stackSummaryResponse) {
             status = SlotStatus.AVAILABLE; // 이용 가능
           } else {
@@ -258,7 +258,7 @@ export const useSlotStore = create<SlotState>((set, get) => ({
       // 원본 상태 저장 (계산용)
       setOriginalSlots([...slotsUI]);
     } catch (error) {
-      console.error("벤딩머신 상세 정보 로드 실패:", error);
+      // console.error("벤딩머신 상세 정보 로드 실패:", error);
       setError(
         error instanceof Error ? error.message : "벤딩머신 상세 정보 로드 실패"
       );

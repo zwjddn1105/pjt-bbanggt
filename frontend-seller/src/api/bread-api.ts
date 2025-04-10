@@ -42,10 +42,10 @@ export const analyzeBreadImage = async (
         },
       }
     );
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
   } catch (error) {
-    console.error("빵 이미지 분석 중 오류가 발생했습니다:", error);
+    // console.error("빵 이미지 분석 중 오류가 발생했습니다:", error);
     throw error;
   }
 };
@@ -77,7 +77,7 @@ export const validateBreadType = async (
 
     return response.data;
   } catch (error) {
-    console.error("빵 등록 가능 여부 확인 중 오류가 발생했습니다:", error);
+    // console.error("빵 등록 가능 여부 확인 중 오류가 발생했습니다:", error);
     throw error;
   }
 };

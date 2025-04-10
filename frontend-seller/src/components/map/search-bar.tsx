@@ -71,7 +71,7 @@ export default function SearchBar() {
         alert("검색 결과가 없습니다. 다른 검색어를 입력해보세요.");
       }
     } catch (error) {
-      console.error("검색 중 오류가 발생했습니다:", error);
+      // console.error("검색 중 오류가 발생했습니다:", error);
       alert("검색 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setIsSearching(false);

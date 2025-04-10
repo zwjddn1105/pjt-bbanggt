@@ -23,7 +23,7 @@ export const useMyPageStore = create<MyPageState>((set, get) => ({
       const data = await fetchUserData();
       set({ userData: data, isLoading: false });
     } catch (error) {
-      console.error("사용자 데이터를 가져오는 중 오류 발생:", error);
+      // console.error("사용자 데이터를 가져오는 중 오류 발생:", error);
       set({
         error: "사용자 데이터를 가져오는 중 오류가 발생했습니다.",
         isLoading: false,
@@ -43,7 +43,7 @@ export const useMyPageStore = create<MyPageState>((set, get) => ({
         isLoading: false,
       }));
     } catch (error) {
-      console.error("알림 설정 변경 중 오류 발생:", error);
+      // console.error("알림 설정 변경 중 오류 발생:", error);
       set({
         error: "알림 설정을 변경하는 중 오류가 발생했습니다.",
         isLoading: false,

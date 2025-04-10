@@ -99,7 +99,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       setCurrentResponse(response);
       setCurrentPage(0);
     } catch (error) {
-      console.error("채팅방 목록을 불러오는 중 오류가 발생했습니다:", error);
+      // console.error("채팅방 목록을 불러오는 중 오류가 발생했습니다:", error);
       setError(
         error instanceof Error
           ? error.message
@@ -138,7 +138,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
         setCurrentPage(currentPage + 1);
       }
     } catch (error) {
-      console.error("다음 페이지를 불러오는 중 오류가 발생했습니다:", error);
+      // console.error("다음 페이지를 불러오는 중 오류가 발생했습니다:", error);
       setError(
         error instanceof Error
           ? error.message
@@ -168,7 +168,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       setCurrentResponse(response);
       setCurrentPage(page);
     } catch (error) {
-      console.error(`${page} 페이지를 불러오는 중 오류가 발생했습니다:`, error);
+      // console.error(`${page} 페이지를 불러오는 중 오류가 발생했습니다:`, error);
       setError(
         error instanceof Error
           ? error.message

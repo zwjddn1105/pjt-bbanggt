@@ -65,7 +65,7 @@ export default function ChatRoomPage() {
         setHasMore(response.hasNext);
         setError(null);
       } catch (error) {
-        console.error("메시지 로드 중 오류 발생:", error);
+        // console.error("메시지 로드 중 오류 발생:", error);
         setError("메시지를 불러오는 중 오류가 발생했습니다.");
       } finally {
         setLoading(false);
@@ -106,7 +106,7 @@ export default function ChatRoomPage() {
         scrollToBottom();
       }
     } catch (error) {
-      console.error("새 메시지 로드 중 오류 발생:", error);
+      // console.error("새 메시지 로드 중 오류 발생:", error);
     }
   };
 
@@ -133,7 +133,7 @@ export default function ChatRoomPage() {
         container.scrollTop = newScrollHeight - scrollHeight;
       }
     } catch (error) {
-      console.error("이전 메시지 로드 중 오류 발생:", error);
+      // console.error("이전 메시지 로드 중 오류 발생:", error);
       setError("이전 메시지를 불러오는 중 오류가 발생했습니다.");
     } finally {
       setIsLoadingMore(false);
@@ -174,7 +174,7 @@ export default function ChatRoomPage() {
       // 입력 필드에 포커스
       inputRef.current?.focus();
     } catch (error) {
-      console.error("메시지 전송 중 오류 발생:", error);
+      // console.error("메시지 전송 중 오류 발생:", error);
       setError("메시지를 전송하는 중 오류가 발생했습니다.");
     } finally {
       setIsSending(false);

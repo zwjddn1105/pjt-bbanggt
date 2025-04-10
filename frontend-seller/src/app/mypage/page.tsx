@@ -65,7 +65,7 @@ export default function MyPage() {
       try {
         await fetchUserData();
       } catch (error) {
-        console.error("데이터 로드 중 오류:", error);
+        // console.error("데이터 로드 중 오류:", error);
         // 토큰이 없거나 만료된 경우 로그인 페이지로 리다이렉트
         if ((error as Error).message === "인증 토큰이 없습니다.") {
           router.push("/");

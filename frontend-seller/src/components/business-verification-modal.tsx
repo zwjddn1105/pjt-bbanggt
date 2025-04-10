@@ -50,7 +50,7 @@ export function BusinessVerificationModal({
         onClose();
       }, 3000);
     } catch (error) {
-      console.error("사업자 인증 중 오류 발생:", error);
+      // console.error("사업자 인증 중 오류 발생:", error);
       setError("사업자 인증 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setIsLoading(false);

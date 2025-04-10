@@ -51,7 +51,7 @@ export const useProductDetailStore = create<ProductDetailState>((set) => ({
       const detail = await fetchProductDetail(vendingMachineId, productId);
       set({ productDetail: detail });
     } catch (error) {
-      console.error("상품 상세 정보를 불러오는 중 오류가 발생했습니다:", error);
+      // console.error("상품 상세 정보를 불러오는 중 오류가 발생했습니다:", error);
       set({
         error:
           error instanceof Error

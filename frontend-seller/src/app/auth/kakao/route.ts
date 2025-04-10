@@ -64,10 +64,10 @@ export async function GET(request: Request) {
 
     // accessToken을 쿠키에 저장
     if (accessToken) {
-      console.log(
-        "accessToken 쿠키 설정:",
-        accessToken.substring(0, 10) + "..."
-      );
+      // console.log(
+      //   "accessToken 쿠키 설정:",
+      //   accessToken.substring(0, 10) + "..."
+      // );
       nextResponse.cookies.set("auth_token", accessToken, {
         httpOnly: false,
         secure: process.env.NODE_ENV === "production",
@@ -75,12 +75,12 @@ export async function GET(request: Request) {
         path: "/",
       });
     } else {
-      console.error("accessToken이 응답에 없습니다.");
+      // console.error("accessToken이 응답에 없습니다.");
     }
 
     // userId를 쿠키에 저장 (추가된 부분)
     if (userId) {
-      console.log("userId 쿠키 설정:", userId);
+      // console.log("userId 쿠키 설정:", userId);
       nextResponse.cookies.set("userId", userId.toString(), {
         httpOnly: false, // 자바스크립트에서 접근 가능하도록
         secure: process.env.NODE_ENV === "production",
@@ -88,15 +88,15 @@ export async function GET(request: Request) {
         path: "/",
       });
     } else {
-      console.error("userId가 응답에 없습니다.");
+      // console.error("userId가 응답에 없습니다.");
     }
 
     // refresh-token도 필요하다면 저장
     if (refreshToken) {
-      console.log(
-        "refresh-token 쿠키 설정:",
-        refreshToken.substring(0, 10) + "..."
-      );
+      // console.log(
+      //   "refresh-token 쿠키 설정:",
+      //   refreshToken.substring(0, 10) + "..."
+      // );
       nextResponse.cookies.set("refresh-token", refreshToken, {
         httpOnly: true, // 보안을 위해 httpOnly 설정
         secure: process.env.NODE_ENV === "production",
@@ -104,20 +104,20 @@ export async function GET(request: Request) {
         path: "/",
       });
     } else {
-      console.log("refresh-token을 응답 헤더에서 찾지 못했습니다.");
+      // console.log("refresh-token을 응답 헤더에서 찾지 못했습니다.");
     }
 
     return nextResponse;
   } catch (error) {
-    console.error("카카오 로그인 처리 중 오류 발생:", error);
+    // console.error("카카오 로그인 처리 중 오류 발생:", error);
 
     // 오류 세부 정보 출력
     if (axios.isAxiosError(error)) {
-      console.error("API 오류 상세:", {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message,
-      });
+      // console.error("API 오류 상세:", {
+      //   status: error.response?.status,
+      //   data: error.response?.data,
+      //   message: error.message,
+      // });
     }
 
     // 오류 발생 시 홈페이지로 리다이렉트

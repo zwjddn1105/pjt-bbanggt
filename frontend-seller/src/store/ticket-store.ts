@@ -25,7 +25,7 @@ export const useTicketStore = create<TicketStore>((set) => ({
       set({ isLoading: false });
       return true;
     } catch (error) {
-      console.error("티켓 구매 중 오류 발생:", error);
+      // console.error("티켓 구매 중 오류 발생:", error);
       set({
         error: "티켓 구매 중 오류가 발생했습니다.",
         isLoading: false,

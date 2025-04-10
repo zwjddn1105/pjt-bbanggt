@@ -35,7 +35,7 @@ export const fetchNFTs = async (): Promise<SellerProductsResponse> => {
 
     return response.data;
   } catch (error) {
-    console.error("NFT 목록을 가져오는 중 오류가 발생했습니다:", error);
+    // console.error("NFT 목록을 가져오는 중 오류가 발생했습니다:", error);
     throw error;
   }
 };

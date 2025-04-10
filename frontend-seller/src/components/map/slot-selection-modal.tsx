@@ -66,9 +66,9 @@ export default function SlotSelectionModal() {
     status: SlotStatus,
     hasBread: boolean
   ) => {
-    console.log(
-      `슬롯 클릭: 번호=${slotNumber}, 상태=${status}, 빵있음=${hasBread}`
-    );
+    // console.log(
+    //   `슬롯 클릭: 번호=${slotNumber}, 상태=${status}, 빵있음=${hasBread}`
+    // );
 
     // 내 슬롯인 경우 (노란색)
     if (status === SlotStatus.MINE) {
@@ -79,7 +79,7 @@ export default function SlotSelectionModal() {
       }
 
       // 빵 정보가 없는 경우 상품 등록 모달 열기
-      console.log("상품 등록 모달 열기");
+      // console.log("상품 등록 모달 열기");
       // 선택된 슬롯 번호 설정
       setSelectedSlotNumber(slotNumber);
       // 상품 등록 모달 열기
@@ -217,7 +217,7 @@ export default function SlotSelectionModal() {
 
       alert("빵긋 칸 구매가 완료되었습니다.");
     } catch (error) {
-      console.error("구매 처리 중 오류 발생:", error);
+      // console.error("구매 처리 중 오류 발생:", error);
       alert("구매 처리 중 오류가 발생했습니다.");
     } finally {
       setIsPurchasing(false);
@@ -240,7 +240,7 @@ export default function SlotSelectionModal() {
         // 선택된 슬롯 초기화
         setSelectedSlotNumber(null);
       } catch (error) {
-        console.error("자판기 정보 다시 로드 중 오류 발생:", error);
+        // console.error("자판기 정보 다시 로드 중 오류 발생:", error);
       } finally {
         setIsLoading(false);
       }
