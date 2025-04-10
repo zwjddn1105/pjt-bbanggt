@@ -14,7 +14,7 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
-  basepath: "/buyer",
+  basePath: "/buyer",
 };
 
 export default nextConfig;
