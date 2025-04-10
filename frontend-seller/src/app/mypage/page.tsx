@@ -35,6 +35,8 @@ import { logout } from "../../lib/auth";
 import { RefundModal } from "../../components/refund-modal";
 import { BusinessVerificationModal } from "../../components/business-verification-modal";
 import { BusinessAlert } from "../../components/business-alert";
+// NFT 모달 import 추가 (파일 상단에 추가)
+import NFTModal from "../../components/nft-modal";
 
 export default function MyPage() {
   const router = useRouter();
@@ -47,6 +49,8 @@ export default function MyPage() {
   const [isRefundModalOpen, setIsRefundModalOpen] = useState(false);
   const [isBusinessModalOpen, setIsBusinessModalOpen] = useState(false);
   const [showBusinessAlert, setShowBusinessAlert] = useState(false);
+  // NFT 모달 상태 추가 (컴포넌트 내부 상태 부분에 추가)
+  const [showNFTModal, setShowNFTModal] = useState(false);
 
   // 티켓 구매 수량
   const [ticketCount, setTicketCount] = useState(1);
@@ -104,8 +108,8 @@ export default function MyPage() {
   // NFT 관리 클릭 또는 사업자 인증 알림
   const handleNFTClick = () => {
     if (userData?.business) {
-      // NFT 관리 페이지로 이동 (미구현)
-      console.log("NFT 관리 페이지로 이동");
+      // NFT 모달 열기
+      setShowNFTModal(true);
     } else {
       setShowBusinessAlert(true);
     }
@@ -410,7 +414,8 @@ export default function MyPage() {
                       </div>
                       <Button
                         size="sm"
-                        className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white mt-4 w-full"
+                        className="bg-blue-500 hover:bg-blue-600 text-white mt-4 w-full"
+                        onClick={() => setShowNFTModal(true)}
                       >
                         NFT 관리하기
                       </Button>
@@ -537,6 +542,12 @@ export default function MyPage() {
         isOpen={isBusinessModalOpen}
         onClose={closeBusinessModal}
       />
+      {showNFTModal && (
+        <NFTModal
+          isOpen={showNFTModal}
+          onClose={() => setShowNFTModal(false)}
+        />
+      )}
     </div>
   );
 }
