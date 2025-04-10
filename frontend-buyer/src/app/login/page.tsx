@@ -29,7 +29,7 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           <div className="w-24 h-24 mx-auto mb-4 relative">
             <Image
-              src="/mascot.png"
+              src="/movingbreadgut.gif"
               alt="빵긋 로고"
               fill
               sizes="(max-width: 768px) 40px, 80px"

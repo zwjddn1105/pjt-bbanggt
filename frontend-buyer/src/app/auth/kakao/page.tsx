@@ -1,5 +1,5 @@
 "use client"
-
+import Image from "next/image"
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useAuthContext } from "../../../context/auth-context"
@@ -184,7 +184,7 @@ export default function KakaoAuthPage() {
   // 로딩 상태 UI
   if (status === "loading") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#EC9A5E]">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-custom mb-4"></div>
         <p>카카오 로그인 처리 중...</p>
       </div>
@@ -194,7 +194,7 @@ export default function KakaoAuthPage() {
   // 에러 상태 UI
   if (status === "error") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#EC9A5E]">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           <p>{errorMessage}</p>
         </div>
@@ -204,4 +204,13 @@ export default function KakaoAuthPage() {
       </div>
     )
   }
+  // 성공 상태 UI
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#EC9A5E]">
+      <div className="px-4 py-3 rounded mb-4">
+        <Image src="/movingbreadgut.gif" alt="로그인 성공" width={300} height={300} priority />
+      </div>
+    </div>
+  )
+
 }
