@@ -321,7 +321,6 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         QBakery qBakery = QBakery.bakery;
         QVendingMachine qVendingMachine = vendingMachine;
         QTransaction qTransaction = QTransaction.transaction;
-        QNftImage qNftImage = QNftImage.nftImage;
         QTransaction subQTransaction = new QTransaction("subTransaction");
 
         JPQLQuery<Long> latestTransactionIdSubquery = JPAExpressions
@@ -356,7 +355,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                                 qOrder.discount
                         ),
                         qOrder.count,
-                        qNftImage.image,
+                        qOrder.image,
                         qOrder.productState,
                         qOrder.breadType,
                         qBakery.id,
@@ -373,7 +372,6 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
                 .leftJoin(qTransaction).on(
                         qTransaction.id.eq(latestTransactionIdSubquery))
-                .leftJoin(qNftImage).on(qNftImage.orderId.eq(qOrder.id))
                 .where(qOrder.sellerId.eq(userId))
                 .fetch();
     }
