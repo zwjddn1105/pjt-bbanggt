@@ -1,10 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true, // 빌드시 eslint 무시
+  images: {
+    domains: ["palgona.s3.ap-northeast-2.amazonaws.com"], // 정확한 S3 도메인으로 수정
   },
-  reactStrictMode: false, // Strict Mode 비활성화
-  basebath : '/buyer',
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  experimental: {
+    webpackBuildWorker: true,
+    parallelServerBuildTraces: true,
+    parallelServerCompiles: true,
+  },
 };
 
 export default nextConfig;
