@@ -292,8 +292,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
     public Integer countAvailableOrderByVendingMachineId(Long vendingMachineId) {
         return queryFactory.select(order.count().intValue())
                 .from(order)
-                .leftJoin(space).on(order.spaceId.eq(space.id))
-                .leftJoin(vendingMachine).on(space.vendingMachineId.eq(vendingMachineId))
+                .innerJoin(space).on(order.spaceId.eq(space.id))
+                .innerJoin(vendingMachine).on(space.vendingMachineId.eq(vendingMachineId))
                 .where(order.productState.eq(ProductState.AVAILABLE)
                         .and(space.vendingMachineId.eq(vendingMachineId)))
                 .fetchOne();
@@ -307,8 +307,8 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                                 order.count().intValue(),
                                 vendingMachine.id
                         )).from(order)
-                .leftJoin(space).on(order.spaceId.eq(space.id))
-                .leftJoin(vendingMachine).on(space.vendingMachineId.eq(space.vendingMachineId))
+                .innerJoin(space).on(order.spaceId.eq(space.id))
+                .innerJoin(vendingMachine).on(space.vendingMachineId.eq(space.vendingMachineId))
                 .where(vendingMachine.id.in(vendingMachineIds).and(order.productState.eq(ProductState.AVAILABLE)))
                 .groupBy(vendingMachine.id)
                 .fetch();
