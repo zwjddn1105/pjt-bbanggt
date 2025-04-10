@@ -69,7 +69,7 @@ public class OrderService {
     private final TransactionService transactionService;
     private final TransactionRepository transactionRepository;
     private final S3Service s3Service;
-    private final IpfsService ipfsService;
+    private final IpfsServiceFacade ipfsServiceFacade;
     private final PaymentValidator paymentValidator;
 
     @Transactional(readOnly = true)
@@ -108,11 +108,20 @@ public class OrderService {
             throw new BadRequestException(ErrorCode.UNABLE_TO_USE_SPACE);
         }
         String imageUrl = s3Service.uploadFile(image);
-        //String imageUrl = ipfsService.uploadFile(image);
+        // Image를 분산 원장에 저장한다.
+        // String imageUrl2 = ipfsService.uploadFile(image);
+        // NFTService.saveImage(ddlkdlqk)
+        // image 를 분산 원장에서 URL을 가져온다. ->
+        // ipfsServiceFacade.uploadImage();
+        // NFT 거기서 가져오는 거잖아?
         if (orderRequests.size() == 1) {
-            return saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), imageUrl).getId();
+            Order order = saveSingleBreadOrder(user, spaceId, bakeryId, orderRequests.get(0), imageUrl);
+            ipfsServiceFacade.uploadImage(order.getId(), image);
+            return order.getId();
         } else {
-            return saveMixedBreadOrder(user, spaceId, bakeryId, orderRequests, imageUrl).getId();
+            Order order = saveMixedBreadOrder(user, spaceId, bakeryId, orderRequests, imageUrl);
+            ipfsServiceFacade.uploadImage(order.getId(), image);
+            return order.getId();
         }
     }
 

@@ -76,6 +76,21 @@ dependencies {
 	implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
 }
 
+tasks.register("copyW3", Copy) {
+	from("src/main/resources/w3.cmd")
+	into(layout.buildDirectory.dir("bin"))
+
+	from("src/main/resources/node_modules") {
+		into("node_modules") // 상대 경로 유지
+	}
+}
+
+
+// 빌드 전에 w3.cmd 복사되도록 설정
+tasks.named("processResources") {
+	dependsOn(tasks.named("copyW3"))
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }
