@@ -47,7 +47,7 @@ export const fetchChatRooms = async (pageToken?: string | null): Promise<PageInf
 
     return await response.json()
   } catch (error) {
-    console.error("채팅방 목록 조회 오류:", error)
+    // console.error("채팅방 목록 조회 오류:", error)
     throw error
   }
 }
@@ -75,7 +75,7 @@ export const fetchChatMessages = async (
 
     return await response.json()
   } catch (error) {
-    console.error("채팅 메시지 조회 오류:", error)
+    // console.error("채팅 메시지 조회 오류:", error)
     throw error
   }
 }
@@ -96,7 +96,7 @@ export const sendChatMessage = async (chatRoomId: number, content: string): Prom
       throw new Error("채팅 메시지 전송에 실패했습니다.")
     }
   } catch (error) {
-    console.error("채팅 메시지 전송 오류:", error)
+    // console.error("채팅 메시지 전송 오류:", error)
     throw error
   }
 }
@@ -116,7 +116,7 @@ export const createChatRoom = async (bakeryId: number): Promise<void> => {
       throw new Error("채팅방 생성에 실패했습니다.")
     }
   } catch (error) {
-    console.error("채팅방 생성 오류:", error)
+    // console.error("채팅방 생성 오류:", error)
     throw error
   }
 }

@@ -11,7 +11,7 @@ export default function LoginPage() {
     const redirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI
 
     if (!clientId || !redirectUri) {
-      console.error("카카오 로그인 환경 변수가 설정되지 않았습니다.")
+      // console.error("카카오 로그인 환경 변수가 설정되지 않았습니다.")
       return
     }
 

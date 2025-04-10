@@ -49,7 +49,7 @@ export const chatService = {
       })
       return response.data
     } catch (error) {
-      console.error("Error fetching buyer chat rooms:", error)
+      // console.error("Error fetching buyer chat rooms:", error)
       // Return empty data structure to prevent errors
       return { data: [], pageToken: null, hasNext: false }
     }
@@ -69,7 +69,7 @@ export const chatService = {
       })
       return response.data
     } catch (error) {
-      console.error("Error fetching chat messages:", error)
+      // console.error("Error fetching chat messages:", error)
       // Return empty data structure to prevent errors
       return { data: [], pageToken: null, hasNext: false }
     }

@@ -24,7 +24,7 @@ export default function KakaoAuthPage() {
 
     // 이미 처리 중이거나 이미 처리된 코드인 경우 중복 실행 방지
     if (isProcessingRef.current || (code && code === processedCode)) {
-      console.log("🔄 이미 인증 처리 중이거나 처리된 코드입니다. 중복 요청 무시.")
+      // console.log("🔄 이미 인증 처리 중이거나 처리된 코드입니다. 중복 요청 무시.")
       return
     }
 
@@ -35,16 +35,16 @@ export default function KakaoAuthPage() {
     const error = searchParams.get("error")
 
     // 디버깅: URL 파라미터 로깅
-    console.log("🔍 카카오 인증 콜백 파라미터:", {
-      code: code ? `${code.substring(0, 10)}...` : "없음",
-      state,
-      error,
-      fullUrl: window.location.href,
-    })
+    // console.log("🔍 카카오 인증 콜백 파라미터:", {
+    //   code: code ? `${code.substring(0, 10)}...` : "없음",
+    //   state,
+    //   error,
+    //   fullUrl: window.location.href,
+    // })
 
     // 에러 처리
     if (error) {
-      console.error("❌ 카카오 인증 오류:", error)
+      // console.error("❌ 카카오 인증 오류:", error)
       setStatus("error")
       setErrorMessage(`인증 오류: ${error}`)
       isProcessingRef.current = false
@@ -53,7 +53,7 @@ export default function KakaoAuthPage() {
 
     // 코드 확인
     if (!code) {
-      console.error("❌ 인증 코드가 없습니다.")
+      // console.error("❌ 인증 코드가 없습니다.")
       setStatus("error")
       setErrorMessage("인증 코드가 없습니다.")
       isProcessingRef.current = false
@@ -63,7 +63,7 @@ export default function KakaoAuthPage() {
     // 인증 코드를 서버로 전송하여 토큰 발급
     const sendAuthCodeToServer = async () => {
       try {
-        console.log("🚀 인증 코드 서버 전송 시작")
+        // console.log("🚀 인증 코드 서버 전송 시작")
 
         // 처리 중인 코드 저장
         sessionStorage.setItem("kakao_processed_code", code)
@@ -72,11 +72,11 @@ export default function KakaoAuthPage() {
         const backendApiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login/kakao`
 
         // 디버깅: 전체 URL 로깅 추가
-        console.log("🔗 백엔드 API URL:", backendApiUrl)
-        console.log("📤 백엔드로 전송할 데이터:", { code: code.substring(0, 10) + "..." })
+        // console.log("🔗 백엔드 API URL:", backendApiUrl)
+        // console.log("📤 백엔드로 전송할 데이터:", { code: code.substring(0, 10) + "..." })
 
         // 백엔드 API 직접 호출 - 인증 코드만 전송
-        console.log("🔄 백엔드 API 직접 호출 시작 - 인증 코드만 전송")
+        // console.log("🔄 백엔드 API 직접 호출 시작 - 인증 코드만 전송")
 
         // axios를 사용하여 API 요청
         const response = await axios.post(
@@ -89,8 +89,8 @@ export default function KakaoAuthPage() {
         )
 
         // 디버깅: 백엔드 응답 상태 로깅
-        console.log("✅ 백엔드 응답 상태:", response.status)
-        console.log("✅ 백엔드 응답 데이터:", response.data)
+        // console.log("✅ 백엔드 응답 상태:", response.status)
+        // console.log("✅ 백엔드 응답 데이터:", response.data)
 
         // 응답 데이터에서 userId, accessToken과 refreshToken 가져오기
         const userId = response.data.userId
@@ -99,14 +99,14 @@ export default function KakaoAuthPage() {
 
         // 로컬 스토리지에 userId 저장
         if (userId) {
-          localStorage.setItem("user_id", userId.toString())
-          console.log("✅ 사용자 ID 저장 완료:", userId)
+          // localStorage.setItem("user_id", userId.toString())
+          // console.log("✅ 사용자 ID 저장 완료:", userId)
 
           // 쿠키에도 userId 저장 (7일 유효기간)
           document.cookie = `user_id=${userId}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`
-          console.log("✅ 사용자 ID 쿠키 저장 완료")
+          // console.log("✅ 사용자 ID 쿠키 저장 완료")
         } else {
-          console.warn("⚠️ 백엔드에서 사용자 ID를 제공하지 않았습니다.")
+          // console.warn("⚠️ 백엔드에서 사용자 ID를 제공하지 않았습니다.")
         }
 
         if (!accessToken) {
@@ -119,9 +119,9 @@ export default function KakaoAuthPage() {
         // 리프레시 토큰도 저장 (백엔드에서 제공하는 경우)
         if (refreshToken) {
           localStorage.setItem("refresh_token", refreshToken)
-          console.log("✅ 리프레시 토큰 저장 완료:", refreshToken.substring(0, 10) + "...")
+          // console.log("✅ 리프레시 토큰 저장 완료:", refreshToken.substring(0, 10) + "...")
         } else {
-          console.warn("⚠️ 백엔드에서 리프레시 토큰을 제공하지 않았습니다.")
+          // console.warn("⚠️ 백엔드에서 리프레시 토큰을 제공하지 않았습니다.")
         }
 
         // 백엔드에서 user 정보를 반환하지 않는 경우, 기본 사용자 정보 사용
@@ -130,43 +130,43 @@ export default function KakaoAuthPage() {
           nickname: "사용자",
         }
 
-        console.log("👤 사용자 정보:", user)
+        // console.log("👤 사용자 정보:", user)
 
         // 사용자 정보 저장
         localStorage.setItem("user_info", JSON.stringify(user))
 
         // 인증 성공 시 로그인 처리
         login(accessToken, user, refreshToken)
-        console.log("🔓 로그인 처리 완료")
+        // console.log("🔓 로그인 처리 완료")
 
         // 인증 성공
         setStatus("success")
-        console.log("✨ 인증 성공 - 홈페이지로 리다이렉트 예정")
+        // console.log("✨ 인증 성공 - 홈페이지로 리다이렉트 예정")
 
         // 홈페이지로 리다이렉트
         setTimeout(() => {
           router.push("/")
         }, 1500)
       } catch (error) {
-        console.error("❌ 인증 처리 오류:", error)
+        // console.error("❌ 인증 처리 오류:", error)
 
         // 오류 세부 정보 출력
-        if (axios.isAxiosError(error)) {
-          console.error("❌ 백엔드 API 호출 실패!")
-          console.error("🔍 API 오류 상세:", {
-            status: error.response?.status,
-            statusText: error.response?.statusText,
-            data: error.response?.data,
-            message: error.message,
-          })
-        }
+        // if (axios.isAxiosError(error)) {
+        //   console.error("❌ 백엔드 API 호출 실패!")
+        //   console.error("🔍 API 오류 상세:", {
+        //     status: error.response?.status,
+        //     statusText: error.response?.statusText,
+        //     data: error.response?.data,
+        //     message: error.message,
+        //   })
+        // }
 
         setStatus("error")
         setErrorMessage(error instanceof Error ? error.message : "인증 처리 중 오류가 발생했습니다.")
       } finally {
         // 처리 완료 플래그 설정
         isProcessingRef.current = false
-        console.log("🏁 인증 처리 완료")
+        // console.log("🏁 인증 처리 완료")
       }
     }
 

@@ -103,14 +103,14 @@ export async function fetchAccountInfo(): Promise<AccountResponse[]> {
 
 // 결제 함수 수정 - 디버깅 로그 추가 및 URL 경로 수정
 export async function payForOrder(orderId: number, payRequest: PayRequest): Promise<any> {
-  console.log(`결제 요청: orderId=${orderId}, payRequest=`, payRequest)
+  // console.log(`결제 요청: orderId=${orderId}, payRequest=`, payRequest)
   try {
     // 백엔드 API 경로가 /api/v1/order/{orderId}/pay 형식임을 확인
     const response = await api.post(`/api/v1/order/${orderId}/pay`, payRequest)
-    console.log("결제 응답:", response)
+    // console.log("결제 응답:", response)
     return response
   } catch (error) {
-    console.error("결제 오류:", error)
+    // console.error("결제 오류:", error)
     throw error
   }
 }

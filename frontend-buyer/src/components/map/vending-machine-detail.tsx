@@ -50,7 +50,7 @@ export default function VendingMachineDetail({
         setVendingMachineDetail(data)
         setLoading(false)
       } catch (err) {
-        console.error("자판기 상세 정보를 가져오는데 실패했습니다:", err)
+        // console.error("자판기 상세 정보를 가져오는데 실패했습니다:", err)
         setError("자판기 상세 정보를 가져오는데 실패했습니다.")
         setLoading(false)
       }
@@ -70,7 +70,10 @@ export default function VendingMachineDetail({
     if (!slot.orderSummaryResponse || slot.orderSummaryResponse.productState !== "AVAILABLE") {
       return "bg-gray-300"
     }
-
+    // 북마크된 빵집의 빵인 경우 특별한 테두리 추가
+    if (slot.orderSummaryResponse.mark) {
+      return "bg-white border-2 border-[#EC9A5E]" // 북마크된 빵집은 특별한 테두리 색상 적용
+    }
     // AVAILABLE인 경우 흰색 배경 (이미지가 보이도록)
     return "bg-white"
   }

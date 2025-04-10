@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const errorData = await tokenResponse.json()
-      console.error("카카오 토큰 발급 실패:", errorData)
+      // console.error("카카오 토큰 발급 실패:", errorData)
       return NextResponse.json({ message: "카카오 토큰 발급에 실패했습니다." }, { status: 500 })
     }
 
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!userResponse.ok) {
-      console.error("카카오 사용자 정보 조회 실패")
+      // console.error("카카오 사용자 정보 조회 실패")
       return NextResponse.json({ message: "사용자 정보 조회에 실패했습니다." }, { status: 500 })
     }
 
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("카카오 로그인 처리 오류:", error)
+    // console.error("카카오 로그인 처리 오류:", error)
     return NextResponse.json({ message: "로그인 처리 중 오류가 발생했습니다." }, { status: 500 })
   }
 }

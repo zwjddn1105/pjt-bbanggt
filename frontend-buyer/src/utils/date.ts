@@ -11,7 +11,7 @@ export function formatDate(dateString: string): string {
   
       return `${period} ${displayHours}:${minutes < 10 ? "0" + minutes : minutes}`
     } catch (error) {
-      console.error("Error formatting date:", error)
+      // console.error("Error formatting date:", error)
       return dateString
     }
   }
@@ -26,7 +26,7 @@ export function formatDate(dateString: string): string {
   
       return `${hours}:${minutes < 10 ? "0" + minutes : minutes}`
     } catch (error) {
-      console.error("Error formatting time:", error)
+      // console.error("Error formatting time:", error)
       return dateString
     }
   }

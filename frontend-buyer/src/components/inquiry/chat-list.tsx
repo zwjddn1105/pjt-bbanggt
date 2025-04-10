@@ -70,7 +70,7 @@ export default function ChatList() {
           fetchLastMessageTime(room.chatRoomId)
         }
       } catch (error) {
-        console.error("채팅방 목록을 불러오는 중 오류가 발생했습니다:", error)
+        // console.error("채팅방 목록을 불러오는 중 오류가 발생했습니다:", error)
       } finally {
         setLoading(false)
       }
@@ -101,7 +101,7 @@ export default function ChatList() {
         })
       }
     } catch (error) {
-      console.error(`채팅방 ${chatRoomId}의 마지막 메시지 시간을 가져오는 중 오류가 발생했습니다:`, error)
+      // console.error(`채팅방 ${chatRoomId}의 마지막 메시지 시간을 가져오는 중 오류가 발생했습니다:`, error)
     }
   }
 
