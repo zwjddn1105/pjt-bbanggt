@@ -27,7 +27,7 @@ public interface SpaceJpaRepository extends JpaRepository<Space, Long>, SpaceQue
         WHERE s.vendingMachineId = :vendingMachineId
         AND s.occupied = false
         """)
-    int countNotOccupiedSpaceByVendingMachineId(Long vendingMachineId);
+    int countNotOccupiedSpaceByVendingMachineId(@Param("vendingMachineId") Long vendingMachineId);
 
     @Query("SELECT s.vendingMachineId FROM Space s WHERE s.id IN :spaceIds")
     List<Long> findVendingMachineIdsBySpaceIds(@Param("spaceIds") List<Long> spaceIds);

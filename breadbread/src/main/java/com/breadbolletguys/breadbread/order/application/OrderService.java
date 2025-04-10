@@ -379,6 +379,10 @@ public class OrderService {
             }
         }
     }
+
+    public List<OrderResponse> getMyNFT(User user) {
+        return orderRepository.findMyNFT(user.getId());
+    }
 //    @Scheduled(cron = "0 10 10 * * *")
 //    @Transactional
 //    public void expireOutdatedOrders() {

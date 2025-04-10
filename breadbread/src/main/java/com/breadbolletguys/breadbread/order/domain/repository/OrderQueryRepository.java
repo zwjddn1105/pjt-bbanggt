@@ -25,4 +25,6 @@ public interface OrderQueryRepository {
     Integer countAvailableOrderByVendingMachineId(Long vendingMachineId);
 
     List<OrderCountQueryResponse> findAvailableCountsByVendingMachineIds(List<Long> vendingMachineIds);
+
+    List<OrderResponse> findMyNFT(Long userId);
 }

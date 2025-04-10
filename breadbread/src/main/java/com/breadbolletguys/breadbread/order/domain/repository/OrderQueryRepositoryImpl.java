@@ -312,4 +312,66 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
                 .groupBy(vendingMachine.id)
                 .fetch();
     }
+
+    @Override
+    public List<OrderResponse> findMyNFT(Long userId) {
+        QSpace qSpace = space;
+        QOrder qOrder = order;
+        QBakery qBakery = QBakery.bakery;
+        QVendingMachine qVendingMachine = vendingMachine;
+        QTransaction qTransaction = QTransaction.transaction;
+        QTransaction subQTransaction = new QTransaction("subTransaction");
+
+        JPQLQuery<Long> latestTransactionIdSubquery = JPAExpressions
+                .select(subQTransaction.id.max())
+                .from(subQTransaction)
+                .where(subQTransaction.orderId.eq(qOrder.id));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        NumberTemplate<Integer> slotNumberExpr = Expressions.numberTemplate(
+                Integer.class,
+                "({0} * {1}) + {2} + 1",
+                qSpace.height, qVendingMachine.width, qSpace.width
+        );
+
+        Expression<LocalDateTime> paymentDateExpr = new CaseBuilder()
+                .when(qOrder.productState.eq(ProductState.SOLD_OUT))
+                .then(qTransaction.transactionDate)
+                .otherwise((LocalDateTime) null);
+
+        return queryFactory
+                .select(Projections.constructor(
+                        OrderResponse.class,
+                        qOrder.id,
+                        qVendingMachine.address,
+                        qBakery.name,
+                        qOrder.price,
+                        Expressions.numberTemplate(
+                                Integer.class,
+                                "FLOOR({0} * (1 - {1}))",
+                                qOrder.price,
+                                qOrder.discount
+                        ),
+                        qOrder.count,
+                        qOrder.image,
+                        qOrder.productState,
+                        qOrder.breadType,
+                        qBakery.id,
+                        qVendingMachine.id,
+                        qVendingMachine.latitude,
+                        qVendingMachine.longitude,
+                        qVendingMachine.name,
+                        slotNumberExpr,
+                        paymentDateExpr
+                ))
+                .from(qOrder)
+                .join(qSpace).on(qOrder.spaceId.eq(qSpace.id))
+                .join(qBakery).on(qOrder.bakeryId.eq(qBakery.id))
+                .join(qVendingMachine).on(qSpace.vendingMachineId.eq(qVendingMachine.id))
+                .leftJoin(qTransaction).on(
+                        qTransaction.id.eq(latestTransactionIdSubquery))
+                .where(qOrder.sellerId.eq(userId))
+                .fetch();
+    }
 }
