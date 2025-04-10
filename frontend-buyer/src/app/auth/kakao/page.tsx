@@ -147,7 +147,7 @@ export default function KakaoAuthPage() {
 
         // 홈페이지로 리다이렉트
         setTimeout(() => {
-          router.push("/buyer")
+          router.push("/")
         }, 1500)
       } catch (error) {
         // console.error("❌ 인증 처리 오류:", error)
@@ -200,7 +200,7 @@ export default function KakaoAuthPage() {
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           <p>{errorMessage}</p>
         </div>
-        <button onClick={() => router.push("/buyer/login")} className="px-4 py-2 bg-primary-custom text-white rounded-md">
+        <button onClick={() => router.push("/login")} className="px-4 py-2 bg-primary-custom text-white rounded-md">
           로그인 페이지로 돌아가기
         </button>
       </div>
