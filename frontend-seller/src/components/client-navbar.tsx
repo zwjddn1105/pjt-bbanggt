@@ -1,52 +1,51 @@
-"use client"
+"use client";
 
-// 기존 navbar.tsx의 내용을 여기로 옮깁니다
-import Image from "next/image"
-import { useState, useEffect } from "react"
-import { cn } from "../lib/utils"
-import { Button } from "../components/ui/button"
-import { Menu, X } from "lucide-react"
-import { isLoggedIn } from "../lib/auth"
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import { cn } from "../lib/utils";
+import { Button } from "../components/ui/button";
+import { Menu, X } from "lucide-react";
+import { isLoggedIn } from "../lib/auth";
 
 export default function ClientNavbar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
-  const [isLoading, setIsLoading] = useState(true) // 로딩 상태 추가
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
 
   // 컴포넌트가 마운트될 때 로그인 상태 확인
   useEffect(() => {
     try {
-      setIsLoading(true)
-      const loggedIn = isLoggedIn()
-      setIsUserLoggedIn(loggedIn)
+      setIsLoading(true);
+      const loggedIn = isLoggedIn();
+      setIsUserLoggedIn(loggedIn);
     } catch (error) {
-      console.error("로그인 상태 확인 중 오류:", error)
-      setIsUserLoggedIn(false)
+      console.error("로그인 상태 확인 중 오류:", error);
+      setIsUserLoggedIn(false);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   // 로그인이 필요한 페이지로 이동하려고 할 때 처리
   const handleProtectedNavigation = (path: string) => {
     // 로그인 상태 재확인
     if (!isLoggedIn()) {
-      window.location.href = "/"
-      return
+      window.location.href = "/";
+      return;
     }
-    window.location.href = path
-  }
+    window.location.href = path;
+  };
 
   // 로그인/마이페이지 버튼 클릭 처리
   const handleAuthButtonClick = () => {
     if (isUserLoggedIn) {
       // 마이페이지로 이동 또는 드롭다운 메뉴 표시 등
-      window.location.href = "/mypage"
+      window.location.href = "/mypage";
     } else {
       // 로그인 페이지로 이동
-      window.location.href = "/"
+      window.location.href = "/";
     }
-  }
+  };
 
   // 로딩 중일 때 간단한 스켈레톤 UI 표시
   if (isLoading) {
@@ -73,7 +72,7 @@ export default function ClientNavbar() {
           </div>
         </div>
       </header>
-    )
+    );
   }
 
   return (
@@ -143,7 +142,11 @@ export default function ClientNavbar() {
 
           {/* 모바일 메뉴 버튼 */}
           <div className="md:hidden flex items-center ml-4">
-            <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
               <span className="sr-only">메뉴 열기</span>
               {isMobileMenuOpen ? (
                 <X className="h-6 w-6 text-orange-500" />
@@ -156,12 +159,17 @@ export default function ClientNavbar() {
       </div>
 
       {/* 모바일 메뉴 */}
-      <div className={cn("md:hidden shadow-lg absolute w-full", isMobileMenuOpen ? "block" : "hidden")}>
+      <div
+        className={cn(
+          "md:hidden shadow-lg absolute w-full",
+          isMobileMenuOpen ? "block" : "hidden"
+        )}
+      >
         <div className="px-4 pt-3 pb-4 space-y-2 sm:px-5 bg-white">
           <button
             onClick={() => {
-              setIsMobileMenuOpen(false)
-              handleProtectedNavigation("/map")
+              setIsMobileMenuOpen(false);
+              handleProtectedNavigation("/map");
             }}
             className="block w-full text-left px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all duration-200"
           >
@@ -169,8 +177,8 @@ export default function ClientNavbar() {
           </button>
           <button
             onClick={() => {
-              setIsMobileMenuOpen(false)
-              handleProtectedNavigation("/products")
+              setIsMobileMenuOpen(false);
+              handleProtectedNavigation("/products");
             }}
             className="block w-full text-left px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all duration-200"
           >
@@ -178,8 +186,8 @@ export default function ClientNavbar() {
           </button>
           <button
             onClick={() => {
-              setIsMobileMenuOpen(false)
-              handleProtectedNavigation("/inquiries")
+              setIsMobileMenuOpen(false);
+              handleProtectedNavigation("/inquiries");
             }}
             className="block w-full text-left px-3 py-3 rounded-md text-base font-medium text-gray-600 hover:text-orange-500 hover:bg-orange-50 transition-all duration-200"
           >
@@ -189,8 +197,8 @@ export default function ClientNavbar() {
             <Button
               className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white rounded-full py-2 shadow-md hover:shadow-lg transition-all duration-200"
               onClick={() => {
-                setIsMobileMenuOpen(false)
-                handleAuthButtonClick()
+                setIsMobileMenuOpen(false);
+                handleAuthButtonClick();
               }}
             >
               {isUserLoggedIn ? "마이페이지" : "로그인"}
@@ -199,5 +207,5 @@ export default function ClientNavbar() {
         </div>
       </div>
     </header>
-  )
+  );
 }
