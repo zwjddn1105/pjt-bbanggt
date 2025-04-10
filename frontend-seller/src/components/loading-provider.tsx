@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { createContext, useContext, useState, useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { BreadIcon } from "../components/icons";
 
 // 로딩 컨텍스트 생성
@@ -22,7 +22,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
 
   // 클라이언트 사이드에서만 마운트 상태 설정
   useEffect(() => {
@@ -38,7 +38,7 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
     return () => {
       // 클린업 함수
     };
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   return (
     <LoadingContext.Provider value={{ isLoading, setLoading: setIsLoading }}>
