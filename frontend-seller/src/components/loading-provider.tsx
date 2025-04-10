@@ -1,33 +1,45 @@
-"use client";
+"use client"
 
-import type React from "react";
-import { createContext, useContext, useState, useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { BreadIcon } from "../components/icons";
+import type React from "react"
+import { createContext, useContext, useState, useEffect } from "react"
+import { usePathname, useSearchParams } from "next/navigation"
+import { BreadIcon } from "@/components/icons"
 
 // 로딩 컨텍스트 생성
 type LoadingContextType = {
-  isLoading: boolean;
-  setLoading: (loading: boolean) => void;
-};
+  isLoading: boolean
+  setLoading: (loading: boolean) => void
+}
 
-const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
+const LoadingContext = createContext<LoadingContextType | undefined>(undefined)
 
 // 로딩 프로바이더 컴포넌트
 export function LoadingProvider({ children }: { children: React.ReactNode }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // 클라이언트 사이드에서만 마운트 상태 설정
+  useEffect(() => {
+    setIsMounted(true)
+    return () => setIsMounted(false)
+  }, [])
 
   // 라우트 변경 감지
   useEffect(() => {
     // 페이지 로드 완료 시 로딩 상태 해제
-    setIsLoading(false);
+    setIsLoading(false)
 
     return () => {
       // 클린업 함수
-    };
-  }, [pathname, searchParams]);
+    }
+  }, [pathname, searchParams])
+
+  // 서버 사이드 렌더링 중에는 로딩 UI를 표시하지 않음
+  if (!isMounted) {
+    return <>{children}</>
+  }
 
   return (
     <LoadingContext.Provider value={{ isLoading, setLoading: setIsLoading }}>
@@ -64,14 +76,14 @@ export function LoadingProvider({ children }: { children: React.ReactNode }) {
         </div>
       )}
     </LoadingContext.Provider>
-  );
+  )
 }
 
 // 로딩 훅
 export function useLoading() {
-  const context = useContext(LoadingContext);
+  const context = useContext(LoadingContext)
   if (context === undefined) {
-    throw new Error("useLoading must be used within a LoadingProvider");
+    throw new Error("useLoading must be used within a LoadingProvider")
   }
-  return context;
+  return context
 }
