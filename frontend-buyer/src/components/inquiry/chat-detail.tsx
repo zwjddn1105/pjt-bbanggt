@@ -269,7 +269,7 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
     <div className="flex flex-col h-[calc(100vh-8rem)]">
       {/* 헤더 */}
       <div className="flex items-center mb-4">
-        <Link href="/buyer/inquiry" className="mr-4">
+        <Link href="/inquiry" className="mr-4">
           <span className="text-2xl">&larr;</span>
         </Link>
         <h1 className="text-xl font-bold">{bakeryName}</h1>

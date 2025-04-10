@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card } from "@/components/ui/card"
+import { Card } from "../ui/card"
 import { Navigation, MessageCircle, Clock, Bookmark } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { addBakeryBookmark, removeBakeryBookmark, fetchBakeryById } from "@/services/breadgut-api"
+import { addBakeryBookmark, removeBakeryBookmark, fetchBakeryById } from "../../services/breadgut-api"
 
 interface PickupItemProps {
   orderId: number
@@ -445,7 +445,7 @@ export function PickupItem({
       }
 
       // console.log(`[채팅방으로 이동] 채팅방 ID: ${chatRoomId}`)
-      router.push(`/buyer/inquiry/${chatRoomId}`)
+      router.push(`/inquiry/${chatRoomId}`)
     } catch (error) {
       // console.error("[채팅 문의 오류]", error)
       alert(error instanceof Error ? error.message : "채팅 문의 처리 중 오류가 발생했습니다")
