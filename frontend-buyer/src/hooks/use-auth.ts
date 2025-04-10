@@ -28,18 +28,18 @@ export function useAuth() {
   // 로그인 상태 확인
   const checkAuthStatus = useCallback(async () => {
     try {
-      console.log("🔍 로그인 상태 확인 시작")
+      // console.log("🔍 로그인 상태 확인 시작")
 
       // 로컬 스토리지에서 액세스 토큰과 사용자 정보 가져오기
       const token = localStorage.getItem("access_token")
       const userJson = localStorage.getItem("user_info")
 
       // 디버깅: 토큰 정보 로깅
-      console.log("🔑 저장된 액세스 토큰:", token ? `${token.substring(0, 10)}...` : "없음")
-      console.log("👤 저장된 사용자 정보:", userJson || "없음")
+      // console.log("🔑 저장된 액세스 토큰:", token ? `${token.substring(0, 10)}...` : "없음")
+      // console.log("👤 저장된 사용자 정보:", userJson || "없음")
 
       if (!token) {
-        console.log("❌ 저장된 토큰 없음 - 로그아웃 상태")
+        // console.log("❌ 저장된 토큰 없음 - 로그아웃 상태")
         setAuthState({
           isAuthenticated: false,
           user: null,
@@ -56,13 +56,13 @@ export function useAuth() {
         try {
           user = JSON.parse(userJson)
         } catch (e) {
-          console.error("❌ 사용자 정보 파싱 오류:", e)
+          // console.error("❌ 사용자 정보 파싱 오류:", e)
         }
       }
 
       // 토큰이 있으면 인증된 상태로 간주
       if (token) {
-        console.log("✅ 토큰 확인됨 - 로그인 상태")
+        // console.log("✅ 토큰 확인됨 - 로그인 상태")
         setAuthState({
           isAuthenticated: true,
           user,
@@ -72,17 +72,17 @@ export function useAuth() {
         })
       } else {
         // 토큰 갱신 시도
-        console.log("🔄 토큰 갱신 시도")
+        // console.log("🔄 토큰 갱신 시도")
         const refreshSuccess = await refreshToken()
 
         if (!refreshSuccess) {
           // 갱신 실패 시 로그아웃
-          console.log("❌ 토큰 갱신 실패 - 로그아웃 처리")
+          // console.log("❌ 토큰 갱신 실패 - 로그아웃 처리")
           logout()
         }
       }
     } catch (error) {
-      console.error("❌ 인증 상태 확인 오류:", error)
+      // console.error("❌ 인증 상태 확인 오류:", error)
       setAuthState({
         isAuthenticated: false,
         user: null,
@@ -96,17 +96,17 @@ export function useAuth() {
   // 토큰 갱신
   const refreshToken = async () => {
     try {
-      console.log("🔄 토큰 갱신 API 호출 시작")
+      // console.log("🔄 토큰 갱신 API 호출 시작")
 
       // 로컬 스토리지에서 리프레시 토큰 가져오기
       const refreshTokenValue = localStorage.getItem("refresh_token")
 
       if (!refreshTokenValue) {
-        console.error("❌ 리프레시 토큰이 없습니다.")
+        // console.error("❌ 리프레시 토큰이 없습니다.")
         return false
       }
 
-      console.log("🔑 리프레시 토큰:", refreshTokenValue ? `${refreshTokenValue.substring(0, 10)}...` : "없음")
+      // console.log("🔑 리프레시 토큰:", refreshTokenValue ? `${refreshTokenValue.substring(0, 10)}...` : "없음")
 
       // 백엔드 API URL
       const backendApiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/reissue`
@@ -121,18 +121,18 @@ export function useAuth() {
       )
 
       // 디버깅: 응답 상태 로깅
-      console.log("🔍 토큰 갱신 응답 상태:", response.status)
-      console.log("🔍 토큰 갱신 응답 데이터:", response.data)
+      // console.log("🔍 토큰 갱신 응답 상태:", response.status)
+      // console.log("🔍 토큰 갱신 응답 데이터:", response.data)
 
       if (response.status >= 200 && response.status < 300) {
         // 응답 데이터에서 새 토큰 가져오기
         const { accessToken, refreshToken: newRefreshToken } = response.data
 
         // 디버깅: 갱신된 토큰 정보 로깅
-        console.log("✅ 토큰 갱신 성공:", {
-          accessToken: accessToken ? `${accessToken.substring(0, 10)}...` : "없음",
-          refreshToken: newRefreshToken ? `${newRefreshToken.substring(0, 10)}...` : "없음",
-        })
+        // console.log("✅ 토큰 갱신 성공:", {
+        //   accessToken: accessToken ? `${accessToken.substring(0, 10)}...` : "없음",
+        //   refreshToken: newRefreshToken ? `${newRefreshToken.substring(0, 10)}...` : "없음",
+        // })
 
         localStorage.setItem("access_token", accessToken)
 
@@ -157,12 +157,12 @@ export function useAuth() {
         return true
       } else {
         // 갱신 실패 시 로그아웃
-        console.error("❌ 토큰 갱신 실패:", response.data)
+        // console.error("❌ 토큰 갱신 실패:", response.data)
         logout()
         return false
       }
     } catch (error) {
-      console.error("❌ 토큰 갱신 오류:", error)
+      // console.error("❌ 토큰 갱신 오류:", error)
       logout()
       return false
     }
@@ -170,11 +170,11 @@ export function useAuth() {
 
   // 로그인
   const login = async (accessToken: string, user: User, refreshToken?: string) => {
-    console.log("🔑 로그인 처리:", {
-      accessToken: accessToken ? `${accessToken.substring(0, 10)}...` : "없음",
-      refreshToken: refreshToken ? `${refreshToken.substring(0, 10)}...` : "없음",
-      user,
-    })
+    // console.log("🔑 로그인 처리:", {
+    //   accessToken: accessToken ? `${accessToken.substring(0, 10)}...` : "없음",
+    //   refreshToken: refreshToken ? `${refreshToken.substring(0, 10)}...` : "없음",
+    //   user,
+    // })
 
     // 로컬 스토리지에 저장
     localStorage.setItem("access_token", accessToken)
@@ -208,7 +208,7 @@ export function useAuth() {
   // 로그아웃
   const logout = () => {
     const token = localStorage.getItem("access_token")
-    console.log("🚪 로그아웃 처리 시작")
+    // console.log("🚪 로그아웃 처리 시작")
 
     // 로컬 스토리지에서 토큰 제거
     localStorage.removeItem("access_token")
@@ -222,7 +222,7 @@ export function useAuth() {
 
     // 서버에 로그아웃 요청
     if (token) {
-      console.log("🔄 서버 로그아웃 API 호출")
+      // console.log("🔄 서버 로그아웃 API 호출")
 
       // 백엔드 API URL
       const backendApiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/logout`
@@ -239,10 +239,10 @@ export function useAuth() {
           },
         )
         .then((response) => {
-          console.log("✅ 서버 로그아웃 응답:", response.status, response.statusText)
+          // console.log("✅ 서버 로그아웃 응답:", response.status, response.statusText)
         })
         .catch((error) => {
-          console.error("❌ 서버 로그아웃 오류:", error)
+          // console.error("❌ 서버 로그아웃 오류:", error)
         })
     }
 

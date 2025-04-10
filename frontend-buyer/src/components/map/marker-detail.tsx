@@ -30,7 +30,7 @@ export default function MarkerDetail({ vendingMachine, onClose, onBookmarkChange
 
     // 빵집 ID가 없는 경우 처리
     if (!vendingMachine.bakeryId) {
-      console.error("빵집 ID가 없습니다.")
+      // console.error("빵집 ID가 없습니다.")
       alert("북마크 처리에 필요한 정보가 없습니다.")
       return
     }
@@ -52,7 +52,7 @@ export default function MarkerDetail({ vendingMachine, onClose, onBookmarkChange
         onBookmarkChange(newBookmarkState)
       }
     } catch (error) {
-      console.error("북마크 상태 변경 중 오류:", error)
+      // console.error("북마크 상태 변경 중 오류:", error)
       alert("북마크 상태 변경에 실패했습니다.")
     } finally {
       setIsLoading(false)

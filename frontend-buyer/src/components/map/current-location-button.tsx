@@ -28,7 +28,7 @@ export default function CurrentLocationButton({ map }: CurrentLocationButtonProp
         setLoading(false)
       },
       (error) => {
-        console.error("현재 위치를 가져오는데 실패했습니다:", error)
+        // console.error("현재 위치를 가져오는데 실패했습니다:", error)
         alert("현재 위치를 가져오는데 실패했습니다. 위치 권한을 확인해주세요.")
         setLoading(false)
       },

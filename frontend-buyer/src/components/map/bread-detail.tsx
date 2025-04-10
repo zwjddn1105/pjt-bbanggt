@@ -75,13 +75,13 @@ export default function BreadDetail({
             const bakeryData = await fetchBakeryById(data.bakeryId)
             setIsBookmarked(bakeryData.mark ?? false)
           } catch (bakeryErr) {
-            console.error("빵집 정보를 가져오는데 실패했습니다:", bakeryErr)
+            // console.error("빵집 정보를 가져오는데 실패했습니다:", bakeryErr)
           }
         }
 
         setLoading(false)
       } catch (err) {
-        console.error("빵 상세 정보를 가져오는데 실패했습니다:", err)
+        // console.error("빵 상세 정보를 가져오는데 실패했습니다:", err)
         setError("빵 상세 정보를 가져오는데 실패했습니다.")
         setLoading(false)
       }
@@ -98,7 +98,7 @@ export default function BreadDetail({
         setAccountInfo(data)
         setAccountLoading(false)
       } catch (err) {
-        console.error("계좌 정보를 가져오는데 실패했습니다:", err)
+        // console.error("계좌 정보를 가져오는데 실패했습니다:", err)
         setAccountLoading(false)
       }
     }
@@ -191,7 +191,7 @@ export default function BreadDetail({
           alert("결제가 성공적으로 완료되었습니다!")
           router.push("/pickup")
         } catch (err) {
-          console.error("결제 처리 중 오류:", err)
+          // console.error("결제 처리 중 오류:", err)
           alert(err instanceof Error ? err.message : "결제 처리 중 오류가 발생했습니다.")
         }
       } else {
@@ -212,7 +212,7 @@ export default function BreadDetail({
       }
       setIsBookmarked(!isBookmarked)
     } catch (err) {
-      console.error("북마크 처리 중 오류:", err)
+      // console.error("북마크 처리 중 오류:", err)
       alert("북마크 처리에 실패했습니다.")
     } finally {
       setBookmarkLoading(false)
@@ -221,7 +221,7 @@ export default function BreadDetail({
 
   const handlePayment = async () => {
     if (!agreeToTerms || !breadDetail || accountInfo.length === 0) {
-      console.log("결제 조건 미충족:", { agreeToTerms, breadDetail, accountInfo })
+      // console.log("결제 조건 미충족:", { agreeToTerms, breadDetail, accountInfo })
       return
     }
 
@@ -248,7 +248,7 @@ export default function BreadDetail({
 
       router.push("/pickup")
     } catch (err) {
-      console.error("결제 오류:", err)
+      // console.error("결제 오류:", err)
       alert(err instanceof Error ? err.message : "결제 실패")
     } finally {
       setPaymentLoading(false)

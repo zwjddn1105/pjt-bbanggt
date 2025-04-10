@@ -54,10 +54,10 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
 
     const fetchedUserId = getUserId()
     if (fetchedUserId) {
-      console.log("🔍 사용자 ID 확인:", fetchedUserId)
+      // console.log("🔍 사용자 ID 확인:", fetchedUserId)
       setUserId(fetchedUserId)
     } else {
-      console.warn("⚠️ 사용자 ID를 찾을 수 없습니다.")
+      // console.warn("⚠️ 사용자 ID를 찾을 수 없습니다.")
     }
   }, [])
 
@@ -107,7 +107,7 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
         setBakeryName("베이커리")
       }
     } catch (error) {
-      console.error("채팅방 정보를 가져오는 중 오류가 발생했습니다:", error)
+      // console.error("채팅방 정보를 가져오는 중 오류가 발생했습니다:", error)
       // 오류 발생 시 기본값 설정
       setBakeryName("베이커리")
     }
@@ -158,7 +158,7 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
           localStorage.setItem("readMessages", JSON.stringify(updatedReadMessages))
         }
       } catch (error) {
-        console.error("메시지를 불러오는 중 오류가 발생했습니다:", error)
+        // console.error("메시지를 불러오는 중 오류가 발생했습니다:", error)
       } finally {
         setLoading(false)
         if (refresh) {
@@ -205,7 +205,7 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
       // 메시지 전송 후 항상 스크롤을 아래로 이동
       setIsAtBottom(true)
     } catch (error) {
-      console.error("메시지 전송 중 오류가 발생했습니다:", error)
+      // console.error("메시지 전송 중 오류가 발생했습니다:", error)
     }
   }
 
@@ -256,7 +256,7 @@ export default function ChatDetail({ chatRoomId }: ChatDetailProps) {
     }
 
     // 사용자 ID를 알 수 없는 경우 (fallback)
-    console.warn("사용자 ID를 알 수 없어 시간 기반으로 메시지 소유자를 추정합니다.")
+    // console.warn("사용자 ID를 알 수 없어 시간 기반으로 메시지 소유자를 추정합니다.")
     const now = new Date().getTime()
     const messageTime = new Date(message.createdAt).getTime()
     const timeDiff = now - messageTime

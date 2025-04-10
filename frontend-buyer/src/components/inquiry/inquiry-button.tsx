@@ -18,7 +18,7 @@ export default function InquiryButton({ bakeryId }: InquiryButtonProps) {
       await createChatRoom(bakeryId)
       router.push("/inquiry")
     } catch (error) {
-      console.error("채팅방 생성 실패:", error)
+      // console.error("채팅방 생성 실패:", error)
       alert("문의하기 채팅방을 생성하는 중 오류가 발생했습니다.")
     } finally {
       setLoading(false)

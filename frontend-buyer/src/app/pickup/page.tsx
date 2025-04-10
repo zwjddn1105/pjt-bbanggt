@@ -55,7 +55,7 @@ export default function PickupPage() {
       try {
         const token = localStorage.getItem("access_token")
         if (!token) {
-          console.warn("Access Token 없음")
+          // console.warn("Access Token 없음")
           setIsLoading(false)
           return
         }
@@ -99,7 +99,7 @@ export default function PickupPage() {
 
         setPickupItems(sortedItems)
       } catch (error) {
-        console.error("픽업 데이터 불러오기 실패", error)
+        // console.error("픽업 데이터 불러오기 실패", error)
         setError("픽업 데이터를 불러오는데 실패했습니다.")
       } finally {
         setIsLoading(false)

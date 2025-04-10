@@ -15,17 +15,17 @@ export default function KakaoLoginButton() {
     const REDIRECT_URI = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI
 
     // 디버깅: 환경 변수 로깅
-    console.log("🔑 카카오 로그인 설정 (전체 값):", {
-      CLIENT_ID_FULL: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID,
-      REDIRECT_URI_FULL: process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI,
-    })
+    // console.log("🔑 카카오 로그인 설정 (전체 값):", {
+    //   CLIENT_ID_FULL: process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID,
+    //   REDIRECT_URI_FULL: process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI,
+    // })
 
-    // 디버깅: 리다이렉트 URI 로깅
-    console.log("🔍 리다이렉트 URI (전체 값):", REDIRECT_URI)
+    // // 디버깅: 리다이렉트 URI 로깅
+    // console.log("🔍 리다이렉트 URI (전체 값):", REDIRECT_URI)
 
     // 환경 변수가 설정되어 있는지 확인
     if (!CLIENT_ID || !REDIRECT_URI) {
-      console.error("❌ 카카오 로그인 설정이 없습니다.")
+      // console.error("❌ 카카오 로그인 설정이 없습니다.")
       setIsLoading(false)
       return
     }
@@ -36,17 +36,17 @@ export default function KakaoLoginButton() {
     // state를 세션 스토리지에 저장 (검증용)
     try {
       sessionStorage.setItem("kakao_auth_state", state)
-      console.log("✅ 상태 값 저장 완료:", state)
+      // console.log("✅ 상태 값 저장 완료:", state)
 
       // 저장 확인
       const savedState = sessionStorage.getItem("kakao_auth_state")
-      console.log("✅ 저장된 상태 값 확인:", savedState)
+      // console.log("✅ 저장된 상태 값 확인:", savedState)
 
       if (savedState !== state) {
-        console.warn("⚠️ 상태 값이 제대로 저장되지 않았습니다.")
+        // console.warn("⚠️ 상태 값이 제대로 저장되지 않았습니다.")
       }
     } catch (e) {
-      console.error("❌ 세션 스토리지 접근 오류:", e)
+      // console.error("❌ 세션 스토리지 접근 오류:", e)
       // 오류가 발생해도 계속 진행 (개발 중에는 허용)
     }
 
@@ -54,7 +54,7 @@ export default function KakaoLoginButton() {
     const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&state=${state}`
 
     // 디버깅: 카카오 인증 URL 로깅
-    console.log("🔗 카카오 인증 URL:", kakaoURL)
+    // console.log("🔗 카카오 인증 URL:", kakaoURL)
 
     // 카카오 로그인 페이지로 리다이렉트
     window.location.href = kakaoURL

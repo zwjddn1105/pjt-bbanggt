@@ -31,7 +31,7 @@ export default function LoginButton() {
       // 홈으로 이동
       router.push("/")
     } catch (error) {
-      console.error("로그인 중 오류 발생:", error)
+      // console.error("로그인 중 오류 발생:", error)
       alert("로그인에 실패했습니다. 다시 시도해주세요.")
     } finally {
       setIsLoading(false)

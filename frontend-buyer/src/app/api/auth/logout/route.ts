@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: "로그아웃 성공" })
   } catch (error) {
-    console.error("로그아웃 오류:", error)
+    // console.error("로그아웃 오류:", error)
 
     // 오류가 발생해도 쿠키는 삭제
     cookies().delete("refresh-token")

@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card } from "../../components/ui/card"
-import { Navigation, MessageCircle, Clock } from "lucide-react"
+import { Card } from "@/components/ui/card"
+import { Navigation, MessageCircle, Clock, Bookmark } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { addBakeryBookmark, removeBakeryBookmark, fetchBakeryById } from "@/services/breadgut-api"
 
 interface PickupItemProps {
   orderId: number
@@ -59,7 +60,25 @@ export function PickupItem({
   const [isChatLoading, setIsChatLoading] = useState(false)
   const [isRefundLoading, setIsRefundLoading] = useState(false)
   const [isPickupDisabled, setIsPickupDisabled] = useState(false)
+  const [isBookmarked, setIsBookmarked] = useState(false)
+  const [bookmarkLoading, setBookmarkLoading] = useState(false)
   const router = useRouter()
+
+  // 북마크 상태 가져오기
+  useEffect(() => {
+    const fetchBookmarkStatus = async () => {
+      if (!bakeryId) return
+
+      try {
+        const bakeryData = await fetchBakeryById(bakeryId)
+        setIsBookmarked(bakeryData.mark ?? false)
+      } catch (error) {
+        // console.error("빵집 북마크 상태를 가져오는데 실패했습니다:", error)
+      }
+    }
+
+    fetchBookmarkStatus()
+  }, [bakeryId])
 
   // 결제 시간 기준으로 픽업 버튼 활성화 여부 결정
   useEffect(() => {
@@ -111,15 +130,15 @@ export function PickupItem({
       setIsPickupDisabled(shouldDisable)
 
       // 디버깅용 로그
-      console.log(`[픽업 버튼 상태] 주문 ID: ${orderId}, 결제 시간: ${paymentDate}`)
-      console.log(`[픽업 버튼 상태] 현재 시간: ${now.toLocaleString()}`)
-      console.log(
-        `[픽업 버튼 상태] 오늘 9시 30분 이후: ${isAfterCutoffToday}, 오늘 9시 30분 이전 결제: ${isPaymentBeforeTodayCutoff}`,
-      )
-      console.log(
-        `[픽업 버튼 상태] 오늘 9시 30분 이전: ${isBeforeCutoffToday}, 어제 9시 30분 이전 결제: ${isPaymentBeforeYesterdayCutoff}`,
-      )
-      console.log(`[픽업 버튼 상태] 비활성화: ${shouldDisable}`)
+      // console.log(`[픽업 버튼 상태] 주문 ID: ${orderId}, 결제 시간: ${paymentDate}`)
+      // console.log(`[픽업 버튼 상태] 현재 시간: ${now.toLocaleString()}`)
+      // console.log(
+      //   `[픽업 버튼 상태] 오늘 9시 30분 이후: ${isAfterCutoffToday}, 오늘 9시 30분 이전 결제: ${isPaymentBeforeTodayCutoff}`,
+      // )
+      // console.log(
+      //   `[픽업 버튼 상태] 오늘 9시 30분 이전: ${isBeforeCutoffToday}, 어제 9시 30분 이전 결제: ${isPaymentBeforeYesterdayCutoff}`,
+      // )
+      // console.log(`[픽업 버튼 상태] 비활성화: ${shouldDisable}`)
     }
 
     checkPickupAvailability()
@@ -129,6 +148,26 @@ export function PickupItem({
 
     return () => clearInterval(intervalId)
   }, [paymentDate, orderId])
+
+  // 북마크 토글 함수
+  const handleBookmarkToggle = async () => {
+    if (!bakeryId || bookmarkLoading) return
+
+    setBookmarkLoading(true)
+    try {
+      if (isBookmarked) {
+        await removeBakeryBookmark(bakeryId)
+      } else {
+        await addBakeryBookmark(bakeryId)
+      }
+      setIsBookmarked(!isBookmarked)
+    } catch (error) {
+      // console.error("북마크 상태 변경 중 오류:", error)
+      alert("북마크 상태 변경에 실패했습니다.")
+    } finally {
+      setBookmarkLoading(false)
+    }
+  }
 
   // 빵 타입 한글 이름 가져오기
   const getBreadTypeName = (type: string): string => {
@@ -165,7 +204,7 @@ export function PickupItem({
   const handleRefund = async () => {
     const confirmed = window.confirm("정말로 주문을 취소하시겠습니까?")
     if (!confirmed) {
-      console.log("주문 취소가 취소되었습니다.")
+      // console.log("주문 취소가 취소되었습니다.")
       return
     }
 
@@ -177,9 +216,9 @@ export function PickupItem({
       }
 
       const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/order/${orderId}/refund`
-      console.log(`[주문 취소 API 호출] URL: ${apiUrl}`)
-      console.log(`[주문 취소 API 호출] 주문 ID: ${orderId}`)
-      console.log(`[주문 취소 API 호출] 토큰: ${token.substring(0, 10)}...`)
+      // console.log(`[주문 취소 API 호출] URL: ${apiUrl}`)
+      // console.log(`[주문 취소 API 호출] 주문 ID: ${orderId}`)
+      // console.log(`[주문 취소 API 호출] 토큰: ${token.substring(0, 10)}...`)
 
       const response = await fetch(apiUrl, {
         method: "POST",
@@ -189,26 +228,26 @@ export function PickupItem({
         },
       })
 
-      console.log(`[주문 취소 API 응답] 상태 코드: ${response.status}`)
+      // console.log(`[주문 취소 API 응답] 상태 코드: ${response.status}`)
 
       let responseData
       try {
         responseData = await response.json()
-        console.log("[주문 취소 API 응답] 데이터:", responseData)
+        // console.log("[주문 취소 API 응답] 데이터:", responseData)
       } catch (e) {
-        console.log("[주문 취소 API 응답] 데이터 없음 또는 JSON이 아님")
+        // console.log("[주문 취소 API 응답] 데이터 없음 또는 JSON이 아님")
       }
 
       if (!response.ok) {
         throw new Error(responseData?.message || "주문 취소 중 오류가 발생했습니다")
       }
 
-      console.log("[주문 취소 API] 성공적으로 처리됨")
+      // console.log("[주문 취소 API] 성공적으로 처리됨")
       alert("주문이 성공적으로 취소되었습니다")
 
       window.location.reload()
     } catch (error) {
-      console.error("[주문 취소 API 오류]", error)
+      // console.error("[주문 취소 API 오류]", error)
       alert(error instanceof Error ? error.message : "주문 취소 중 오류가 발생했습니다")
     } finally {
       setIsLoading(false)
@@ -219,7 +258,7 @@ export function PickupItem({
   const handleFinishedRefund = async () => {
     const confirmed = window.confirm("정말로 환불을 요청하시겠습니까?")
     if (!confirmed) {
-      console.log("환불 요청이 취소되었습니다.")
+      // console.log("환불 요청이 취소되었습니다.")
       return
     }
 
@@ -231,8 +270,8 @@ export function PickupItem({
       }
 
       const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/refunds`
-      console.log(`[환불 API 호출] URL: ${apiUrl}`)
-      console.log(`[환불 API 호출] 주문 ID: ${orderId}`)
+      // console.log(`[환불 API 호출] URL: ${apiUrl}`)
+      // console.log(`[환불 API 호출] 주문 ID: ${orderId}`)
 
       const response = await fetch(apiUrl, {
         method: "POST",
@@ -243,26 +282,26 @@ export function PickupItem({
         body: JSON.stringify({ orderId }),
       })
 
-      console.log(`[환불 API 응답] 상태 코드: ${response.status}`)
+      // console.log(`[환불 API 응답] 상태 코드: ${response.status}`)
 
       let responseData
       try {
         responseData = await response.json()
-        console.log("[환불 API 응답] 데이터:", responseData)
+        // console.log("[환불 API 응답] 데이터:", responseData)
       } catch (e) {
-        console.log("[환불 API 응답] 데이터 없음 또는 JSON이 아님")
+        // console.log("[환불 API 응답] 데이터 없음 또는 JSON이 아님")
       }
 
       if (!response.ok) {
         throw new Error(responseData?.message || "환불 처리 중 오류가 발생했습니다")
       }
 
-      console.log("[환불 API] 성공적으로 처리됨")
+      // console.log("[환불 API] 성공적으로 처리됨")
       alert("환불이 요청되었습니다")
 
       window.location.reload()
     } catch (error) {
-      console.error("[환불 API 오류]", error)
+      // console.error("[환불 API 오류]", error)
       alert(error instanceof Error ? error.message : "환불 처리 중 오류가 발생했습니다")
     } finally {
       setIsRefundLoading(false)
@@ -287,7 +326,7 @@ export function PickupItem({
     if (productState === "SOLD_OUT") {
       const confirmed = window.confirm("정말로 여시겠습니까?")
       if (!confirmed) {
-        console.log("픽업 취소됨")
+        // console.log("픽업 취소됨")
         return
       }
 
@@ -299,9 +338,9 @@ export function PickupItem({
         }
 
         const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/order/${orderId}/pickup`
-        console.log(`[픽업 API 호출] URL: ${apiUrl}`)
-        console.log(`[픽업 API 호출] 주문 ID: ${orderId}`)
-        console.log(`[픽업 API 호출] 토큰: ${token.substring(0, 10)}...`)
+        // console.log(`[픽업 API 호출] URL: ${apiUrl}`)
+        // console.log(`[픽업 API 호출] 주문 ID: ${orderId}`)
+        // console.log(`[픽업 API 호출] 토큰: ${token.substring(0, 10)}...`)
 
         const response = await fetch(apiUrl, {
           method: "POST",
@@ -311,26 +350,26 @@ export function PickupItem({
           },
         })
 
-        console.log(`[픽업 API 응답] 상태 코드: ${response.status}`)
+        // console.log(`[픽업 API 응답] 상태 코드: ${response.status}`)
 
         let responseData
         try {
           responseData = await response.json()
-          console.log("[픽업 API 응답] 데이터:", responseData)
+          // console.log("[픽업 API 응답] 데이터:", responseData)
         } catch (e) {
-          console.log("[픽업 API 응답] 데이터 없음 또는 JSON이 아님")
+          // console.log("[픽업 API 응답] 데이터 없음 또는 JSON이 아님")
         }
 
         if (!response.ok) {
           throw new Error(responseData?.message || "픽업 처리 중 오류가 발생했습니다")
         }
 
-        console.log("[픽업 API] 성공적으로 처리됨")
+        // console.log("[픽업 API] 성공적으로 처리됨")
         alert(`${vendingMachineName}의 빵긋이 열립니다`)
 
         window.location.reload()
       } catch (error) {
-        console.error("[픽업 API 오류]", error)
+        // console.error("[픽업 API 오류]", error)
         alert(error instanceof Error ? error.message : "픽업 처리 중 오류가 발생했습니다")
       } finally {
         setIsLoading(false)
@@ -352,7 +391,7 @@ export function PickupItem({
         throw new Error("로그인이 필요합니다")
       }
 
-      console.log(`[채팅방 확인 API 호출] 빵집 ID: ${bakeryId}`)
+      // console.log(`[채팅방 확인 API 호출] 빵집 ID: ${bakeryId}`)
       const checkResponse = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-rooms/check?bakeryId=${bakeryId}`,
         {
@@ -367,12 +406,12 @@ export function PickupItem({
       }
 
       const checkData = await checkResponse.json()
-      console.log("[채팅방 확인 API 응답]", checkData)
+      // console.log("[채팅방 확인 API 응답]", checkData)
 
       let chatRoomId: number
 
       if (!checkData.isExist) {
-        console.log("[채팅방 생성 API 호출] 빵집 ID:", bakeryId)
+        // console.log("[채팅방 생성 API 호출] 빵집 ID:", bakeryId)
         const createResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat-rooms`, {
           method: "POST",
           headers: {
@@ -405,10 +444,10 @@ export function PickupItem({
         chatRoomId = checkData.id
       }
 
-      console.log(`[채팅방으로 이동] 채팅방 ID: ${chatRoomId}`)
+      // console.log(`[채팅방으로 이동] 채팅방 ID: ${chatRoomId}`)
       router.push(`/inquiry/${chatRoomId}`)
     } catch (error) {
-      console.error("[채팅 문의 오류]", error)
+      // console.error("[채팅 문의 오류]", error)
       alert(error instanceof Error ? error.message : "채팅 문의 처리 중 오류가 발생했습니다")
     } finally {
       setIsChatLoading(false)
@@ -468,7 +507,25 @@ export function PickupItem({
         <div className="flex-1">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm text-gray-600">{bakeryName}</p>
+              <div className="flex items-center">
+                <p className="text-sm text-gray-600">{bakeryName}</p>
+                {bakeryId && (
+                  <button
+                    onClick={handleBookmarkToggle}
+                    disabled={bookmarkLoading}
+                    className="ml-1 p-1"
+                    aria-label={isBookmarked ? "북마크 제거" : "북마크 추가"}
+                  >
+                    {bookmarkLoading ? (
+                      <div className="w-4 h-4 border-2 border-gray-300 border-t-orange-500 rounded-full animate-spin"></div>
+                    ) : (
+                      <Bookmark
+                        className={`w-4 h-4 ${isBookmarked ? "fill-[#EC9A5E] text-[#EC9A5E]" : "text-gray-400"}`}
+                      />
+                    )}
+                  </button>
+                )}
+              </div>
               <h3 className="font-medium">{getBreadTypeName(breadType)}</h3>
             </div>
             <div className="flex flex-col items-end">
@@ -482,10 +539,13 @@ export function PickupItem({
               </button>
             </div>
           </div>
-          <p className="text-ㅡ text-gray-700">{bakeryName}</p>
-          {/* 벤딩머신 이름 */}
-          <p className="text-sm text-gray-700 mt-1">{vendingMachineName}</p>
-          <p className="text-xs text-gray-500">{address}</p>
+
+          {/* 빵집 및 자판기 정보 */}
+          <div className="mt-1">
+            <p className="text-xs font-medium text-orange-600">{bakeryName} 자판기</p>
+            <p className="text-sm text-gray-700">{vendingMachineName}</p>
+            <p className="text-xs text-gray-500">{address}</p>
+          </div>
 
           {/* 빵긋번호 */}
           <p className="text-sm mt-1">빵긋번호: {slotNumber}번</p>

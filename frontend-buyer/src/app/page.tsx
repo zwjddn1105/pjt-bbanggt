@@ -59,7 +59,7 @@ export default function Home() {
           fetchData(latitude, longitude, showBookmarkedOnly)
         },
         (error) => {
-          console.error("현재 위치를 가져오는데 실패했습니다:", error)
+          // console.error("현재 위치를 가져오는데 실패했습니다:", error)
           setCurrentLocation({ lat: 37.5013925, lng: 127.03958 })
           fetchData(37.5013925, 127.03958, showBookmarkedOnly)
         },
@@ -86,7 +86,7 @@ export default function Home() {
         setVendingMachines(uniqueVendingMachines)
       }
     } catch (error) {
-      console.error("데이터를 가져오는데 실패했습니다:", error)
+      // console.error("데이터를 가져오는데 실패했습니다:", error)
     }
   }
 
@@ -141,7 +141,7 @@ export default function Home() {
         alert("검색 결과가 없습니다. 다른 검색어를 입력해보세요.")
       }
     } catch (error) {
-      console.error("검색 중 오류가 발생했습니다:", error)
+      // console.error("검색 중 오류가 발생했습니다:", error)
       alert("검색 중 오류가 발생했습니다.")
     } finally {
       setIsLoading(false)
@@ -168,7 +168,7 @@ export default function Home() {
         setVendingMachines(uniqueVendingMachines)
       })
       .catch((error) => {
-        console.error("북마크된 빵긋 데이터를 가져오는데 실패했습니다:", error)
+        // console.error("북마크된 빵긋 데이터를 가져오는데 실패했습니다:", error)
       })
   }
 
@@ -198,11 +198,11 @@ export default function Home() {
           setSelectedVendingMachine(null)
         }
       } catch (error) {
-        console.error("북마크 상태 변경 중 오류:", error)
+        // console.error("북마크 상태 변경 중 오류:", error)
         alert("북마크 상태 변경에 실패했습니다.")
       }
     } else {
-      console.error("빵집 ID가 없습니다.")
+      // console.error("빵집 ID가 없습니다.")
       alert("북마크 처리에 필요한 정보가 없습니다.")
     }
   }

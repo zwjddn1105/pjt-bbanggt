@@ -39,7 +39,7 @@ export default function FilterButtons({ onFilterChange, onBookmarkClick }: Filte
       const bakeries = await fetchBookmarkedBakeries()
       setBookmarkedBakeries(bakeries)
     } catch (err) {
-      console.error("북마크된 빵집 목록을 가져오는데 실패했습니다:", err)
+      // console.error("북마크된 빵집 목록을 가져오는데 실패했습니다:", err)
       setError("북마크된 빵집 목록을 가져오는데 실패했습니다.")
     } finally {
       setLoading(false)
@@ -57,7 +57,7 @@ export default function FilterButtons({ onFilterChange, onBookmarkClick }: Filte
         onBookmarkClick()
       }
     } catch (err) {
-      console.error("북마크 제거에 실패했습니다:", err)
+      // console.error("북마크 제거에 실패했습니다:", err)
       alert("북마크 제거에 실패했습니다. 다시 시도해주세요.")
     }
   }
