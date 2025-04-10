@@ -75,4 +75,8 @@ public class OrderRepository {
     ) {
         return orderJpaRepository.findFirstBySpaceIdAndProductStateIn(spaceId, productStates);
     }
+
+    public List<OrderResponse> findMyNFT(Long userId) {
+        return orderQueryRepository.findMyNFT(userId);
+    }
 }

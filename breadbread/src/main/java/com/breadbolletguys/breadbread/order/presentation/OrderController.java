@@ -172,4 +172,11 @@ public class OrderController {
     ) {
         return ResponseEntity.ok(orderService.getOrdersBySellerId(user, vendingMachineId));
     }
+
+    @GetMapping("/seller")
+    public ResponseEntity<List<OrderResponse>> getMyNFT(
+            @AuthUser User user
+    ) {
+        return ResponseEntity.ok(orderService.getMyNFT(user));
+    }
 }

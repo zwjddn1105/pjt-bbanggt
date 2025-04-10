@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.breadbolletguys.breadbread.vendingmachine.domain.VendingMachine;
 
@@ -17,7 +18,7 @@ public interface VendingMachineJpaRepository
         lEFT JOIN Order o ON o.spaceId = sp.id
         WHERE o.id = :orderId
         """)
-    Optional<VendingMachine> findByOrderId(Long orderId);
+    Optional<VendingMachine> findByOrderId(@Param("orderId") Long orderId);
 
     @Query("""
         SELECT vm
@@ -27,5 +28,5 @@ public interface VendingMachineJpaRepository
         ORDER BY vm.id
         LIMIT 1
         """)
-    Optional<VendingMachine> findBySpaceId(Long spaceId);
+    Optional<VendingMachine> findBySpaceId(@Param("spaceId") Long spaceId);
 }
