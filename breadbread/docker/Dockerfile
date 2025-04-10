@@ -2,12 +2,6 @@ FROM openjdk:17-jdk
 
 WORKDIR /app
 
-RUN apt-get update && \
-    apt-get install -y curl gnupg && \
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && \
-    npm install -g @web3-storage/w3
-
 COPY build/libs/breadbread-0.0.1-SNAPSHOT.jar backend.jar
 
 ENV TZ=Asia/Seoul
