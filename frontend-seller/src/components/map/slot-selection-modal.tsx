@@ -9,6 +9,9 @@ import { SlotStatus } from "../../types/map";
 import ProductRegistrationModal from "./product-registration-modal";
 import SellerProductsModal from "./seller-products-modal";
 import axios from "axios";
+import VendingMachineDoor from "./vending-machine-door";
+import VendingMachineDoor3D from "./vending-machine-door-3d";
+import { useVendingMachineStyle } from "../../hooks/use-vending-machine-style";
 
 export default function SlotSelectionModal() {
   const {
@@ -36,6 +39,9 @@ export default function SlotSelectionModal() {
   const [showProductModal, setShowProductModal] = useState(false);
   // 구매 중 상태
   const [isPurchasing, setIsPurchasing] = useState(false);
+
+  // Inside the component, add this line to get the style state
+  const { use3DStyle, toggleStyle } = useVendingMachineStyle();
 
   // ESC 키로 모달 닫기
   useEffect(() => {
@@ -265,7 +271,22 @@ export default function SlotSelectionModal() {
               {vendingMachineDetail?.vendingMachineName || "빵긋 자판기"}
             </h2>
             <div className="flex items-center space-x-3">
-              {/* 등록한 빵 목록 버튼 추가 */}
+              {/* 3D 스타일 전환 버튼 */}
+              <button
+                onClick={toggleStyle}
+                className="flex items-center px-4 py-2 bg-orange-100 text-orange-600 rounded-md hover:bg-orange-200 transition-colors"
+              >
+                <span className="mr-2">{use3DStyle ? "2D" : "3D"} 스타일</span>
+                <span className="relative inline-block w-10 h-5 rounded-full bg-gray-200">
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-orange-500 transition-transform ${
+                      use3DStyle ? "translate-x-5" : ""
+                    }`}
+                  ></span>
+                </span>
+              </button>
+
+              {/* 등록한 빵 목록 버튼 */}
               <button
                 onClick={handleOpenProductsModal}
                 className="flex items-center px-4 py-2 bg-orange-100 text-orange-600 rounded-md hover:bg-orange-200 transition-colors"
@@ -350,39 +371,37 @@ export default function SlotSelectionModal() {
                           }, minmax(0, 1fr))`,
                         }}
                       >
-                        {slots.map((slot) => (
-                          <div
-                            key={slot.slotNumber}
-                            className={`
-                            aspect-square rounded-md shadow-sm border border-gray-200 
-                            ${getSlotColor(slot.status)} 
-                            ${getSlotCursor(slot.status, slot.hasBread)}
-                            transition-all duration-200 hover:shadow-md
-                            ${
-                              slot.status === SlotStatus.SELECTED
-                                ? "ring-2 ring-green-600"
-                                : ""
-                            }
-                            flex items-center justify-center text-sm font-medium
-                            ${
-                              slot.status === SlotStatus.SELECTED
-                                ? "text-white"
-                                : slot.status === SlotStatus.OCCUPIED
-                                ? "text-white"
-                                : "text-gray-700"
-                            }
-                          `}
-                            onClick={() =>
-                              handleSlotClick(
-                                slot.slotNumber,
-                                slot.status,
-                                slot.hasBread
-                              )
-                            }
-                          >
-                            {slot.slotNumber}
-                          </div>
-                        ))}
+                        {slots.map((slot) =>
+                          use3DStyle ? (
+                            <VendingMachineDoor3D
+                              key={slot.slotNumber}
+                              slotNumber={slot.slotNumber}
+                              status={slot.status}
+                              hasBread={slot.hasBread}
+                              onClick={() =>
+                                handleSlotClick(
+                                  slot.slotNumber,
+                                  slot.status,
+                                  slot.hasBread
+                                )
+                              }
+                            />
+                          ) : (
+                            <VendingMachineDoor
+                              key={slot.slotNumber}
+                              slotNumber={slot.slotNumber}
+                              status={slot.status}
+                              hasBread={slot.hasBread}
+                              onClick={() =>
+                                handleSlotClick(
+                                  slot.slotNumber,
+                                  slot.status,
+                                  slot.hasBread
+                                )
+                              }
+                            />
+                          )
+                        )}
                       </div>
                     ) : (
                       <div className="flex items-center justify-center h-60 text-gray-500">
@@ -395,7 +414,7 @@ export default function SlotSelectionModal() {
                 {/* 범례 */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-white border border-gray-200 rounded-md flex items-center justify-center text-xs text-gray-700">
+                    <div className="w-6 h-6 bg-white border border-gray-300 rounded-md flex items-center justify-center text-xs text-gray-700">
                       1
                     </div>
                     <span className="text-sm text-gray-600">

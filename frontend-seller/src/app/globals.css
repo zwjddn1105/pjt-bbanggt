@@ -105,3 +105,32 @@
 .animate-spin-slow {
   animation: spin-slow 3s linear infinite;
 }
+
+/* 3D 변환 스타일 직접 포함 */
+.perspective-500 {
+  perspective: 500px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-15 {
+  transform: rotateY(15deg);
+}
+
+.rotate-y-30 {
+  transform: rotateY(30deg);
+}
+
+.rotate-y-90 {
+  transform: rotateY(90deg);
+}
+
+.rotate-x-90 {
+  transform: rotateX(90deg);
+}

@@ -98,7 +98,23 @@ export default function SellerProductsModal({
   // 날짜 포맷팅
   const formatDate = (dateString: string) => {
     try {
+      // 유효한 날짜인지 확인
       const date = new Date(dateString);
+
+      // 1970년 1월 1일(Epoch time)인 경우 "날짜 정보 없음" 반환
+      if (
+        date.getFullYear() === 1970 &&
+        date.getMonth() === 0 &&
+        date.getDate() === 1
+      ) {
+        return "날짜 정보 없음";
+      }
+
+      // 유효하지 않은 날짜인 경우
+      if (isNaN(date.getTime())) {
+        return "날짜 정보 없음";
+      }
+
       return date.toLocaleDateString("ko-KR", {
         year: "numeric",
         month: "long",
@@ -107,7 +123,7 @@ export default function SellerProductsModal({
         minute: "2-digit",
       });
     } catch (error) {
-      return dateString;
+      return "날짜 정보 없음";
     }
   };
 
@@ -248,7 +264,12 @@ export default function SellerProductsModal({
                           </div>
                           <div className="flex items-center text-gray-600 text-sm">
                             <Calendar className="w-4 h-4 mr-1" />
-                            <span>{formatDate(product.paymentDate)}</span>
+                            <span>
+                              {formatDate(product.paymentDate) !==
+                              "날짜 정보 없음"
+                                ? formatDate(product.paymentDate)
+                                : ""}
+                            </span>
                           </div>
                         </div>
                         <div className="flex justify-between items-center">

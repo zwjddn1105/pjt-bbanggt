@@ -60,17 +60,28 @@ export default function ProductDetailModal({
 
   // 날짜 포맷팅
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return "정보 없음";
+    if (!dateString) return null;
 
     try {
       const date = new Date(dateString);
+
+      // 유효하지 않은 날짜이거나 1970년 1월 1일(Epoch time)인 경우 null 반환
+      if (
+        isNaN(date.getTime()) ||
+        (date.getFullYear() === 1970 &&
+          date.getMonth() === 0 &&
+          date.getDate() === 1)
+      ) {
+        return null;
+      }
+
       return date.toLocaleDateString("ko-KR", {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
       });
     } catch (error) {
-      return dateString || "정보 없음";
+      return null;
     }
   };
 
@@ -154,12 +165,14 @@ export default function ProductDetailModal({
                       <MapPin className="w-4 h-4 mr-1" />
                       <span className="text-sm">{productDetail.address}</span>
                     </div>
-                    <div className="flex items-center text-gray-600">
-                      <Calendar className="w-4 h-4 mr-1" />
-                      <span className="text-sm">
-                        생성일시: {formatDate(productDetail.paymentDate)}
-                      </span>
-                    </div>
+                    {formatDate(productDetail.paymentDate) && (
+                      <div className="flex items-center text-gray-600">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        <span className="text-sm">
+                          생성일시: {formatDate(productDetail.paymentDate)}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-orange-50 rounded-lg p-4 w-full md:w-auto">
