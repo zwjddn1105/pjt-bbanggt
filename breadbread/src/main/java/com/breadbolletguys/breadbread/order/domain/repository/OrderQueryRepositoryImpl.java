@@ -293,7 +293,7 @@ public class OrderQueryRepositoryImpl implements OrderQueryRepository {
         return queryFactory.select(order.count().intValue())
                 .from(order)
                 .innerJoin(space).on(order.spaceId.eq(space.id))
-                .innerJoin(vendingMachine).on(space.vendingMachineId.eq(vendingMachineId))
+                .innerJoin(vendingMachine).on(space.vendingMachineId.eq(vendingMachine.id))
                 .where(order.productState.eq(ProductState.AVAILABLE)
                         .and(space.vendingMachineId.eq(vendingMachineId)))
                 .fetchOne();
