@@ -1,0 +1,53 @@
+/* 빛나는 효과 애니메이션 */
+@keyframes shine {
+  0% {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.animate-shine {
+  animation: shine 2s infinite;
+}
+
+/* 별 튀는 효과 애니메이션 */
+@keyframes star {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(var(--tx), var(--ty)) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--tx) * 2), calc(var(--ty) * 2)) scale(0);
+  }
+}
+
+.animate-star {
+  --tx: calc(random(100) * 1px - 50px);
+  --ty: calc(random(100) * 1px - 50px);
+  animation: star 2s infinite;
+}
+
+/* 3D 변환 스타일 */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
